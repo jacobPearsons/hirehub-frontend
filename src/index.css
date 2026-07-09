@@ -1,0 +1,62 @@
+@import '@fontsource/inter/400.css';
+@import '@fontsource/inter/500.css';
+@import '@fontsource/jetbrains-mono/400.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-canvas: #f5f1ec;
+  --color-ink: #111111;
+  --color-ink-muted: #626260;
+  --color-ink-subtle: #9c9fa5;
+  --color-ink-tertiary: #b0b3b8;
+  --color-surface: #ffffff;
+  --color-surface-2: #ebe7e1;
+  --color-hairline: #d3cec6;
+  --color-hairline-soft: #ebe7e1;
+  --color-accent: #ff5600;
+  --color-success: #2e7d32;
+  --color-error: #c41c1c;
+  --color-danger: #d32f2f;
+}
+
+[data-theme="dark"] {
+  --color-canvas: #0f0f0f;
+  --color-ink: #e8e8e8;
+  --color-ink-muted: #999999;
+  --color-ink-subtle: #7b7b78;
+  --color-ink-tertiary: #6b6b68;
+  --color-surface: #1a1a1a;
+  --color-surface-2: #242424;
+  --color-hairline: #333333;
+  --color-hairline-soft: #2a2a2a;
+  --color-accent: #ff7a3d;
+  --color-success: #4caf50;
+  --color-error: #ef5350;
+  --color-danger: #f44336;
+}
+
+body {
+  margin: 0;
+  font-family: 'Inter', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: var(--color-canvas);
+  color: var(--color-ink);
+}
+
+::selection {
+  background-color: var(--color-ink);
+  color: var(--color-canvas);
+}
+
+[data-theme="dark"] ::selection {
+  background-color: var(--color-ink);
+  color: var(--color-canvas);
+}
+
+:focus-visible {
+  outline: none;
+}

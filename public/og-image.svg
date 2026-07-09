@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <rect width="1200" height="630" fill="#f5f1ec"/>
+  <rect x="60" y="60" width="80" height="80" rx="16" fill="#ff5600"/>
+  <path d="M80 100v40M80 120h40M120 100v40" stroke="white" stroke-width="6" stroke-linecap="round" fill="none"/>
+  <text x="160" y="115" font-family="Inter, system-ui, sans-serif" font-size="48" font-weight="500" fill="#111111">HireHub</text>
+  <text x="160" y="150" font-family="Inter, system-ui, sans-serif" font-size="28" fill="#626260">Community</text>
+  <text x="60" y="320" font-family="Inter, system-ui, sans-serif" font-size="52" font-weight="500" fill="#111111">Find your next opportunity</text>
+  <text x="60" y="380" font-family="Inter, system-ui, sans-serif" font-size="26" fill="#626260">Connecting talented job seekers with top employers</text>
+</svg>

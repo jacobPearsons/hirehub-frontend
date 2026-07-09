@@ -1,0 +1,1 @@
+next thing to add is the Preloader component which would always be active as well, let's also make the "Featured openings" on the Home Page clickable, also for the Portfolio URL we would change it to file upload of their resume
