@@ -80,13 +80,13 @@ export function Navbar() {
                   <LogOut size={18} />
                 </button>
                 {user.role === 'employer' && (
-                  <Link to="/post-job"><Button variant="primary" size="sm">Post a Job</Button></Link>
+                  <Link to="/post-job"><Button variant="primary" size="sm" className="dark:text-black">Post a Job</Button></Link>
                 )}
               </>
             ) : (
               <>
                 <Link to="/login"><Button variant="ghost" size="sm">Sign In</Button></Link>
-                <Link to="/post-job"><Button variant="primary" size="sm">Post a Job</Button></Link>
+                <Link to="/post-job"><Button variant="primary" size="sm" className="dark:text-black">Post a Job</Button></Link>
               </>
             )}
           </div>
@@ -166,7 +166,7 @@ export function Navbar() {
             </NavLink>
             <div className="flex flex-col items-center gap-3 mt-4">
               <Link to="/login"><Button variant="ghost" size="sm">Sign In</Button></Link>
-              <Link to="/post-job"><Button variant="primary" size="sm">Post a Job</Button></Link>
+              <Link to="/post-job"><Button variant="primary" size="sm" className="dark:text-black">Post a Job</Button></Link>
             </div>
           </>
         )}

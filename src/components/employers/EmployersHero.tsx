@@ -21,10 +21,10 @@ export function EmployersHero() {
             <Tag variant="category" className="mb-4 text-accent">
               For Employers
             </Tag>
-            <h1 className="text-[40px] md:text-[56px] leading-[1.1] tracking-[-1px] font-medium max-w-3xl">
+            <h1 className="text-white text-[40px] md:text-[56px] leading-[1.1] tracking-[-1px] font-medium max-w-3xl">
               Find the talent your team needs to grow
             </h1>
-            <p className="text-lg text-ink-muted max-w-2xl mt-4 mb-8">
+            <p className="text-lg text-white/70 max-w-2xl mt-4 mb-8">
               Post jobs, discover top candidates, and build your dream team with HireHub Community.
             </p>
             <div className="flex items-center gap-6">
