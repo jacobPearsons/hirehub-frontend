@@ -1,6 +1,6 @@
 import { useState, type FormEvent } from 'react'
 import { CheckCircle } from 'lucide-react'
-import { Input } from '../ui/Input'
+import { Input, Textarea } from '../ui'
 import { Button } from '../ui/Button'
 import { submitContact } from '../../api/contact'
 
@@ -47,10 +47,8 @@ export function ContactForm() {
       <div className="mt-4">
         <Input label="Subject" value={subject} onChange={e => setSubject(e.target.value)} placeholder="What's this about?" />
       </div>
-      <div className="flex flex-col gap-1.5 mt-4">
-        <label htmlFor="contact-message" className="text-sm font-medium text-ink">Message</label>
-        <textarea id="contact-message" value={message} onChange={e => setMessage(e.target.value)} placeholder="Your message..."
-          className="w-full rounded-md border border-hairline bg-surface-1 text-ink placeholder:text-ink-tertiary outline-none focus:ring-2 focus:ring-ink/20 focus:border-ink px-3 py-2.5 text-sm min-h-[120px]" />
+      <div className="mt-4">
+        <Textarea label="Message" value={message} onChange={e => setMessage(e.target.value)} placeholder="Your message..." className="min-h-[120px]" />
       </div>
       <div className="mt-4">
         <Button variant="primary" size="lg" type="submit" disabled={loading}>

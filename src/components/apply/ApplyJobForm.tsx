@@ -1,6 +1,7 @@
 import { useState, useRef, type ChangeEvent, type FormEvent } from 'react'
 import { X, File as FileIcon } from 'lucide-react'
-import { Input, Button } from '../ui'
+import { Input, Button, Textarea } from '../ui'
+import { useToast } from '../ui/Toast'
 import { useApp } from '../../context/AppContext'
 import { createApplication } from '../../api/applications'
 import type { Job } from '../../data/jobs'
@@ -19,16 +20,19 @@ export function ApplyJobForm({ job, onSuccess }: ApplyJobFormProps) {
   const fileInputRef = useRef<HTMLInputElement>(null)
   const { user, addApplication } = useApp()
 
+  const { showToast } = useToast()
   const [fullName, setFullName] = useState(user?.name || '')
   const [email, setEmail] = useState(user?.email || '')
   const [phone, setPhone] = useState('')
   const [coverLetter, setCoverLetter] = useState('')
 
+  const COVER_LETTER_MAX = 2000
+
   function handleFileChange(e: ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
     if (!file) return
     if (file.size > MAX_FILE_SIZE) {
-      alert('File is too large. Maximum size is 10MB.')
+      showToast('error', 'File is too large. Maximum size is 10MB.')
       if (fileInputRef.current) fileInputRef.current.value = ''
       return
     }
@@ -72,10 +76,11 @@ export function ApplyJobForm({ job, onSuccess }: ApplyJobFormProps) {
       <Input label="Email" type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="john@example.com" />
       <Input label="Phone (optional)" type="tel" value={phone} onChange={e => setPhone(e.target.value)} placeholder="+1 (555) 123-4567" />
       <div>
-        <label htmlFor="coverLetter" className="block text-sm font-medium text-ink mb-1">Cover Letter</label>
-        <textarea id="coverLetter" rows={5} value={coverLetter} onChange={e => setCoverLetter(e.target.value)}
-          className="w-full px-3 py-2.5 rounded-md border border-hairline bg-surface-1 text-ink placeholder:text-ink-tertiary outline-none transition-colors focus-visible:ring-2 focus-visible:ring-ink/40 resize-y"
-          placeholder="Tell us why you're a great fit..." />
+        <Textarea label="Cover Letter" id="coverLetter" rows={5} value={coverLetter} onChange={e => setCoverLetter(e.target.value.slice(0, COVER_LETTER_MAX))}
+          placeholder="Tell us why you're a great fit..." className="min-h-[120px]" />
+        <p className="mt-1 text-xs text-ink-tertiary text-right">
+          {coverLetter.length}/{COVER_LETTER_MAX} characters
+        </p>
       </div>
       <div>
         <label className="block text-sm font-medium text-ink mb-1">Resume (optional)</label>

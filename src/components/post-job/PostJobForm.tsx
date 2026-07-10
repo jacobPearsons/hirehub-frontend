@@ -30,9 +30,9 @@ const jobSchema = z.object({
 type JobFormData = z.infer<typeof jobSchema>
 
 const selectClass =
-  'w-full rounded-md border border-hairline bg-surface-1 text-ink outline-none focus-visible:ring-2 focus-visible:ring-ink/20 focus-visible:border-ink px-3 py-2.5 text-sm'
+  'w-full rounded-md border border-hairline bg-surface-1 text-ink outline-none focus-visible:ring-2 focus-visible:ring-ink/40 focus-visible:border-ink px-3 py-2.5 text-sm'
 const textareaClass =
-  'w-full rounded-md border border-hairline bg-surface-1 text-ink placeholder:text-ink-tertiary outline-none focus-visible:ring-2 focus-visible:ring-ink/20 focus-visible:border-ink px-3 py-2.5 text-sm resize-none'
+  'w-full rounded-md border border-hairline bg-surface-1 text-ink placeholder:text-ink-tertiary outline-none focus-visible:ring-2 focus-visible:ring-ink/40 focus-visible:border-ink px-3 py-2.5 text-sm resize-none'
 
 export default function PostJobForm() {
   const [submitError, setSubmitError] = useState<string | null>(null)

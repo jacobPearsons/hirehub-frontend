@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import { Eye, EyeOff } from 'lucide-react'
 import { usePageMeta } from '../../utils/usePageMeta'
 import { AuthCard } from './AuthCard'
 import { Input } from '../ui/Input'
@@ -16,6 +17,7 @@ export default function LoginPage() {
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const [showPassword, setShowPassword] = useState(false)
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault()
@@ -44,10 +46,17 @@ export default function LoginPage() {
       <form onSubmit={handleSubmit} className="space-y-4">
         {error && <p className="text-sm text-danger bg-danger/10 px-3 py-2 rounded-md">{error}</p>}
         <Input label="Email" type="email" placeholder="you@company.com" value={email} onChange={e => setEmail(e.target.value)} />
-        <Input label="Password" type="password" placeholder="Enter your password" value={password} onChange={e => setPassword(e.target.value)} />
+        <div className="relative">
+          <Input label="Password" type={showPassword ? 'text' : 'password'} placeholder="Enter your password" value={password} onChange={e => setPassword(e.target.value)} />
+          <button type="button" onClick={() => setShowPassword(!showPassword)}
+            className="absolute right-3 top-[34px] text-ink-tertiary hover:text-ink transition-colors"
+            aria-label={showPassword ? 'Hide password' : 'Show password'}>
+            {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+          </button>
+        </div>
         <div className="flex items-center justify-between">
           <label className="flex items-center gap-2 text-sm text-ink cursor-pointer">
-            <input type="checkbox" className="h-4 w-4 rounded border-hairline text-ink focus:ring-ink/30" />
+            <input type="checkbox" className="h-4 w-4 rounded border-hairline text-ink focus-visible:ring-2 focus-visible:ring-ink/40" />
             Remember me
           </label>
           <Link to="/forgot-password" className="text-sm text-accent hover:underline">Forgot password?</Link>
