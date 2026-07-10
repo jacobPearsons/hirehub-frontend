@@ -1,41 +1,117 @@
 import { useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
 import { CheckCircle } from 'lucide-react'
 import { Button, Input } from '../ui'
+import { createJob } from '../../api/jobs'
 
 const currencies = ['USD', 'EUR', 'GBP']
 const categories = ['Engineering', 'Design', 'Marketing', 'Sales', 'Operations', 'Product', 'Support']
 const seniorities = ['Junior', 'Mid', 'Senior', 'Lead', 'Executive']
 
-export default function PostJobForm() {
-  const [title, setTitle] = useState('')
-  const [company, setCompany] = useState('')
-  const [location, setLocation] = useState('')
-  const [remote, setRemote] = useState(false)
-  const [salaryMin, setSalaryMin] = useState('')
-  const [salaryMax, setSalaryMax] = useState('')
-  const [currency, setCurrency] = useState('USD')
-  const [category, setCategory] = useState('Engineering')
-  const [seniority, setSeniority] = useState('Mid')
-  const [tags, setTags] = useState('')
-  const [description, setDescription] = useState('')
-  const [requirements, setRequirements] = useState('')
-  const [responsibilities, setResponsibilities] = useState('')
-  const [applicationUrl, setApplicationUrl] = useState('')
-  const [submitted, setSubmitted] = useState(false)
+const jobSchema = z.object({
+  title: z.string().min(1, 'Job title is required'),
+  company: z.string().min(1, 'Company name is required'),
+  location: z.string().min(1, 'Location is required'),
+  remote: z.boolean(),
+  salaryMin: z.preprocess((v) => (v === '' ? undefined : v), z.coerce.number().min(0, 'Must be positive').optional()),
+  salaryMax: z.preprocess((v) => (v === '' ? undefined : v), z.coerce.number().min(0, 'Must be positive').optional()),
+  currency: z.string(),
+  category: z.string(),
+  seniority: z.string(),
+  tags: z.string(),
+  description: z.string().min(1, 'Description is required'),
+  requirements: z.string(),
+  responsibilities: z.string(),
+  applicationUrl: z.string().url('Invalid URL').optional().or(z.literal('')).transform(v => v === '' ? undefined : v),
+})
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    setSubmitted(true)
+type JobFormData = z.infer<typeof jobSchema>
+
+const selectClass =
+  'w-full rounded-md border border-hairline bg-surface-1 text-ink outline-none focus-visible:ring-2 focus-visible:ring-ink/20 focus-visible:border-ink px-3 py-2.5 text-sm'
+const textareaClass =
+  'w-full rounded-md border border-hairline bg-surface-1 text-ink placeholder:text-ink-tertiary outline-none focus-visible:ring-2 focus-visible:ring-ink/20 focus-visible:border-ink px-3 py-2.5 text-sm resize-none'
+
+export default function PostJobForm() {
+  const [submitError, setSubmitError] = useState<string | null>(null)
+
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors, isSubmitting, isSubmitSuccessful },
+  } = useForm<JobFormData>({
+    resolver: zodResolver(jobSchema),
+    defaultValues: {
+      title: '',
+      company: '',
+      location: '',
+      remote: false,
+      salaryMin: '' as unknown as number,
+      salaryMax: '' as unknown as number,
+      currency: 'USD',
+      category: 'Engineering',
+      seniority: 'Mid',
+      tags: '',
+      description: '',
+      requirements: '',
+      responsibilities: '',
+      applicationUrl: '' as unknown as string,
+    },
+  })
+
+  const onSubmit = async (data: JobFormData) => {
+    setSubmitError(null)
+    try {
+      await createJob({
+        title: data.title,
+        company: data.company,
+        location: data.location,
+        remote: data.remote,
+        salaryMin: data.salaryMin as number | undefined,
+        salaryMax: data.salaryMax as number | undefined,
+        currency: data.currency,
+        category: data.category,
+        seniority: data.seniority,
+        tags: data.tags
+          .split(',')
+          .map(t => t.trim())
+          .filter(Boolean),
+        description: data.description,
+        requirements: data.requirements
+          .split('\n')
+          .map(r => r.trim())
+          .filter(Boolean),
+        responsibilities: data.responsibilities
+          .split('\n')
+          .map(r => r.trim())
+          .filter(Boolean),
+        applicationUrl: data.applicationUrl as string | undefined,
+      })
+      reset(undefined, { keepIsSubmitSuccessful: true })
+    } catch (err) {
+      setSubmitError(err instanceof Error ? err.message : 'Something went wrong. Please try again.')
+    }
   }
 
-  const selectClass =
-    'w-full rounded-md border border-hairline bg-surface-1 text-ink outline-none focus:ring-2 focus:ring-ink/20 focus:border-ink px-3 py-2.5 text-sm'
-  const textareaClass =
-    'w-full rounded-md border border-hairline bg-surface-1 text-ink placeholder:text-ink-tertiary outline-none focus:ring-2 focus:ring-ink/20 focus:border-ink px-3 py-2.5 text-sm'
+  const onInvalid = () => {
+    setSubmitError(null)
+  }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-5">
-      {submitted && (
+    <form onSubmit={handleSubmit(onSubmit, onInvalid)} className="space-y-5">
+      {submitError && (
+        <div
+          role="alert"
+          className="rounded-lg border border-error/30 bg-error/5 p-4 text-sm text-error"
+        >
+          {submitError}
+        </div>
+      )}
+
+      {isSubmitSuccessful && !submitError && (
         <div
           role="alert"
           className="flex items-start gap-3 rounded-lg border border-success/30 bg-success/5 p-4"
@@ -53,31 +129,30 @@ export default function PostJobForm() {
       <Input
         label="Job title"
         required
-        value={title}
-        onChange={(e) => setTitle(e.target.value)}
+        error={errors.title?.message}
+        {...register('title')}
       />
 
       <Input
         label="Company name"
         required
-        value={company}
-        onChange={(e) => setCompany(e.target.value)}
+        error={errors.company?.message}
+        {...register('company')}
       />
 
       <Input
         label="Location"
         required
-        value={location}
-        onChange={(e) => setLocation(e.target.value)}
+        error={errors.location?.message}
+        {...register('location')}
       />
 
       <div>
         <label className="flex items-center gap-2 text-sm font-medium text-ink">
           <input
             type="checkbox"
-            checked={remote}
-            onChange={(e) => setRemote(e.target.checked)}
             className="h-4 w-4 rounded border-hairline accent-ink"
+            {...register('remote')}
           />
           This job is remote
         </label>
@@ -87,19 +162,19 @@ export default function PostJobForm() {
         <label className="text-sm font-medium text-ink mb-1.5 block">Salary range</label>
         <div className="flex gap-3">
           <Input
-            label="Min (USD)"
+            label="Min"
             type="number"
             placeholder="Min"
-            value={salaryMin}
-            onChange={(e) => setSalaryMin(e.target.value)}
             className="[&>div]:mb-0"
+            error={errors.salaryMin?.message}
+            {...register('salaryMin')}
           />
           <Input
-            label="Max (USD)"
+            label="Max"
             type="number"
             placeholder="Max"
-            value={salaryMax}
-            onChange={(e) => setSalaryMax(e.target.value)}
+            error={errors.salaryMax?.message}
+            {...register('salaryMax')}
           />
         </div>
       </div>
@@ -110,9 +185,8 @@ export default function PostJobForm() {
         </label>
         <select
           id="currency"
-          value={currency}
-          onChange={(e) => setCurrency(e.target.value)}
           className={selectClass}
+          {...register('currency')}
         >
           {currencies.map((c) => (
             <option key={c} value={c}>
@@ -128,9 +202,8 @@ export default function PostJobForm() {
         </label>
         <select
           id="category"
-          value={category}
-          onChange={(e) => setCategory(e.target.value)}
           className={selectClass}
+          {...register('category')}
         >
           {categories.map((c) => (
             <option key={c} value={c}>
@@ -146,9 +219,8 @@ export default function PostJobForm() {
         </label>
         <select
           id="seniority"
-          value={seniority}
-          onChange={(e) => setSeniority(e.target.value)}
           className={selectClass}
+          {...register('seniority')}
         >
           {seniorities.map((s) => (
             <option key={s} value={s}>
@@ -161,8 +233,7 @@ export default function PostJobForm() {
       <Input
         label="Tags"
         placeholder="Comma-separated (e.g. React, TypeScript, AWS)"
-        value={tags}
-        onChange={(e) => setTags(e.target.value)}
+        {...register('tags')}
       />
 
       <div>
@@ -173,10 +244,14 @@ export default function PostJobForm() {
           id="description"
           rows={6}
           placeholder="Full job description..."
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
           className={textareaClass}
+          {...register('description')}
         />
+        {errors.description?.message && (
+          <p className="mt-1 text-sm text-error" role="alert">
+            {errors.description.message}
+          </p>
+        )}
       </div>
 
       <div>
@@ -187,9 +262,8 @@ export default function PostJobForm() {
           id="requirements"
           rows={4}
           placeholder="One per line..."
-          value={requirements}
-          onChange={(e) => setRequirements(e.target.value)}
           className={textareaClass}
+          {...register('requirements')}
         />
       </div>
 
@@ -201,9 +275,8 @@ export default function PostJobForm() {
           id="responsibilities"
           rows={4}
           placeholder="One per line..."
-          value={responsibilities}
-          onChange={(e) => setResponsibilities(e.target.value)}
           className={textareaClass}
+          {...register('responsibilities')}
         />
       </div>
 
@@ -211,12 +284,12 @@ export default function PostJobForm() {
         label="Application URL"
         type="url"
         placeholder="https://..."
-        value={applicationUrl}
-        onChange={(e) => setApplicationUrl(e.target.value)}
+        error={errors.applicationUrl?.message}
+        {...register('applicationUrl')}
       />
 
-      <Button variant="primary" size="lg" className="w-full" type="submit">
-        Submit job listing
+      <Button variant="primary" size="lg" className="w-full" type="submit" disabled={isSubmitting}>
+        {isSubmitting ? 'Submitting...' : 'Submit job listing'}
       </Button>
     </form>
   )

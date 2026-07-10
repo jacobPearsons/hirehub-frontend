@@ -1,5 +1,26 @@
-import { apiGet } from './client'
+import { apiGet, apiPost } from './client'
 import type { Job, JobListParams } from './types'
+
+export interface CreateJobParams {
+  title: string
+  company: string
+  location: string
+  remote: boolean
+  salaryMin?: number
+  salaryMax?: number
+  currency: string
+  category: string
+  seniority: string
+  tags: string[]
+  description: string
+  requirements: string[]
+  responsibilities: string[]
+  applicationUrl?: string
+}
+
+export async function createJob(data: CreateJobParams) {
+  return apiPost<Job>('/jobs', data)
+}
 
 export async function listJobs(params?: JobListParams) {
   const searchParams = new URLSearchParams()
