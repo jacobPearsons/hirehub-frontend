@@ -4,6 +4,7 @@ import { MapPin } from 'lucide-react'
 import { Section } from '../ui/Section'
 import { Container } from '../ui/Container'
 import { Card } from '../ui/Card'
+import { SkeletonGrid } from '../ui/SkeletonGrid'
 import { listJobs } from '../../api/jobs'
 import type { Job } from '../../data/jobs'
 
@@ -15,11 +16,13 @@ function formatSalary(min: number, max: number): string {
 
 export function FeaturedJobs() {
   const [featured, setFeatured] = useState<Job[]>([])
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     listJobs({ take: 20 }).then(res => {
       setFeatured(res.data.filter((j: Job) => j.featured).slice(0, 3))
     }).catch(() => {})
+      .finally(() => setLoading(false))
   }, [])
 
   return (
@@ -31,7 +34,9 @@ export function FeaturedJobs() {
         <h2 className="text-[40px] leading-[1.15] tracking-[-0.8px] font-medium mb-8">
           Featured openings
         </h2>
-        {featured.length === 0 ? (
+        {loading ? (
+          <SkeletonGrid count={3} columns={3} />
+        ) : featured.length === 0 ? (
           <p className="text-ink-muted">No featured jobs right now. Check back soon.</p>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

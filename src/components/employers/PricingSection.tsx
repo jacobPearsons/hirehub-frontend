@@ -5,14 +5,17 @@ import { Section } from '../ui/Section'
 import { Container } from '../ui/Container'
 import { Card } from '../ui/Card'
 import { Button } from '../ui/Button'
+import { SkeletonGrid } from '../ui/SkeletonGrid'
 import { listPricingTiers } from '../../api/pricing'
 import type { PricingTier } from '../../data/pricing'
 
 export function PricingSection() {
   const [tiers, setTiers] = useState<PricingTier[]>([])
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     listPricingTiers().then(res => setTiers(res.data)).catch(() => {})
+      .finally(() => setLoading(false))
   }, [])
 
   return (
@@ -27,6 +30,11 @@ export function PricingSection() {
         <p className="text-lg text-ink-muted text-center max-w-2xl mx-auto mb-12">
           Choose the plan that fits your team. No hidden fees, no surprises.
         </p>
+        {loading ? (
+          <div className="max-w-5xl mx-auto">
+            <SkeletonGrid count={3} columns={3} />
+          </div>
+        ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
           {tiers.map((tier) => (
             <motion.div key={tier.tier} whileHover={{ y: -6 }} transition={{ duration: 0.25, ease: 'easeOut' }}>
@@ -51,6 +59,7 @@ export function PricingSection() {
             </motion.div>
           ))}
         </div>
+        )}
       </Container>
     </Section>
   )

@@ -5,6 +5,7 @@ import { Bookmark } from 'lucide-react'
 import { useApp } from '../../context/AppContext'
 import { listSavedJobs } from '../../api/savedJobs'
 import { JobCard } from '../jobs/JobCard'
+import { SkeletonGrid } from '../ui/SkeletonGrid'
 import type { Job } from '../../data/jobs'
 
 const containerVariants = {
@@ -25,7 +26,7 @@ export function SavedJobsTab() {
   }, [savedJobIds])
 
   if (loading) {
-    return <div className="text-center py-16"><p className="text-ink-muted">Loading...</p></div>
+    return <SkeletonGrid count={6} columns={3} />
   }
 
   if (savedJobs.length === 0) {

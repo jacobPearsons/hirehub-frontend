@@ -3,6 +3,7 @@ import { motion } from 'framer-motion'
 import { Briefcase, Eye, Users } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { Card, Tag } from '../ui'
+import { SkeletonGrid } from '../ui/SkeletonGrid'
 import { listJobs } from '../../api/jobs'
 import { useApp } from '../../context/AppContext'
 import type { Job } from '../../data/jobs'
@@ -29,7 +30,7 @@ export function JobListingsTab() {
     : allJobs
 
   if (loading) {
-    return <div className="text-center py-16"><p className="text-ink-muted">Loading...</p></div>
+    return <SkeletonGrid count={4} columns={2} />
   }
 
   if (jobs.length === 0) {

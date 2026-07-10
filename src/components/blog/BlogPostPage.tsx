@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { Section, Container, Reveal } from '../ui'
 import { HeroContent } from '../ui/HeroContent'
+import { SkeletonCard } from '../ui/SkeletonCard'
 import { usePageMeta } from '../../utils/usePageMeta'
 import { Tag } from '../ui/Tag'
 import { formatDate } from '../../utils/date'
@@ -31,7 +32,7 @@ export default function BlogPostPage() {
   if (loading) {
     return (
       <Section>
-        <Container><div className="text-center py-16"><p className="text-ink-muted">Loading...</p></div></Container>
+        <Container><div className="max-w-3xl mx-auto"><SkeletonCard /></div></Container>
       </Section>
     )
   }

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { HeroContent } from '../ui/HeroContent'
 import { Section, Container, Reveal } from '../ui'
+import { SkeletonGrid } from '../ui/SkeletonGrid'
 import { usePageMeta } from '../../utils/usePageMeta'
 import { FeaturedPost } from './FeaturedPost'
 import { CategoryFilter } from './CategoryFilter'
@@ -34,7 +35,7 @@ export default function BlogPage() {
   if (loading) {
     return (
       <Section>
-        <Container><div className="text-center py-16"><p className="text-ink-muted">Loading...</p></div></Container>
+        <Container><SkeletonGrid count={6} columns={3} /></Container>
       </Section>
     )
   }

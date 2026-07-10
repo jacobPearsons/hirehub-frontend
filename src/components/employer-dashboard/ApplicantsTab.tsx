@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { FileText, Users } from 'lucide-react'
 import { Card } from '../ui'
+import { SkeletonGrid } from '../ui/SkeletonGrid'
 import { listApplications, updateApplicationStatus as updateAppStatusApi } from '../../api/applications'
 import { listJobs } from '../../api/jobs'
 import { useApp } from '../../context/AppContext'
@@ -55,9 +56,7 @@ export function ApplicantsTab() {
 
   if (loading) {
     return (
-      <div className="text-center py-16">
-        <p className="text-ink-muted">Loading applicants…</p>
-      </div>
+      <SkeletonGrid count={4} columns={2} />
     )
   }
 

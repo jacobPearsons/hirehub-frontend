@@ -3,6 +3,7 @@ import { motion } from 'framer-motion'
 import { FileText } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { listApplications } from '../../api/applications'
+import { SkeletonGrid } from '../ui/SkeletonGrid'
 import type { Application } from '../../types/application'
 import { ApplicationCard } from './ApplicationCard'
 
@@ -26,9 +27,7 @@ export function ApplicationsTab() {
 
   if (loading) {
     return (
-      <div className="text-center py-16">
-        <p className="text-ink-muted">Loading...</p>
-      </div>
+      <SkeletonGrid count={3} columns={2} />
     )
   }
 
