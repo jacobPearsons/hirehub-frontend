@@ -3,20 +3,12 @@ import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { Card, Tag } from '../ui'
 import { SaveButton } from './SaveButton'
+import { formatDate } from '../../utils/date'
+import { formatSalary } from '../../utils/format'
 import type { Job } from '../../data/jobs'
 
 interface JobCardProps {
   job: Job
-}
-
-function formatSalary(min: number, max: number, currency: string) {
-  const formatter = new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency,
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  })
-  return `${formatter.format(min)} - ${formatter.format(max)}`
 }
 
 export function JobCard({ job }: JobCardProps) {
@@ -63,7 +55,7 @@ export function JobCard({ job }: JobCardProps) {
       </div>
 
       <div className="flex items-center justify-between mt-3">
-        <p className="text-xs text-ink-tertiary">{job.postedDate}</p>
+        <p className="text-xs text-ink-tertiary">{formatDate(job.postedDate)}</p>
       </div>
     </Card></motion.div>
   )

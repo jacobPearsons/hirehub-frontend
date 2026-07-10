@@ -1,16 +1,8 @@
 import { MapPin } from 'lucide-react'
 import { Tag } from '../ui'
+import { formatDate } from '../../utils/date'
+import { formatSalary } from '../../utils/format'
 import type { Job } from '../../data/jobs'
-
-function formatSalary(min: number, max: number, currency: string) {
-  const formatter = new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency,
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  })
-  return `${formatter.format(min)} - ${formatter.format(max)}`
-}
 
 interface JobHeaderProps {
   job: Job
@@ -43,7 +35,7 @@ export function JobHeader({ job }: JobHeaderProps) {
             </Tag>
           ))}
         </div>
-        <p className="text-sm text-ink-tertiary mt-2">{job.postedDate}</p>
+        <p className="text-sm text-ink-tertiary mt-2">{formatDate(job.postedDate)}</p>
       </div>
     </div>
   )

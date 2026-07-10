@@ -6,13 +6,8 @@ import { Container } from '../ui/Container'
 import { Card } from '../ui/Card'
 import { SkeletonGrid } from '../ui/SkeletonGrid'
 import { listJobs } from '../../api/jobs'
+import { formatSalary } from '../../utils/format'
 import type { Job } from '../../data/jobs'
-
-function formatSalary(min: number, max: number): string {
-  const fmt = (n: number) =>
-    n >= 1000 ? `$${(n / 1000).toFixed(0)}k` : `$${n.toLocaleString()}`
-  return `${fmt(min)} - ${fmt(max)}`
-}
 
 export function FeaturedJobs() {
   const [featured, setFeatured] = useState<Job[]>([])
@@ -53,7 +48,7 @@ export function FeaturedJobs() {
                     {job.location}
                   </div>
                   <p className="text-sm font-medium text-ink mb-3">
-                    {formatSalary(job.salaryMin, job.salaryMax)}
+                    {formatSalary(job.salaryMin, job.salaryMax, job.currency)}
                   </p>
                   <div className="flex flex-wrap gap-2">
                     {job.tags.map((tag) => (
