@@ -3,6 +3,8 @@ import { motion } from 'framer-motion'
 import { FileText, Users } from 'lucide-react'
 import { Card } from '../ui'
 import { listApplications, updateApplicationStatus as updateAppStatusApi } from '../../api/applications'
+import { listJobs } from '../../api/jobs'
+import { useApp } from '../../context/AppContext'
 import type { Application, ApplicationStatus } from '../../types/application'
 
 const statusConfig: Record<ApplicationStatus, { label: string; color: string }> = {
@@ -19,20 +21,35 @@ const containerVariants = {
 }
 
 export function ApplicantsTab() {
-  const [apps, setApps] = useState<Application[]>([])
+  const { user } = useApp()
+  const [allApps, setAllApps] = useState<Application[]>([])
+  const [employerJobIds, setEmployerJobIds] = useState<string[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    listApplications()
-      .then(res => setApps(res.data))
+    const fetchJobs = user?.companyName
+      ? listJobs({ take: 100 }).then(res =>
+          res.data
+            .filter(job => job.company.toLowerCase() === user.companyName!.toLowerCase())
+            .map(job => job.id)
+        )
+      : Promise.resolve([])
+
+    Promise.all([listApplications(), fetchJobs])
+      .then(([appsRes, jobIds]) => {
+        setAllApps(appsRes.data)
+        setEmployerJobIds(jobIds)
+      })
       .catch(() => {})
       .finally(() => setLoading(false))
-  }, [])
+  }, [user?.companyName])
+
+  const apps = allApps.filter(app => employerJobIds.includes(app.jobId))
 
   async function handleStatusChange(id: string, status: ApplicationStatus) {
     try {
       await updateAppStatusApi(id, status)
-      setApps(prev => prev.map(a => a.id === id ? { ...a, status } : a))
+      setAllApps(prev => prev.map(a => a.id === id ? { ...a, status } : a))
     } catch {}
   }
 

@@ -1,4 +1,4 @@
-import { useSearchParams } from 'react-router-dom'
+import { useSearchParams, Link } from 'react-router-dom'
 import { Section, Container } from '../ui'
 import { HeroContent } from '../ui/HeroContent'
 import { usePageMeta } from '../../utils/usePageMeta'
@@ -30,12 +30,12 @@ export default function EmployerDashboardPage() {
               <p className="text-ink-muted mt-1">Manage your job listings and review applicants</p>
             </div>
           </HeroContent>
-          <a
-            href="/post-job"
+          <Link
+            to="/post-job"
             className="text-sm font-medium text-accent hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/40 rounded"
           >
             Post a new job
-          </a>
+          </Link>
         </div>
 
         <div role="tablist" aria-label="Employer dashboard tabs" className="flex gap-1 border-b border-hairline mb-8">

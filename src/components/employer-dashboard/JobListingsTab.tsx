@@ -13,16 +13,20 @@ const containerVariants = {
 }
 
 export function JobListingsTab() {
-  const { applications } = useApp()
-  const [jobs, setJobs] = useState<Job[]>([])
+  const { user, applications } = useApp()
+  const [allJobs, setAllJobs] = useState<Job[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     listJobs({ take: 50 })
-      .then(res => setJobs(res.data))
+      .then(res => setAllJobs(res.data))
       .catch(() => {})
       .finally(() => setLoading(false))
   }, [])
+
+  const jobs = user?.companyName
+    ? allJobs.filter(job => job.company.toLowerCase() === user.companyName!.toLowerCase())
+    : allJobs
 
   if (loading) {
     return <div className="text-center py-16"><p className="text-ink-muted">Loading...</p></div>
