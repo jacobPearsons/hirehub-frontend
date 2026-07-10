@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion'
 import { BlogCard } from './BlogCard'
+import { EmptyState } from '../ui/EmptyState'
 import type { BlogPost } from '../../data/blog'
 
 interface BlogGridProps {
@@ -18,11 +19,7 @@ const itemVariants = {
 
 export function BlogGrid({ posts }: BlogGridProps) {
   if (posts.length === 0) {
-    return (
-      <div className="flex items-center justify-center py-16">
-        <p className="text-ink-muted text-lg">No posts yet</p>
-      </div>
-    )
+    return <EmptyState title="No posts yet" />
   }
 
   return (

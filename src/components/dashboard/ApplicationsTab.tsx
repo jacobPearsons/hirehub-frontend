@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { FileText } from 'lucide-react'
-import { Link } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { listApplications } from '../../api/applications'
 import { SkeletonGrid } from '../ui/SkeletonGrid'
+import { EmptyState } from '../ui/EmptyState'
+import { ErrorState } from '../ui/ErrorState'
 import type { Application } from '../../types/application'
 import { ApplicationCard } from './ApplicationCard'
 
@@ -13,16 +15,24 @@ const containerVariants = {
 }
 
 export function ApplicationsTab() {
+  const navigate = useNavigate()
   const [apps, setApps] = useState<Application[]>([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
-  useEffect(() => {
+  function fetchApps() {
+    setLoading(true)
+    setError(null)
     listApplications()
       .then((res) => {
         setApps(res.data)
-        setLoading(false)
       })
-      .catch(() => setLoading(false))
+      .catch(() => setError('Failed to load applications.'))
+      .finally(() => setLoading(false))
+  }
+
+  useEffect(() => {
+    fetchApps()
   }, [])
 
   if (loading) {
@@ -31,19 +41,19 @@ export function ApplicationsTab() {
     )
   }
 
+  if (error) {
+    return <ErrorState message={error} onRetry={fetchApps} />
+  }
+
   if (apps.length === 0) {
     return (
-      <div className="text-center py-16">
-        <FileText className="w-12 h-12 text-ink-tertiary mx-auto mb-4" aria-hidden="true" />
-        <h2 className="text-lg font-medium text-ink mb-2">No applications yet</h2>
-        <p className="text-ink-muted mb-6">Start applying to jobs to track your applications here.</p>
-        <Link
-          to="/jobs"
-          className="inline-flex items-center gap-2 text-sm font-medium text-accent hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/40 rounded"
-        >
-          Browse jobs
-        </Link>
-      </div>
+      <EmptyState
+        icon={<FileText className="w-12 h-12" />}
+        title="No applications yet"
+        description="Start applying to jobs to track your applications here."
+        actionLabel="Browse jobs"
+        onAction={() => navigate('/jobs')}
+      />
     )
   }
 

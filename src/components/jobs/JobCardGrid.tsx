@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion'
 import { JobCard } from './JobCard'
+import { EmptyState } from '../ui/EmptyState'
 import type { Job } from '../../data/jobs'
 
 interface JobCardGridProps {
@@ -19,12 +20,10 @@ const itemVariants = {
 export function JobCardGrid({ jobs }: JobCardGridProps) {
   if (jobs.length === 0) {
     return (
-      <div className="bg-surface-1 rounded-lg p-12 text-center">
-        <p className="text-ink font-medium">No jobs match your filters.</p>
-        <p className="text-ink-muted text-sm mt-1">
-          Try adjusting your search or filter criteria.
-        </p>
-      </div>
+      <EmptyState
+        title="No jobs match your filters."
+        description="Try adjusting your search or filter criteria."
+      />
     )
   }
 

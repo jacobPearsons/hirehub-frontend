@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react'
-import { Link } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { Bookmark } from 'lucide-react'
 import { useApp } from '../../context/AppContext'
 import { listSavedJobs } from '../../api/savedJobs'
 import { JobCard } from '../jobs/JobCard'
 import { SkeletonGrid } from '../ui/SkeletonGrid'
+import { EmptyState } from '../ui/EmptyState'
+import { ErrorState } from '../ui/ErrorState'
 import type { Job } from '../../data/jobs'
 
 const containerVariants = {
@@ -15,28 +17,41 @@ const containerVariants = {
 
 export function SavedJobsTab() {
   const { savedJobIds } = useApp()
+  const navigate = useNavigate()
   const [savedJobs, setSavedJobs] = useState<Job[]>([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
-  useEffect(() => {
+  function fetchJobs() {
+    setLoading(true)
+    setError(null)
     listSavedJobs()
       .then(res => setSavedJobs(res.data))
-      .catch(() => {})
+      .catch(() => setError('Failed to load saved jobs.'))
       .finally(() => setLoading(false))
+  }
+
+  useEffect(() => {
+    fetchJobs()
   }, [savedJobIds])
 
   if (loading) {
     return <SkeletonGrid count={6} columns={3} />
   }
 
+  if (error) {
+    return <ErrorState message={error} onRetry={fetchJobs} />
+  }
+
   if (savedJobs.length === 0) {
     return (
-      <div className="text-center py-16">
-        <Bookmark className="w-12 h-12 text-ink-tertiary mx-auto mb-4" aria-hidden="true" />
-        <h2 className="text-lg font-medium text-ink mb-2">No saved jobs yet</h2>
-        <p className="text-ink-muted mb-6">Save jobs you're interested in to come back to them later.</p>
-        <Link to="/jobs" className="inline-flex items-center gap-2 text-sm font-medium text-accent hover:underline">Browse jobs</Link>
-      </div>
+      <EmptyState
+        icon={<Bookmark className="w-12 h-12" />}
+        title="No saved jobs yet"
+        description="Save jobs you're interested in to come back to them later."
+        actionLabel="Browse jobs"
+        onAction={() => navigate('/jobs')}
+      />
     )
   }
 

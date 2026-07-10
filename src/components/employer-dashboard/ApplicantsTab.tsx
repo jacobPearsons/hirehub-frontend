@@ -3,6 +3,8 @@ import { motion } from 'framer-motion'
 import { FileText, Users } from 'lucide-react'
 import { Card } from '../ui'
 import { SkeletonGrid } from '../ui/SkeletonGrid'
+import { EmptyState } from '../ui/EmptyState'
+import { ErrorState } from '../ui/ErrorState'
 import { listApplications, updateApplicationStatus as updateAppStatusApi } from '../../api/applications'
 import { listJobs } from '../../api/jobs'
 import { useApp } from '../../context/AppContext'
@@ -26,8 +28,11 @@ export function ApplicantsTab() {
   const [allApps, setAllApps] = useState<Application[]>([])
   const [employerJobIds, setEmployerJobIds] = useState<string[]>([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
-  useEffect(() => {
+  function fetchData() {
+    setLoading(true)
+    setError(null)
     const fetchJobs = user?.companyName
       ? listJobs({ take: 100 }).then(res =>
           res.data
@@ -41,8 +46,12 @@ export function ApplicantsTab() {
         setAllApps(appsRes.data)
         setEmployerJobIds(jobIds)
       })
-      .catch(() => {})
+      .catch(() => setError('Failed to load applicants.'))
       .finally(() => setLoading(false))
+  }
+
+  useEffect(() => {
+    fetchData()
   }, [user?.companyName])
 
   const apps = allApps.filter(app => employerJobIds.includes(app.jobId))
@@ -60,13 +69,17 @@ export function ApplicantsTab() {
     )
   }
 
+  if (error) {
+    return <ErrorState message={error} onRetry={fetchData} />
+  }
+
   if (apps.length === 0) {
     return (
-      <div className="text-center py-16">
-        <Users className="w-12 h-12 text-ink-tertiary mx-auto mb-4" aria-hidden="true" />
-        <h2 className="text-lg font-medium text-ink mb-2">No applicants yet</h2>
-        <p className="text-ink-muted mb-6">When candidates start applying, their applications will appear here.</p>
-      </div>
+      <EmptyState
+        icon={<Users className="w-12 h-12" />}
+        title="No applicants yet"
+        description="When candidates start applying, their applications will appear here."
+      />
     )
   }
 
