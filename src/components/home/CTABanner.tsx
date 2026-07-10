@@ -15,7 +15,7 @@ export function CTABanner() {
           </p>
           <Link
             to="/jobs"
-            className="inline-flex items-center justify-center px-6 py-3 text-base rounded-md font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/30 bg-ink text-white dark:text-black hover:bg-[#3a3a3a] dark:hover:bg-[#3a3a3a]"
+            className="inline-flex items-center justify-center px-6 py-3 text-base rounded-md font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/30 bg-ink text-white hover:bg-[#3a3a3a]"
           >
             Get Started
           </Link>

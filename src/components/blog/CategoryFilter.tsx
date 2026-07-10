@@ -20,7 +20,7 @@ export function CategoryFilter({
             aria-pressed={isActive}
             className={`rounded-pill px-4 py-1.5 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/40 ${
               isActive
-                ? 'bg-ink text-white'
+                ? 'bg-ink text-white dark:bg-surface-2 dark:text-ink'
                 : 'bg-surface-2 text-ink-muted hover:text-ink'
             }`}
           >

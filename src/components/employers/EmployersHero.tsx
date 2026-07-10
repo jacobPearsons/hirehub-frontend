@@ -18,13 +18,13 @@ export function EmployersHero() {
       <Container className="relative py-24 md:py-32">
         <div className="flex flex-col items-start max-w-xl">
           <HeroContent variant="card">
-            <Tag variant="category" className="mb-4 text-accent">
+            <Tag variant="category" className="mb-4 text-white">
               For Employers
             </Tag>
             <h1 className="text-white text-[40px] md:text-[56px] leading-[1.1] tracking-[-1px] font-medium max-w-3xl">
               Find the talent your team needs to grow
             </h1>
-            <p className="text-lg text-white/70 max-w-2xl mt-4 mb-8">
+            <p className="text-lg text-white/80 max-w-2xl mt-4 mb-8">
               Post jobs, discover top candidates, and build your dream team with HireHub Community.
             </p>
             <div className="flex items-center gap-6">
@@ -36,7 +36,7 @@ export function EmployersHero() {
               </Link>
               <Link
                 to="#pricing"
-                className="text-sm font-medium text-ink-muted hover:text-ink transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/40 rounded"
+                className="text-sm font-medium text-white/70 hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/40 rounded"
               >
                 Learn more
               </Link>
