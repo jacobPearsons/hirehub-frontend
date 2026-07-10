@@ -5,6 +5,7 @@ import { HelmetProvider } from 'react-helmet-async'
 import { ThemeProvider } from './context/ThemeContext'
 import Layout from './components/layout/Layout'
 import { ToastProvider } from './components/ui/Toast'
+import { ProtectedRoute } from './components/auth/ProtectedRoute'
 
 const HomePage = lazy(() => import('./components/home/HomePage'))
 const JobBoardPage = lazy(() => import('./components/jobs/JobBoardPage'))
@@ -53,9 +54,9 @@ function App() {
               <Route path="/reset-password" element={<ResetPasswordPage />} />
               <Route path="/about" element={<AboutPage />} />
               <Route path="/contact" element={<ContactPage />} />
-              <Route path="/dashboard" element={<DashboardPage />} />
-              <Route path="/employer/dashboard" element={<EmployerDashboardPage />} />
-              <Route path="/post-job" element={<PostJobPage />} />
+              <Route path="/dashboard" element={<ProtectedRoute allowedRoles={['seeker']}><DashboardPage /></ProtectedRoute>} />
+              <Route path="/employer/dashboard" element={<ProtectedRoute allowedRoles={['employer']}><EmployerDashboardPage /></ProtectedRoute>} />
+              <Route path="/post-job" element={<ProtectedRoute allowedRoles={['employer']}><PostJobPage /></ProtectedRoute>} />
               <Route path="*" element={
                 <main className="min-h-screen flex items-center justify-center bg-canvas">
                   <div className="text-center">
