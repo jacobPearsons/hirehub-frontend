@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useCallback } from 'react'
+import { useState, useEffect, useMemo, useCallback, useRef } from 'react'
 import { HeroContent } from '../ui/HeroContent'
 import { Section, Container, Reveal } from '../ui'
 import { usePageMeta } from '../../utils/usePageMeta'
@@ -23,6 +23,14 @@ export default function JobBoardPage() {
   const [search, setSearch] = useState('')
   const [filters, setFilters] = useState({ category: '', seniority: '', remote: '' })
 
+  const searchRef = useRef(search)
+  const filtersRef = useRef(filters)
+  const cursorRef = useRef(cursor)
+
+  useEffect(() => { searchRef.current = search }, [search])
+  useEffect(() => { filtersRef.current = filters }, [filters])
+  useEffect(() => { cursorRef.current = cursor }, [cursor])
+
   const loadJobs = useCallback(async (reset = false) => {
     if (reset) {
       setLoading(true)
@@ -33,10 +41,10 @@ export default function JobBoardPage() {
 
     try {
       const params: Record<string, string | number> = { take: PAGE_SIZE }
-      if (!reset && cursor) params.cursor = cursor
-      if (search) params.search = search
-      if (filters.category) params.category = filters.category
-      if (filters.seniority) params.seniority = filters.seniority
+      if (!reset && cursorRef.current) params.cursor = cursorRef.current
+      if (searchRef.current) params.search = searchRef.current
+      if (filtersRef.current.category) params.category = filtersRef.current.category
+      if (filtersRef.current.seniority) params.seniority = filtersRef.current.seniority
 
       const res = await listJobs(params as any)
       setAllJobs(prev => reset ? res.data : [...prev, ...res.data])
@@ -48,41 +56,29 @@ export default function JobBoardPage() {
       setLoading(false)
       setLoadingMore(false)
     }
-  }, [cursor, search, filters])
+  }, [])
 
   useEffect(() => {
     loadJobs(true)
-  }, [])
+  }, [search, filters, loadJobs])
 
   const handleFilterChange = (key: string, value: string) => {
     setFilters((prev) => ({ ...prev, [key]: value }))
-    setCursor(null)
-    setAllJobs([])
   }
 
   const handleSearchChange = (value: string) => {
     setSearch(value)
-    setCursor(null)
-    setAllJobs([])
   }
 
   const filteredJobs = useMemo(() => {
+    if (!filters.remote) return allJobs
     return allJobs.filter((job) => {
-      const matchesSearch =
-        !search ||
-        job.title.toLowerCase().includes(search.toLowerCase()) ||
-        job.company.toLowerCase().includes(search.toLowerCase())
-      const matchesCategory = !filters.category || job.category === filters.category
-      const matchesSeniority = !filters.seniority || job.seniority === filters.seniority
-      let matchesRemote = true
-      if (filters.remote) {
-        if (filters.remote === 'Remote') matchesRemote = job.remote === true
-        else if (filters.remote === 'On-site') matchesRemote = job.remote === false
-        else if (filters.remote === 'Hybrid') matchesRemote = job.location.toLowerCase().includes('hybrid')
-      }
-      return matchesSearch && matchesCategory && matchesSeniority && matchesRemote
+      if (filters.remote === 'Remote') return job.remote === true
+      if (filters.remote === 'On-site') return job.remote === false
+      if (filters.remote === 'Hybrid') return job.location?.toLowerCase().includes('hybrid')
+      return true
     })
-  }, [search, filters, allJobs])
+  }, [filters.remote, allJobs])
 
   const hasMore = cursor !== null && allJobs.length < total
 
