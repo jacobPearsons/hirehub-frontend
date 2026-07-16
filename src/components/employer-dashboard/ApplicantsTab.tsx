@@ -5,6 +5,7 @@ import { Card } from '../ui'
 import { SkeletonGrid } from '../ui/SkeletonGrid'
 import { EmptyState } from '../ui/EmptyState'
 import { ErrorState } from '../ui/ErrorState'
+import { InterviewScheduleModal } from '../interview'
 import { listApplications, updateApplicationStatus as updateAppStatusApi } from '../../api/applications'
 import { listJobs } from '../../api/jobs'
 import { useApp } from '../../context/AppContext'
@@ -14,7 +15,7 @@ const statusConfig: Record<ApplicationStatus, { label: string; color: string }> 
   applied: { label: 'Applied', color: 'bg-accent/10 text-accent' },
   reviewing: { label: 'Under Review', color: 'bg-ink-muted/10 text-ink-muted' },
   interviewing: { label: 'Interviewing', color: 'bg-surface-2 text-ink' },
-  rejected: { label: 'Rejected', color: 'bg-danger/10 text-danger' },
+  rejected: { label: 'Rejected', color: 'bg-error/10 text-error' },
   offer: { label: 'Offer', color: 'bg-success/10 text-success' },
 }
 
@@ -29,6 +30,7 @@ export function ApplicantsTab() {
   const [employerJobIds, setEmployerJobIds] = useState<string[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [interviewModalApp, setInterviewModalApp] = useState<Application | null>(null)
 
   function fetchData() {
     setLoading(true)
@@ -130,10 +132,10 @@ export function ApplicantsTab() {
                     )}
                     {app.status !== 'interviewing' && (
                       <button
-                        onClick={() => handleStatusChange(app.id, 'interviewing')}
+                        onClick={() => setInterviewModalApp(app)}
                         className="text-xs font-medium text-accent hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/40 rounded"
                       >
-                        Mark interviewing
+                        Schedule Interview
                       </button>
                     )}
                     {app.status !== 'offer' && (
@@ -147,7 +149,7 @@ export function ApplicantsTab() {
                     {app.status !== 'rejected' && (
                       <button
                         onClick={() => handleStatusChange(app.id, 'rejected')}
-                        className="text-xs font-medium text-danger hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/40 rounded"
+                        className="text-xs font-medium text-error hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/40 rounded"
                       >
                         Reject
                       </button>
@@ -170,5 +172,15 @@ export function ApplicantsTab() {
         )
       })}
     </motion.div>
+    <>
+      {interviewModalApp && (
+        <InterviewScheduleModal
+          application={interviewModalApp}
+          open={!!interviewModalApp}
+          onOpenChange={(open) => { if (!open) setInterviewModalApp(null) }}
+          onSuccess={() => { setInterviewModalApp(null); fetchData() }}
+        />
+      )}
+    </>
   )
 }
