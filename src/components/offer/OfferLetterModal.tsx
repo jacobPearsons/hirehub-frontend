@@ -10,14 +10,14 @@ import { useToast } from '../ui/Toast'
 import { updateApplicationStatus } from '../../api/applications'
 import { sendOfferLetter } from '../../api/emails'
 import type { Application } from '../../types/application'
-import type { OfferDetails } from '../../types/hiring-flow'
+
 
 const offerSchema = z.object({
   jobTitle: z.string().min(1, 'Job title is required'),
   employmentType: z.enum(['full-time', 'part-time', 'contract']),
   startDate: z.string().min(1, 'Start date is required'),
   hourlyRate: z.number().min(0, 'Rate must be positive'),
-  currency: z.string().min(1, 'Currency is required').default('USD'),
+  currency: z.string().min(1, 'Currency is required'),
   schedule: z.string().min(1, 'Schedule is required'),
   managerName: z.string().min(1, 'Manager name is required'),
   managerTitle: z.string().min(1, 'Manager title is required'),
@@ -74,20 +74,6 @@ export function OfferLetterModal({
   const onSubmit = async (data: OfferFormData) => {
     setSubmitting(true)
     try {
-      const offerDetails: OfferDetails = {
-        jobTitle: data.jobTitle,
-        employmentType: data.employmentType,
-        startDate: data.startDate,
-        hourlyRate: data.hourlyRate,
-        currency: data.currency,
-        schedule: data.schedule,
-        managerName: data.managerName,
-        managerTitle: data.managerTitle,
-        responsibilities: data.responsibilities.split('\n').filter((l) => l.trim()),
-        contingencies: data.contingencies.split('\n').filter((l) => l.trim()),
-        expirationDate: data.expirationDate,
-      }
-
       await updateApplicationStatus(application.id, 'offer')
 
       sendOfferLetter({

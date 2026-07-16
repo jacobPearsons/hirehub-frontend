@@ -8,7 +8,7 @@ interface SearchBarProps {
 
 export function SearchBar({ value, onChange }: SearchBarProps) {
   const [localValue, setLocalValue] = useState(value)
-  const timerRef = useRef<ReturnType<typeof setTimeout>>()
+  const timerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
 
   useEffect(() => { setLocalValue(value) }, [value])
   useEffect(() => { return () => clearTimeout(timerRef.current) }, [])

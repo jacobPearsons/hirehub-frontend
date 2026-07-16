@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
+import type { Resolver } from 'react-hook-form'
 import { CheckCircle } from 'lucide-react'
 import { Button, Input } from '../ui'
 import { createJob } from '../../api/jobs'
@@ -15,8 +16,8 @@ const jobSchema = z.object({
   company: z.string().min(1, 'Company name is required'),
   location: z.string().min(1, 'Location is required'),
   remote: z.boolean(),
-  salaryMin: z.preprocess((v) => (v === '' ? undefined : v), z.coerce.number().min(0, 'Must be positive').optional()),
-  salaryMax: z.preprocess((v) => (v === '' ? undefined : v), z.coerce.number().min(0, 'Must be positive').optional()),
+  salaryMin: z.coerce.number().min(0, 'Must be positive').optional(),
+  salaryMax: z.coerce.number().min(0, 'Must be positive').optional(),
   currency: z.string(),
   category: z.string(),
   seniority: z.string(),
@@ -24,7 +25,7 @@ const jobSchema = z.object({
   description: z.string().min(1, 'Description is required'),
   requirements: z.string(),
   responsibilities: z.string(),
-  applicationUrl: z.string().url('Invalid URL').optional().or(z.literal('')).transform(v => v === '' ? undefined : v),
+  applicationUrl: z.string().url('Invalid URL').optional().or(z.literal('')),
 })
 
 type JobFormData = z.infer<typeof jobSchema>
@@ -43,14 +44,14 @@ export default function PostJobForm() {
     reset,
     formState: { errors, isSubmitting, isSubmitSuccessful },
   } = useForm<JobFormData>({
-    resolver: zodResolver(jobSchema),
+    resolver: zodResolver(jobSchema) as Resolver<JobFormData>,
     defaultValues: {
       title: '',
       company: '',
       location: '',
       remote: false,
-      salaryMin: '' as unknown as number,
-      salaryMax: '' as unknown as number,
+      salaryMin: undefined,
+      salaryMax: undefined,
       currency: 'USD',
       category: 'Engineering',
       seniority: 'Mid',
@@ -58,7 +59,7 @@ export default function PostJobForm() {
       description: '',
       requirements: '',
       responsibilities: '',
-      applicationUrl: '' as unknown as string,
+      applicationUrl: '',
     },
   })
 

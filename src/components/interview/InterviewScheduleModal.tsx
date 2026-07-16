@@ -10,7 +10,7 @@ import { useToast } from '../ui/Toast'
 import { updateApplicationStatus } from '../../api/applications'
 import { sendInterviewInvitation } from '../../api/emails'
 import type { Application } from '../../types/application'
-import type { InterviewDetails } from '../../types/hiring-flow'
+
 
 const interviewSchema = z.object({
   interviewType: z.enum(['phone', 'video', 'in-person']),
@@ -71,18 +71,6 @@ export function InterviewScheduleModal({
   const onSubmit = async (data: InterviewFormData) => {
     setSubmitting(true)
     try {
-      const interviewDetails: InterviewDetails = {
-        interviewType: data.interviewType,
-        interviewDate: data.interviewDate,
-        interviewTime: data.interviewTime,
-        interviewerName: data.interviewerName,
-        interviewerTitle: data.interviewerTitle,
-        meetingLink: data.meetingLink || undefined,
-        meetingLocation: data.meetingLocation || undefined,
-        notes: data.notes || undefined,
-        scheduledAt: new Date().toISOString(),
-      }
-
       await updateApplicationStatus(application.id, 'interviewing')
 
       sendInterviewInvitation({
