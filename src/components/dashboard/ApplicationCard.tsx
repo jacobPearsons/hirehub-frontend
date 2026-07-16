@@ -2,6 +2,7 @@ import { motion } from 'framer-motion'
 import { Card } from '../ui'
 import { InterviewDetails } from '../interview/InterviewDetails'
 import { OfferLetterView } from '../offer/OfferLetterView'
+import { OrientationCard } from '../orientation/OrientationCard'
 import { PreBoardingChecklist } from '../preboarding/PreBoardingChecklist'
 import type { Application, ApplicationStatus } from '../../types/application'
 
@@ -66,6 +67,17 @@ export function ApplicationCard({ application, onStatusUpdate }: ApplicationCard
           application.preBoardingChecklist && (
             <div className="mt-4 pt-4 border-t border-hairline">
               <PreBoardingChecklist application={application} />
+            </div>
+          )}
+
+        {application.status === 'offer' &&
+          application.offerDetails?.accepted === true &&
+          application.orientationDetails && (
+            <div className="mt-4 pt-4 border-t border-hairline">
+              <OrientationCard
+                details={application.orientationDetails}
+                preBoardingComplete={application.preBoardingChecklist?.every(item => item.completed)}
+              />
             </div>
           )}
       </Card>

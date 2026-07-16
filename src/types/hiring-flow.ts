@@ -47,4 +47,7 @@ export interface OrientationDetails {
   time: string
   location: string
   agenda: string[]
+  notes?: string
+  dressCode?: string
+  parkingInfo?: string
 }
