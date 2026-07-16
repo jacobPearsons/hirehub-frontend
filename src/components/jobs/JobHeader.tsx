@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { MapPin } from 'lucide-react'
 import { Tag } from '../ui'
 import { formatDate } from '../../utils/date'
@@ -9,13 +10,22 @@ interface JobHeaderProps {
 }
 
 export function JobHeader({ job }: JobHeaderProps) {
+  const [logoError, setLogoError] = useState(false)
+
   return (
     <div className="flex items-start gap-4 mb-8">
-      <img
-        src={job.companyLogo}
-        alt={job.company}
-        className="w-14 h-14 rounded-lg bg-surface-2 object-contain flex-shrink-0"
-      />
+      {logoError ? (
+        <div className="w-14 h-14 rounded-lg bg-accent/10 text-accent flex items-center justify-center text-xl font-semibold flex-shrink-0">
+          {job.company.charAt(0)}
+        </div>
+      ) : (
+        <img
+          src={job.companyLogo}
+          alt={job.company}
+          className="w-14 h-14 rounded-lg bg-surface-2 object-contain flex-shrink-0"
+          onError={() => setLogoError(true)}
+        />
+      )}
       <div>
         <p className="text-sm font-medium text-ink-muted">{job.company}</p>
         <h1 className="text-[40px] leading-[1.15] tracking-[-0.8px] font-medium">

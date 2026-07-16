@@ -50,7 +50,7 @@ export default function ForgotPasswordPage() {
     <AuthCard title="Reset your password">
       <p className="text-sm text-ink-muted mb-6">Enter your email and we'll send you a reset link.</p>
       <form onSubmit={handleSubmit} className="space-y-4">
-        {error && <p className="text-sm text-danger bg-danger/10 px-3 py-2 rounded-md">{error}</p>}
+        {error && <p className="text-sm text-error bg-error/10 px-3 py-2 rounded-md">{error}</p>}
         <Input label="Email" type="email" placeholder="you@company.com" value={email} onChange={e => setEmail(e.target.value)} />
         <Button type="submit" variant="primary" size="md" className="w-full" disabled={loading}>
           {loading ? 'Sending...' : 'Send reset link'}

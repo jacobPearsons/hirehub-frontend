@@ -6,9 +6,10 @@ import { EmployerFeatures } from './EmployerFeatures'
 import { PricingSection } from './PricingSection'
 
 export default function EmployersPage() {
-  {usePageMeta({ title: 'For Employers | HireHub Community', description: 'Post jobs, find talent, and build your team with HireHub Community.' })}
+  const meta = usePageMeta({ title: 'For Employers | HireHub Community', description: 'Post jobs, find talent, and build your team with HireHub Community.' })
   return (
     <>
+      {meta}
       <EmployersHero />
       <Reveal><EmployerStats /></Reveal>
       <Reveal delay={0.05}><EmployerFeatures /></Reveal>

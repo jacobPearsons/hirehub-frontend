@@ -1,10 +1,13 @@
+import { useState } from 'react'
 import { MapPin } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
+import { useQueryClient } from '@tanstack/react-query'
 import { Card, Tag } from '../ui'
 import { SaveButton } from './SaveButton'
 import { formatDate } from '../../utils/date'
 import { formatSalary } from '../../utils/format'
+import { getJobById } from '../../api/jobs'
 import type { Job } from '../../data/jobs'
 
 interface JobCardProps {
@@ -12,15 +15,33 @@ interface JobCardProps {
 }
 
 export function JobCard({ job }: JobCardProps) {
+  const queryClient = useQueryClient()
+  const [logoError, setLogoError] = useState(false)
+
+  const prefetchJob = () => {
+    queryClient.prefetchQuery({
+      queryKey: ['job', job.id],
+      queryFn: () => getJobById(job.id),
+      staleTime: 5 * 60 * 1000,
+    })
+  }
+
   return (
-    <motion.div whileHover={{ y: -6 }} transition={{ duration: 0.25, ease: 'easeOut' }}>
+    <motion.div whileHover={{ y: -6 }} transition={{ duration: 0.25, ease: 'easeOut' }} onMouseEnter={prefetchJob} onFocus={prefetchJob}>
       <Card variant="default" className="p-6">
       <div className="flex items-start gap-3">
-        <img
-          src={job.companyLogo}
-          alt={job.company}
-          className="w-10 h-10 rounded-md bg-surface-2 object-contain flex-shrink-0"
-        />
+        {logoError ? (
+          <div className="w-10 h-10 rounded-md bg-accent/10 text-accent flex items-center justify-center text-sm font-semibold flex-shrink-0">
+            {job.company.charAt(0)}
+          </div>
+        ) : (
+          <img
+            src={job.companyLogo}
+            alt={job.company}
+            className="w-10 h-10 rounded-md bg-surface-2 object-contain flex-shrink-0"
+            onError={() => setLogoError(true)}
+          />
+        )}
         <div className="flex-1 min-w-0">
           <div className="flex items-start justify-between gap-2">
             <div>

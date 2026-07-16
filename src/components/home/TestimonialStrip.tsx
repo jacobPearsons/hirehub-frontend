@@ -6,7 +6,7 @@ export function TestimonialStrip() {
     <Section variant="inverse" className="py-16 relative overflow-hidden">
       <div className="absolute inset-0 opacity-20">
         <img
-          src="/testimonials-bg.png"
+          src="/testimonials-bg.svg"
           alt=""
           className="w-full h-full object-cover"
           loading="lazy"

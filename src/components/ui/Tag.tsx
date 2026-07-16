@@ -11,7 +11,7 @@ const seniorityColors: Record<string, string> = {
   mid: 'text-accent bg-accent/10',
   senior: 'text-ink-muted bg-surface-2',
   lead: 'text-ink-muted bg-surface-2',
-  executive: 'text-danger bg-danger/10',
+  executive: 'text-error bg-error/10',
 }
 
 const variantStyles: Record<TagProps['variant'], string> = {

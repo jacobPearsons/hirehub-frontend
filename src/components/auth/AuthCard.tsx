@@ -12,7 +12,7 @@ export function AuthCard({ title, subtitle, children }: AuthCardProps) {
     <div className="min-h-[calc(100vh-3.5rem)] flex items-center justify-center px-4 relative overflow-hidden bg-canvas">
       <div className="absolute inset-0 opacity-30">
         <img
-          src="/auth-bg.png"
+            src="/auth-bg.svg"
           alt=""
           className="w-full h-full object-cover"
           loading="eager"

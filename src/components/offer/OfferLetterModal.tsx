@@ -9,6 +9,7 @@ import { Input, Textarea, Button } from '../ui'
 import { useToast } from '../ui/Toast'
 import { updateApplicationStatus } from '../../api/applications'
 import { sendOfferLetter } from '../../api/emails'
+import { useApplications } from '../../context/ApplicationsContext'
 import type { Application } from '../../types/application'
 
 
@@ -43,6 +44,7 @@ export function OfferLetterModal({
 }: OfferLetterModalProps) {
   const [submitting, setSubmitting] = useState(false)
   const { showToast } = useToast()
+  const { updateApplicationOffer } = useApplications()
 
   const {
     register,
@@ -75,6 +77,22 @@ export function OfferLetterModal({
     setSubmitting(true)
     try {
       await updateApplicationStatus(application.id, 'offer')
+
+      const offerDetails = {
+        jobTitle: data.jobTitle,
+        employmentType: data.employmentType,
+        startDate: data.startDate,
+        hourlyRate: data.hourlyRate,
+        currency: data.currency,
+        schedule: data.schedule,
+        managerName: data.managerName,
+        managerTitle: data.managerTitle,
+        responsibilities: data.responsibilities.split('\n').filter(r => r.trim()),
+        contingencies: data.contingencies.split('\n').filter(c => c.trim()),
+        expirationDate: data.expirationDate,
+      }
+
+      updateApplicationOffer(application.id, offerDetails)
 
       sendOfferLetter({
         to: application.applicantEmail,

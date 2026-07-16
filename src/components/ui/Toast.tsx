@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useCallback, type ReactNode } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion'
 import { X, CheckCircle, AlertCircle, Info } from 'lucide-react'
 
 type ToastType = 'success' | 'error' | 'info'
@@ -24,7 +24,7 @@ const iconMap = {
 
 const colorMap = {
   success: 'text-success',
-  error: 'text-danger',
+  error: 'text-error',
   info: 'text-accent',
 }
 
@@ -32,6 +32,7 @@ let nextId = 1
 
 export function ToastProvider({ children }: { children: ReactNode }) {
   const [toasts, setToasts] = useState<Toast[]>([])
+  const reducedMotion = useReducedMotion()
 
   const showToast = useCallback((type: ToastType, message: string) => {
     const id = nextId++
@@ -56,10 +57,10 @@ export function ToastProvider({ children }: { children: ReactNode }) {
             return (
               <motion.div
                 key={toast.id}
-                initial={{ opacity: 0, y: 20, scale: 0.95 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, y: -10, scale: 0.95 }}
-                transition={{ duration: 0.25, ease: 'easeOut' }}
+                initial={reducedMotion ? { opacity: 1 } : { opacity: 0, y: 20, scale: 0.95 }}
+                animate={reducedMotion ? { opacity: 1 } : { opacity: 1, y: 0, scale: 1 }}
+                exit={reducedMotion ? { opacity: 1 } : { opacity: 0, y: -10, scale: 0.95 }}
+                transition={{ duration: reducedMotion ? 0 : 0.25, ease: 'easeOut' }}
                 className="pointer-events-auto flex items-center gap-3 px-4 py-3 rounded-[10px] shadow-lg border border-hairline bg-surface-1 max-w-sm"
                 role="alert"
               >

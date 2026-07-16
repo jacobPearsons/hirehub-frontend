@@ -29,7 +29,7 @@ export function ValueProps() {
     <Section className="relative overflow-hidden">
       <div className="absolute right-0 top-1/2 -translate-y-1/2 w-1/3 h-full opacity-[0.08] pointer-events-none hidden lg:block">
         <img
-          src="/valueprops-feature.png"
+          src="/valueprops-feature.svg"
           alt=""
           className="w-full h-full object-contain object-right"
           loading="lazy"

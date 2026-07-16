@@ -12,7 +12,7 @@ export function EmployerStats() {
     <Section className="relative overflow-hidden">
       <div className="absolute inset-0 opacity-[0.06]">
         <img
-          src="/employer-stats.png"
+          src="/employer-stats.svg"
           alt=""
           className="w-full h-full object-cover"
           loading="lazy"

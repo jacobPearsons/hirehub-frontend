@@ -10,16 +10,24 @@ interface CompanySidebarProps {
 
 export function CompanySidebar({ job }: CompanySidebarProps) {
   const [modalOpen, setModalOpen] = useState(false)
+  const [logoError, setLogoError] = useState(false)
 
   return (
     <>
       <Card variant="default" className="p-6 sticky top-20">
         <div className="flex items-center gap-3 mb-4">
-          <img
-            src={job.companyLogo}
-            alt={job.company}
-            className="w-10 h-10 rounded-lg bg-surface-2 object-contain flex-shrink-0"
-          />
+          {logoError ? (
+            <div className="w-10 h-10 rounded-lg bg-accent/10 text-accent flex items-center justify-center text-sm font-semibold flex-shrink-0">
+              {job.company.charAt(0)}
+            </div>
+          ) : (
+            <img
+              src={job.companyLogo}
+              alt={job.company}
+              className="w-10 h-10 rounded-lg bg-surface-2 object-contain flex-shrink-0"
+              onError={() => setLogoError(true)}
+            />
+          )}
           <p className="text-base font-medium text-ink">{job.company}</p>
         </div>
 

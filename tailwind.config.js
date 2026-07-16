@@ -24,7 +24,8 @@ export default {
         'brand-blue': '#0007cb',
         success: 'var(--color-success)',
         error: 'var(--color-error)',
-        danger: 'var(--color-danger)',
+        warning: 'var(--color-warning)',
+        info: 'var(--color-info)',
       },
       fontFamily: {
         sans: ['Inter', 'system-ui', 'sans-serif'],

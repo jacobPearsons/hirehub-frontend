@@ -1,5 +1,3 @@
-import { Helmet } from 'react-helmet-async'
-
 interface PageMeta {
   title?: string
   description?: string
@@ -19,7 +17,7 @@ export function usePageMeta(meta: PageMeta = {}) {
   const url = meta.url ? `${BASE_URL}${meta.url}` : BASE_URL
 
   return (
-    <Helmet>
+    <>
       <title>{title}</title>
       <meta name="description" content={description} />
       <meta property="og:title" content={title} />
@@ -31,6 +29,6 @@ export function usePageMeta(meta: PageMeta = {}) {
       <meta name="twitter:title" content={title} />
       <meta name="twitter:description" content={description} />
       <meta name="twitter:image" content={image} />
-    </Helmet>
+    </>
   )
 }

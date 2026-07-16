@@ -63,7 +63,7 @@ export default function ResetPasswordPage() {
   return (
     <AuthCard title="Set new password">
       <form onSubmit={handleSubmit} className="space-y-4">
-        {error && <p className="text-sm text-danger bg-danger/10 px-3 py-2 rounded-md">{error}</p>}
+        {error && <p className="text-sm text-error bg-error/10 px-3 py-2 rounded-md">{error}</p>}
         <Input label="New password" type="password" placeholder="Enter new password" value={newPassword} onChange={e => setNewPassword(e.target.value)} />
         <Input label="Confirm password" type="password" placeholder="Confirm new password" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} />
         <p className="text-sm text-ink-muted">At least 8 characters</p>

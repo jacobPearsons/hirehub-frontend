@@ -1,8 +1,10 @@
 import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
+import { useQueryClient } from '@tanstack/react-query'
 import { Card } from '../ui/Card'
 import { Tag } from '../ui/Tag'
 import { formatDate } from '../../utils/date'
+import { getBlogPostBySlug } from '../../api/blog'
 import type { BlogPost } from '../../data/blog'
 
 interface BlogCardProps {
@@ -10,8 +12,18 @@ interface BlogCardProps {
 }
 
 export function BlogCard({ post }: BlogCardProps) {
+  const queryClient = useQueryClient()
+
+  const prefetchPost = () => {
+    queryClient.prefetchQuery({
+      queryKey: ['blogPost', post.slug],
+      queryFn: () => getBlogPostBySlug(post.slug),
+      staleTime: 5 * 60 * 1000,
+    })
+  }
+
   return (
-    <motion.div whileHover={{ y: -6 }} transition={{ duration: 0.25, ease: 'easeOut' }}>
+    <motion.div whileHover={{ y: -6 }} transition={{ duration: 0.25, ease: 'easeOut' }} onMouseEnter={prefetchPost} onFocus={prefetchPost}>
       <Card variant="default">
       <img
         src={post.image}

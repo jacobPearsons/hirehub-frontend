@@ -9,6 +9,7 @@ import { Input, Textarea, Button } from '../ui'
 import { useToast } from '../ui/Toast'
 import { updateApplicationStatus } from '../../api/applications'
 import { sendInterviewInvitation } from '../../api/emails'
+import { useApplications } from '../../context/ApplicationsContext'
 import type { Application } from '../../types/application'
 
 
@@ -40,6 +41,7 @@ export function InterviewScheduleModal({
 }: InterviewScheduleModalProps) {
   const [submitting, setSubmitting] = useState(false)
   const { showToast } = useToast()
+  const { updateApplicationInterview } = useApplications()
 
   const {
     register,
@@ -72,6 +74,20 @@ export function InterviewScheduleModal({
     setSubmitting(true)
     try {
       await updateApplicationStatus(application.id, 'interviewing')
+
+      const interviewDetails = {
+        interviewType: data.interviewType,
+        interviewDate: data.interviewDate,
+        interviewTime: data.interviewTime,
+        interviewerName: data.interviewerName,
+        interviewerTitle: data.interviewerTitle,
+        meetingLink: data.meetingLink || undefined,
+        meetingLocation: data.meetingLocation || undefined,
+        notes: data.notes || undefined,
+        scheduledAt: new Date().toISOString(),
+      }
+
+      updateApplicationInterview(application.id, interviewDetails)
 
       sendInterviewInvitation({
         to: application.applicantEmail,

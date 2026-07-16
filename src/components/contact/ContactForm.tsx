@@ -1,29 +1,27 @@
-import { useState, type FormEvent } from 'react'
+import { useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
 import { CheckCircle } from 'lucide-react'
 import { Input, Textarea } from '../ui'
 import { Button } from '../ui/Button'
 import { submitContact } from '../../api/contact'
+import { contactSchema, type ContactFormData } from '../../schemas/auth'
 
 export function ContactForm() {
-  const [name, setName] = useState('')
-  const [email, setEmail] = useState('')
-  const [subject, setSubject] = useState('')
-  const [message, setMessage] = useState('')
   const [submitted, setSubmitted] = useState(false)
-  const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
-  const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault()
+  const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<ContactFormData>({
+    resolver: zodResolver(contactSchema),
+  })
+
+  const onSubmit = async (data: ContactFormData) => {
     setError('')
-    setLoading(true)
     try {
-      await submitContact({ name, email, subject, message })
+      await submitContact(data)
       setSubmitted(true)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to send message')
-    } finally {
-      setLoading(false)
     }
   }
 
@@ -38,21 +36,21 @@ export function ContactForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit}>
-      {error && <p className="text-sm text-danger bg-danger/10 px-3 py-2 rounded-md mb-4">{error}</p>}
-      <Input label="Name" value={name} onChange={e => setName(e.target.value)} placeholder="Your name" />
+    <form onSubmit={handleSubmit(onSubmit)}>
+      {error && <p role="alert" className="text-sm text-error bg-error/10 px-3 py-2 rounded-md mb-4">{error}</p>}
+      <Input label="Name" placeholder="Your name" error={errors.name?.message} {...register('name')} />
       <div className="mt-4">
-        <Input label="Email" type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="your@email.com" />
+        <Input label="Email" type="email" placeholder="your@email.com" error={errors.email?.message} {...register('email')} />
       </div>
       <div className="mt-4">
-        <Input label="Subject" value={subject} onChange={e => setSubject(e.target.value)} placeholder="What's this about?" />
+        <Input label="Subject" placeholder="What's this about?" error={errors.subject?.message} {...register('subject')} />
       </div>
       <div className="mt-4">
-        <Textarea label="Message" value={message} onChange={e => setMessage(e.target.value)} placeholder="Your message..." className="min-h-[120px]" />
+        <Textarea label="Message" placeholder="Your message..." className="min-h-[120px]" error={errors.message?.message} {...register('message')} />
       </div>
       <div className="mt-4">
-        <Button variant="primary" size="lg" type="submit" disabled={loading}>
-          {loading ? 'Sending...' : 'Send message'}
+        <Button variant="primary" size="lg" type="submit" disabled={isSubmitting}>
+          {isSubmitting ? 'Sending...' : 'Send message'}
         </Button>
       </div>
     </form>

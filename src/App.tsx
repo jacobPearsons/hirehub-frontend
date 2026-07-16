@@ -1,10 +1,10 @@
 import { lazy, Suspense } from 'react'
 import { Routes, Route, useLocation, Link } from 'react-router-dom'
-import { AnimatePresence, motion } from 'framer-motion'
-import { HelmetProvider } from 'react-helmet-async'
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 import { ThemeProvider } from './context/ThemeContext'
 import Layout from './components/layout/Layout'
 import { ToastProvider } from './components/ui/Toast'
+import { ErrorBoundary } from './components/ui/ErrorBoundary'
 import { ProtectedRoute } from './components/auth/ProtectedRoute'
 
 const HomePage = lazy(() => import('./components/home/HomePage'))
@@ -25,9 +25,9 @@ const EmployerDashboardPage = lazy(() => import('./components/employer-dashboard
 
 function App() {
   const location = useLocation()
+  const reducedMotion = useReducedMotion()
 
   return (
-    <HelmetProvider>
     <ToastProvider>
     <ThemeProvider><Layout>
       <Suspense fallback={
@@ -37,26 +37,26 @@ function App() {
       }>
         <AnimatePresence mode="wait">
           <motion.div key={location.pathname} variants={{
-            initial: { opacity: 0, y: 12 },
-            enter: { opacity: 1, y: 0, transition: { duration: 0.35, ease: 'easeOut' } },
-            exit: { opacity: 0, transition: { duration: 0.15 } },
+            initial: reducedMotion ? { opacity: 1 } : { opacity: 0, y: 12 },
+            enter: { opacity: 1, y: 0, transition: { duration: reducedMotion ? 0 : 0.35, ease: 'easeOut' } },
+            exit: { opacity: 0, transition: { duration: reducedMotion ? 0 : 0.15 } },
           }} initial="initial" animate="enter" exit="exit">
             <Routes location={location}>
-              <Route path="/" element={<HomePage />} />
-              <Route path="/jobs" element={<JobBoardPage />} />
-              <Route path="/jobs/:id" element={<JobDetailPage />} />
-              <Route path="/blog" element={<BlogPage />} />
-              <Route path="/blog/:slug" element={<BlogPostPage />} />
-              <Route path="/employers" element={<EmployersPage />} />
-              <Route path="/login" element={<LoginPage />} />
-              <Route path="/signup" element={<SignupPage />} />
-              <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-              <Route path="/reset-password" element={<ResetPasswordPage />} />
-              <Route path="/about" element={<AboutPage />} />
-              <Route path="/contact" element={<ContactPage />} />
-              <Route path="/dashboard" element={<ProtectedRoute allowedRoles={['seeker']}><DashboardPage /></ProtectedRoute>} />
-              <Route path="/employer/dashboard" element={<ProtectedRoute allowedRoles={['employer']}><EmployerDashboardPage /></ProtectedRoute>} />
-              <Route path="/post-job" element={<ProtectedRoute allowedRoles={['employer']}><PostJobPage /></ProtectedRoute>} />
+              <Route path="/" element={<ErrorBoundary><HomePage /></ErrorBoundary>} />
+              <Route path="/jobs" element={<ErrorBoundary><JobBoardPage /></ErrorBoundary>} />
+              <Route path="/jobs/:id" element={<ErrorBoundary><JobDetailPage /></ErrorBoundary>} />
+              <Route path="/blog" element={<ErrorBoundary><BlogPage /></ErrorBoundary>} />
+              <Route path="/blog/:slug" element={<ErrorBoundary><BlogPostPage /></ErrorBoundary>} />
+              <Route path="/employers" element={<ErrorBoundary><EmployersPage /></ErrorBoundary>} />
+              <Route path="/login" element={<ErrorBoundary><LoginPage /></ErrorBoundary>} />
+              <Route path="/signup" element={<ErrorBoundary><SignupPage /></ErrorBoundary>} />
+              <Route path="/forgot-password" element={<ErrorBoundary><ForgotPasswordPage /></ErrorBoundary>} />
+              <Route path="/reset-password" element={<ErrorBoundary><ResetPasswordPage /></ErrorBoundary>} />
+              <Route path="/about" element={<ErrorBoundary><AboutPage /></ErrorBoundary>} />
+              <Route path="/contact" element={<ErrorBoundary><ContactPage /></ErrorBoundary>} />
+              <Route path="/dashboard" element={<ProtectedRoute allowedRoles={['seeker']}><ErrorBoundary><DashboardPage /></ErrorBoundary></ProtectedRoute>} />
+              <Route path="/employer/dashboard" element={<ProtectedRoute allowedRoles={['employer']}><ErrorBoundary><EmployerDashboardPage /></ErrorBoundary></ProtectedRoute>} />
+              <Route path="/post-job" element={<ProtectedRoute allowedRoles={['employer']}><ErrorBoundary><PostJobPage /></ErrorBoundary></ProtectedRoute>} />
               <Route path="*" element={
                 <main className="min-h-screen flex items-center justify-center bg-canvas">
                   <div className="text-center">
@@ -72,7 +72,6 @@ function App() {
       </Suspense>
     </Layout></ThemeProvider>
     </ToastProvider>
-    </HelmetProvider>
   )
 }
 

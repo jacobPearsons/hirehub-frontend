@@ -9,10 +9,11 @@ import { WhyUs } from './WhyUs'
 import { CTABanner } from './CTABanner'
 
 export default function HomePage() {
-  {usePageMeta({ title: 'HireHub Community', description: 'Find your next role at companies that build. Explore thousands of curated job listings from the world\'s best companies.' })}
+  const meta = usePageMeta({ title: 'HireHub Community', description: 'Find your next role at companies that build. Explore thousands of curated job listings from the world\'s best companies.' })
 
   return (
     <>
+      {meta}
       <HeroSection />
       <Reveal><TrustBar /></Reveal>
       <Reveal delay={0.05}><ValueProps /></Reveal>

@@ -12,7 +12,7 @@ import type { Job } from '../../data/jobs'
 const PAGE_SIZE = 12
 
 export default function JobBoardPage() {
-  {usePageMeta({ title: 'Jobs | HireHub Community', description: 'Browse thousands of curated job listings from top companies.' })}
+  const meta = usePageMeta({ title: 'Jobs | HireHub Community', description: 'Browse thousands of curated job listings from top companies.' })
 
   const [allJobs, setAllJobs] = useState<Job[]>([])
   const [loading, setLoading] = useState(true)
@@ -83,50 +83,53 @@ export default function JobBoardPage() {
   const hasMore = cursor !== null && allJobs.length < total
 
   return (
-    <Section className="relative overflow-hidden">
-      <div className="absolute inset-0 opacity-[0.05]">
-        <img src="/featured-jobs.png" alt="" className="w-full h-full object-cover" loading="lazy" />
-      </div>
-      <Container className="relative">
-        <HeroContent variant="card" className="mb-8">
-          <h1 className="text-[40px] leading-[1.15] tracking-[-0.8px] font-medium">Job Board</h1>
-          <p className="text-lg text-ink-muted mt-2">Explore opportunities from top companies</p>
-        </HeroContent>
+    <>
+      {meta}
+      <Section className="relative overflow-hidden">
+        <div className="absolute inset-0 opacity-[0.05]">
+          <img src="/featured-jobs.png" alt="" className="w-full h-full object-cover" loading="lazy" />
+        </div>
+        <Container className="relative">
+          <HeroContent variant="card" className="mb-8">
+            <h1 className="text-[40px] leading-[1.15] tracking-[-0.8px] font-medium">Job Board</h1>
+            <p className="text-lg text-ink-muted mt-2">Explore opportunities from top companies</p>
+          </HeroContent>
 
-        <Reveal className="max-w-xl mb-8">
-          <SearchBar value={search} onChange={handleSearchChange} />
-        </Reveal>
+          <Reveal className="max-w-xl mb-8">
+            <SearchBar value={search} onChange={handleSearchChange} />
+          </Reveal>
 
-        {loading ? (
-          <div className="text-center py-16">
-            <p className="text-ink-muted">Loading jobs...</p>
-          </div>
-        ) : error ? (
-          <div className="text-center py-16">
-            <p className="text-danger mb-4">{error}</p>
-            <Button variant="primary" size="sm" onClick={() => loadJobs(true)}>Try again</Button>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-8">
-            <Reveal delay={0.05}><FilterSidebar filters={filters} onFilterChange={handleFilterChange} /></Reveal>
-            <Reveal delay={0.1}>
-              <JobCardGrid jobs={filteredJobs} />
-              {hasMore && (
-                <div className="mt-8 text-center">
-                  <Button
-                    variant="ghost"
-                    size="md"
-                    onClick={() => loadJobs(false)}
-                    disabled={loadingMore}
-                  >
-                    {loadingMore ? 'Loading more...' : `Load more (${filteredJobs.length} of ${total})`}
-                  </Button>
-                </div>
-              )}
-            </Reveal>
-          </div>
-        )}
-      </Container>
-    </Section>
+          {loading ? (
+            <div className="text-center py-16">
+              <p className="text-ink-muted">Loading jobs...</p>
+            </div>
+          ) : error ? (
+            <div className="text-center py-16">
+              <p className="text-error mb-4">{error}</p>
+              <Button variant="primary" size="sm" onClick={() => loadJobs(true)}>Try again</Button>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-8">
+              <Reveal delay={0.05}><FilterSidebar filters={filters} onFilterChange={handleFilterChange} /></Reveal>
+              <Reveal delay={0.1}>
+                <JobCardGrid jobs={filteredJobs} />
+                {hasMore && (
+                  <div className="mt-8 text-center">
+                    <Button
+                      variant="ghost"
+                      size="md"
+                      onClick={() => loadJobs(false)}
+                      disabled={loadingMore}
+                    >
+                      {loadingMore ? 'Loading more...' : `Load more (${filteredJobs.length} of ${total})`}
+                    </Button>
+                  </div>
+                )}
+              </Reveal>
+            </div>
+          )}
+        </Container>
+      </Section>
+    </>
   )
 }

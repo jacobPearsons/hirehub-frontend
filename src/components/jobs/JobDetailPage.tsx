@@ -24,60 +24,69 @@ export default function JobDetailPage() {
       .finally(() => setLoading(false))
   }, [id])
 
-  {usePageMeta({
+  const meta = usePageMeta({
     title: job ? `${job.title} | HireHub Community` : 'Job | HireHub Community',
     description: job ? job.description.slice(0, 160).replace(/\s+\S*$/, '') : undefined,
     image: job?.companyLogo,
     url: job ? `/jobs/${job.id}` : undefined,
-  })}
+  })
 
   if (loading) {
     return (
-      <Section>
-        <Container><div className="text-center py-24"><p className="text-ink-muted">Loading...</p></div></Container>
-      </Section>
+      <>
+        {meta}
+        <Section>
+          <Container><div className="text-center py-24"><p className="text-ink-muted">Loading...</p></div></Container>
+        </Section>
+      </>
     )
   }
 
   if (!job || error) {
     return (
-      <Section>
-        <Container>
-          <div className="text-center py-24">
-            <HeroContent variant="accent" className="mb-6">
-              <h1 className="text-[40px] leading-[1.15] tracking-[-0.8px] font-medium">Job not found</h1>
-              <p className="text-ink-muted mt-2">The job you're looking for doesn't exist or has been removed.</p>
-            </HeroContent>
-            <Link to="/jobs" className="text-accent hover:underline text-sm font-medium">Back to all jobs</Link>
-          </div>
-        </Container>
-      </Section>
+      <>
+        {meta}
+        <Section>
+          <Container>
+            <div className="text-center py-24">
+              <HeroContent variant="accent" className="mb-6">
+                <h1 className="text-[40px] leading-[1.15] tracking-[-0.8px] font-medium">Job not found</h1>
+                <p className="text-ink-muted mt-2">The job you're looking for doesn't exist or has been removed.</p>
+              </HeroContent>
+              <Link to="/jobs" className="text-accent hover:underline text-sm font-medium">Back to all jobs</Link>
+            </div>
+          </Container>
+        </Section>
+      </>
     )
   }
 
   return (
-    <Section>
-      <Container>
-        <div className="flex items-center justify-between mb-8">
-          <HeroContent variant="accent" className="mb-8">
-            <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-sm text-ink-muted">
-              <Link to="/jobs" className="hover:text-ink transition-colors">Jobs</Link>
-              <span aria-hidden="true">→</span>
-              <span aria-current="page">{job.title}</span>
-            </nav>
-          </HeroContent>
-          <SaveButton jobId={job.id} />
-        </div>
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-12">
-          <div>
-            <JobHeader job={job} />
-            <JobBody job={job} />
+    <>
+      {meta}
+      <Section>
+        <Container>
+          <div className="flex items-center justify-between mb-8">
+            <HeroContent variant="accent" className="mb-8">
+              <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-sm text-ink-muted">
+                <Link to="/jobs" className="hover:text-ink transition-colors">Jobs</Link>
+                <span aria-hidden="true">→</span>
+                <span aria-current="page">{job.title}</span>
+              </nav>
+            </HeroContent>
+            <SaveButton jobId={job.id} />
           </div>
-          <div>
-            <CompanySidebar job={job} />
+          <div className="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-12">
+            <div>
+              <JobHeader job={job} />
+              <JobBody job={job} />
+            </div>
+            <div>
+              <CompanySidebar job={job} />
+            </div>
           </div>
-        </div>
-      </Container>
-    </Section>
+        </Container>
+      </Section>
+    </>
   )
 }

@@ -6,7 +6,7 @@ export function AboutHero() {
     <section className="relative overflow-hidden bg-canvas">
       <div className="absolute inset-0">
         <img
-          src="/about-hero.png"
+          src="/about-hero.svg"
           alt=""
           className="w-full h-full object-cover"
           loading="eager"
@@ -15,10 +15,10 @@ export function AboutHero() {
       </div>
       <Container className="relative py-24 md:py-32 text-center">
         <HeroContent variant="card" className="bg-white">
-          <h1 className="text-white text-[40px] md:text-[56px] leading-[1.1] tracking-[-1px] font-medium max-w-3xl mx-auto">
+          <h1 className="text-black text-[40px] md:text-[56px] leading-[1.1] tracking-[-1px] font-medium max-w-3xl mx-auto">
             About HireHub Community
           </h1>
-          <p className="text-lg text-white/80 mt-6 max-w-2xl mx-auto">
+          <p className="text-lg text-black/80 mt-6 max-w-2xl mx-auto">
             We're on a mission to make hiring human again. <span className=''>HireHub</span> Community
             connects talented professionals with companies that value culture,
             growth, and impact.

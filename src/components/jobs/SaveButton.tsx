@@ -37,7 +37,7 @@ export function SaveButton({ jobId, className = '' }: SaveButtonProps) {
       onClick={handleToggle}
       disabled={pending}
       className={`inline-flex items-center justify-center p-2 rounded-md transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/40 ${
-        saved ? 'text-danger hover:text-danger' : 'text-ink-tertiary hover:text-ink-muted'
+        saved ? 'text-error hover:text-error' : 'text-ink-tertiary hover:text-ink-muted'
       } ${className}`}
       aria-label={saved ? 'Remove from saved jobs' : 'Save job'}
       aria-pressed={saved}

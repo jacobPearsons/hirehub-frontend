@@ -7,9 +7,9 @@ import { EmptyState } from '../ui/EmptyState'
 import { ErrorState } from '../ui/ErrorState'
 import { InterviewScheduleModal } from '../interview'
 import { OfferLetterModal } from '../offer'
-import { listApplications, updateApplicationStatus as updateAppStatusApi } from '../../api/applications'
 import { listJobs } from '../../api/jobs'
 import { useApp } from '../../context/AppContext'
+import { useApplications } from '../../context/ApplicationsContext'
 import type { Application, ApplicationStatus } from '../../types/application'
 
 const statusConfig: Record<ApplicationStatus, { label: string; color: string }> = {
@@ -27,44 +27,36 @@ const containerVariants = {
 
 export function ApplicantsTab() {
   const { user } = useApp()
-  const [allApps, setAllApps] = useState<Application[]>([])
+  const { applications: allApps, updateApplicationStatus: updateContextStatus } = useApplications()
   const [employerJobIds, setEmployerJobIds] = useState<string[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [interviewModalApp, setInterviewModalApp] = useState<Application | null>(null)
   const [offerModalApp, setOfferModalApp] = useState<Application | null>(null)
 
-  function fetchData() {
+  useEffect(() => {
     setLoading(true)
     setError(null)
-    const fetchJobs = user?.companyName
-      ? listJobs({ take: 100 }).then(res =>
-          res.data
+    if (user?.companyName) {
+      listJobs({ take: 100 })
+        .then(res => {
+          const jobIds = res.data
             .filter(job => job.company.toLowerCase() === user.companyName!.toLowerCase())
             .map(job => job.id)
-        )
-      : Promise.resolve([])
-
-    Promise.all([listApplications(), fetchJobs])
-      .then(([appsRes, jobIds]) => {
-        setAllApps(appsRes.data)
-        setEmployerJobIds(jobIds)
-      })
-      .catch(() => setError('Failed to load applicants.'))
-      .finally(() => setLoading(false))
-  }
-
-  useEffect(() => {
-    fetchData()
+          setEmployerJobIds(jobIds)
+        })
+        .catch(() => setError('Failed to load jobs.'))
+        .finally(() => setLoading(false))
+    } else {
+      setEmployerJobIds([])
+      setLoading(false)
+    }
   }, [user?.companyName])
 
   const apps = allApps.filter(app => employerJobIds.includes(app.jobId))
 
   async function handleStatusChange(id: string, status: ApplicationStatus) {
-    try {
-      await updateAppStatusApi(id, status)
-      setAllApps(prev => prev.map(a => a.id === id ? { ...a, status } : a))
-    } catch {}
+    updateContextStatus(id, status)
   }
 
   if (loading) {
@@ -74,7 +66,7 @@ export function ApplicantsTab() {
   }
 
   if (error) {
-    return <ErrorState message={error} onRetry={fetchData} />
+    return <ErrorState message={error} onRetry={() => window.location.reload()} />
   }
 
   if (apps.length === 0) {
@@ -180,7 +172,7 @@ export function ApplicantsTab() {
           application={interviewModalApp}
           open={!!interviewModalApp}
           onOpenChange={(open) => { if (!open) setInterviewModalApp(null) }}
-          onSuccess={() => { setInterviewModalApp(null); fetchData() }}
+          onSuccess={() => setInterviewModalApp(null)}
         />
       )}
       {offerModalApp && (
@@ -188,7 +180,7 @@ export function ApplicantsTab() {
           application={offerModalApp}
           open={!!offerModalApp}
           onOpenChange={(open) => { if (!open) setOfferModalApp(null) }}
-          onSuccess={() => { setOfferModalApp(null); fetchData() }}
+          onSuccess={() => setOfferModalApp(null)}
         />
       )}
     </>

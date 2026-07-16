@@ -7,6 +7,7 @@
 @tailwind utilities;
 
 :root {
+  color-scheme: light dark;
   --color-canvas: #f5f1ec;
   --color-ink: #111111;
   --color-ink-muted: #626260;
@@ -19,7 +20,9 @@
   --color-accent: #ff5600;
   --color-success: #2e7d32;
   --color-error: #c41c1c;
-  --color-danger: #d32f2f;
+  --color-warning: #ed6c02;
+  --color-info: #0288d1;
+  --color-focus-ring: var(--color-accent);
 }
 
 [data-theme="dark"] {
@@ -35,7 +38,8 @@
   --color-accent: #ff7a3d;
   --color-success: #4caf50;
   --color-error: #ef5350;
-  --color-danger: #f44336;
+  --color-warning: #ff9800;
+  --color-info: #29b6f6;
 }
 
 body {
@@ -58,5 +62,17 @@ body {
 }
 
 :focus-visible {
-  outline: none;
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

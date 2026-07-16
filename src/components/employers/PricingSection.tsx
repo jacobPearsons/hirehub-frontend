@@ -21,7 +21,7 @@ export function PricingSection() {
   return (
     <Section id="pricing" className="relative overflow-hidden">
       <div className="absolute inset-0 opacity-[0.05]">
-        <img src="/pricing-bg.png" alt="" className="w-full h-full object-cover" loading="lazy" />
+          <img src="/pricing-bg.svg" alt="" className="w-full h-full object-cover" loading="lazy" />
       </div>
       <Container className="relative">
         <h2 className="text-[32px] md:text-[40px] leading-[1.15] font-medium text-center mb-4">

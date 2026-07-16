@@ -1,5 +1,5 @@
 import type { ReactNode, ComponentPropsWithoutRef } from 'react'
-import { motion } from 'framer-motion'
+import { motion, useReducedMotion } from 'framer-motion'
 
 interface ButtonProps extends ComponentPropsWithoutRef<typeof motion.button> {
   variant: 'primary' | 'secondary' | 'accent' | 'ghost'
@@ -8,7 +8,7 @@ interface ButtonProps extends ComponentPropsWithoutRef<typeof motion.button> {
 }
 
 const variantStyles: Record<ButtonProps['variant'], string> = {
-  primary: 'bg-ink text-white hover:bg-[#2a2a2a] dark:bg-ink dark:text-white dark:hover:bg-[#3a3a3a]',
+  primary: 'bg-ink text-white hover:bg-red/30 dark:bg-black dark:text-accent dark:hover:bg-[#3a3a3a]',
   secondary: 'bg-surface-2 text-ink hover:bg-hairline',
   accent: 'bg-accent text-white hover:bg-[#e04d00] dark:hover:bg-[#e06000]',
   ghost: 'bg-transparent text-ink-muted hover:text-ink hover:bg-surface-2',
@@ -29,11 +29,13 @@ export function Button({
   disabled,
   ...rest
 }: ButtonProps) {
+  const reducedMotion = useReducedMotion()
+
   return (
     <motion.button
       type={type}
       disabled={disabled}
-      whileTap={{ scale: 0.96 }}
+      whileTap={reducedMotion ? undefined : { scale: 0.96 }}
       className={`rounded-md font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/30 ${variantStyles[variant]} ${sizeStyles[size]} ${className ?? ''}${disabled ? ' opacity-50 cursor-not-allowed' : ''}`}
       {...rest}
     >

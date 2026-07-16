@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link, NavLink, useNavigate } from 'react-router-dom'
 import { Menu, X, LogOut } from 'lucide-react'
+import * as Dialog from '@radix-ui/react-dialog'
 import { Button } from '../ui/Button'
 import { Container } from '../ui/Container'
 import { useApp } from '../../context/AppContext'
@@ -91,86 +92,92 @@ export function Navbar() {
             )}
           </div>
 
-          <button
-            className="md:hidden text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/40 rounded-md"
-            onClick={() => setMobileOpen(true)}
-            aria-label="Open menu"
-            aria-expanded={mobileOpen}
-          >
-            <Menu size={24} />
-          </button>
+          <Dialog.Root open={mobileOpen} onOpenChange={setMobileOpen}>
+            <Dialog.Trigger asChild>
+              <button
+                className="md:hidden text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/40 rounded-md"
+                aria-label="Open menu"
+              >
+                <Menu size={24} />
+              </button>
+            </Dialog.Trigger>
+            <Dialog.Portal>
+              <Dialog.Overlay className="fixed inset-0 z-40 bg-black/40 md:hidden" />
+              <Dialog.Content
+                aria-label="Navigation menu"
+                className="fixed inset-0 z-50 bg-canvas flex flex-col items-center justify-center gap-6 md:hidden"
+              >
+                <Dialog.Close asChild>
+                  <button className="absolute top-4 right-4 text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/40 rounded-md" aria-label="Close menu">
+                    <X size={24} />
+                  </button>
+                </Dialog.Close>
+
+                {navLinks.map((link) => (
+                  <NavLink key={link.to} to={link.to} onClick={() => setMobileOpen(false)}
+                    className={({ isActive }) =>
+                      `text-lg font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/40 rounded ${isActive ? 'text-ink' : 'text-ink-muted hover:text-ink'}`
+                    }
+                  >
+                    {link.label}
+                  </NavLink>
+                ))}
+                <hr className="w-16 border-hairline" />
+
+                {user ? (
+                  <>
+                    {user.role === 'seeker' && (
+                      <NavLink to="/dashboard" onClick={() => setMobileOpen(false)}
+                        className={({ isActive }) =>
+                          `text-lg font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/40 rounded ${isActive ? 'text-ink' : 'text-ink-muted hover:text-ink'}`
+                        }
+                      >
+                        Dashboard
+                      </NavLink>
+                    )}
+                    {user.role === 'employer' && (
+                      <NavLink to="/employer/dashboard" onClick={() => setMobileOpen(false)}
+                        className={({ isActive }) =>
+                          `text-lg font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/40 rounded ${isActive ? 'text-ink' : 'text-ink-muted hover:text-ink'}`
+                        }
+                      >
+                        Employer Dashboard
+                      </NavLink>
+                    )}
+                    <button onClick={() => { handleLogout(); setMobileOpen(false) }}
+                      className="text-lg font-medium text-ink-muted hover:text-ink transition-colors"
+                    >
+                      Sign Out
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <NavLink to="/dashboard" onClick={() => setMobileOpen(false)}
+                      className={({ isActive }) =>
+                        `text-lg font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/40 rounded ${isActive ? 'text-ink' : 'text-ink-muted hover:text-ink'}`
+                      }
+                    >
+                      Dashboard
+                    </NavLink>
+                    <NavLink to="/employer/dashboard" onClick={() => setMobileOpen(false)}
+                      className={({ isActive }) =>
+                        `text-lg font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/40 rounded ${isActive ? 'text-ink' : 'text-ink-muted hover:text-ink'}`
+                      }
+                    >
+                      Employer Dashboard
+                    </NavLink>
+                    <div className="flex flex-col items-center gap-3 mt-4">
+                      <Link to="/login"><Button variant="ghost" size="sm">Sign In</Button></Link>
+                      <Link to="/post-job"><Button variant="primary" size="sm">Post a Job</Button></Link>
+                    </div>
+                  </>
+                )}
+              </Dialog.Content>
+            </Dialog.Portal>
+          </Dialog.Root>
         </div>
       </Container>
 
-      <div role="dialog" aria-label="Navigation menu"
-        className={`fixed inset-0 z-40 bg-canvas flex flex-col items-center justify-center gap-6 transition-transform duration-300 md:hidden ${
-          mobileOpen ? 'translate-x-0' : 'translate-x-full'
-        }`}
-      >
-        <button className="absolute top-4 right-4 text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/40 rounded-md" onClick={() => setMobileOpen(false)} aria-label="Close menu">
-          <X size={24} />
-        </button>
-
-        {navLinks.map((link) => (
-          <NavLink key={link.to} to={link.to} onClick={() => setMobileOpen(false)}
-            className={({ isActive }) =>
-              `text-lg font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/40 rounded ${isActive ? 'text-ink' : 'text-ink-muted hover:text-ink'}`
-            }
-          >
-            {link.label}
-          </NavLink>
-        ))}
-        <hr className="w-16 border-hairline" />
-
-        {user ? (
-          <>
-            {user.role === 'seeker' && (
-              <NavLink to="/dashboard" onClick={() => setMobileOpen(false)}
-                className={({ isActive }) =>
-                  `text-lg font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/40 rounded ${isActive ? 'text-ink' : 'text-ink-muted hover:text-ink'}`
-                }
-              >
-                Dashboard
-              </NavLink>
-            )}
-            {user.role === 'employer' && (
-              <NavLink to="/employer/dashboard" onClick={() => setMobileOpen(false)}
-                className={({ isActive }) =>
-                  `text-lg font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/40 rounded ${isActive ? 'text-ink' : 'text-ink-muted hover:text-ink'}`
-                }
-              >
-                Employer Dashboard
-              </NavLink>
-            )}
-            <button onClick={() => { handleLogout(); setMobileOpen(false) }}
-              className="text-lg font-medium text-ink-muted hover:text-ink transition-colors"
-            >
-              Sign Out
-            </button>
-          </>
-        ) : (
-          <>
-            <NavLink to="/dashboard" onClick={() => setMobileOpen(false)}
-              className={({ isActive }) =>
-                `text-lg font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/40 rounded ${isActive ? 'text-ink' : 'text-ink-muted hover:text-ink'}`
-              }
-            >
-              Dashboard
-            </NavLink>
-            <NavLink to="/employer/dashboard" onClick={() => setMobileOpen(false)}
-              className={({ isActive }) =>
-                `text-lg font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/40 rounded ${isActive ? 'text-ink' : 'text-ink-muted hover:text-ink'}`
-              }
-            >
-              Employer Dashboard
-            </NavLink>
-            <div className="flex flex-col items-center gap-3 mt-4">
-              <Link to="/login"><Button variant="ghost" size="sm">Sign In</Button></Link>
-              <Link to="/post-job"><Button variant="primary" size="sm">Post a Job</Button></Link>
-            </div>
-          </>
-        )}
-      </div>
     </nav>
   )
 }

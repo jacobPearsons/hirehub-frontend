@@ -9,6 +9,25 @@ import { listJobs } from '../../api/jobs'
 import { formatSalary } from '../../utils/format'
 import type { Job } from '../../data/jobs'
 
+function CompanyLogo({ job, className }: { job: Job; className?: string }) {
+  const [error, setError] = useState(false)
+  if (error) {
+    return (
+      <div className={`${className} bg-accent/10 text-accent flex items-center justify-center text-xs font-semibold`}>
+        {job.company.charAt(0)}
+      </div>
+    )
+  }
+  return (
+    <img
+      src={job.companyLogo}
+      alt={job.company}
+      className={className}
+      onError={() => setError(true)}
+    />
+  )
+}
+
 export function FeaturedJobs() {
   const [featured, setFeatured] = useState<Job[]>([])
   const [loading, setLoading] = useState(true)
@@ -39,7 +58,7 @@ export function FeaturedJobs() {
               <Link key={job.id} to={`/jobs/${job.id}`} className="block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/40 rounded-lg group">
                 <Card variant="default" className="p-6 transition-transform duration-200 group-hover:scale-[1.02]">
                   <div className="flex items-center gap-2 mb-2">
-                    <img src={job.companyLogo} alt={job.company} className="w-6 h-6 rounded bg-surface-2 object-contain" />
+                    <CompanyLogo job={job} className="w-6 h-6 rounded" />
                     <p className="text-sm font-medium text-ink-muted">{job.company}</p>
                   </div>
                   <h3 className="text-[22px] leading-[1.25] font-medium mb-2">{job.title}</h3>
