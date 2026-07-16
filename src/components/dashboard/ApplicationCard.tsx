@@ -2,6 +2,7 @@ import { motion } from 'framer-motion'
 import { Card } from '../ui'
 import { InterviewDetails } from '../interview/InterviewDetails'
 import { OfferLetterView } from '../offer/OfferLetterView'
+import { PreBoardingChecklist } from '../preboarding/PreBoardingChecklist'
 import type { Application, ApplicationStatus } from '../../types/application'
 
 const statusConfig: Record<ApplicationStatus, { label: string; color: string }> = {
@@ -59,6 +60,14 @@ export function ApplicationCard({ application, onStatusUpdate }: ApplicationCard
             <OfferLetterView application={application} onStatusUpdate={onStatusUpdate} />
           </div>
         )}
+
+        {application.status === 'offer' &&
+          application.offerDetails?.accepted === true &&
+          application.preBoardingChecklist && (
+            <div className="mt-4 pt-4 border-t border-hairline">
+              <PreBoardingChecklist application={application} />
+            </div>
+          )}
       </Card>
     </motion.div>
   )

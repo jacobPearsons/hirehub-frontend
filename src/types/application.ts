@@ -19,5 +19,6 @@ export interface Application {
   interviewDetails?: InterviewDetails
   offerDetails?: OfferDetails
   onboardingChecklist?: OnboardingChecklistItem[]
+  preBoardingChecklist?: OnboardingChecklistItem[]
   orientationDetails?: OrientationDetails
 }

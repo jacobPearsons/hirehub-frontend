@@ -30,9 +30,14 @@ export interface OfferDetails {
   acceptedAt?: string
 }
 
+export type ChecklistCategory = 'Documents' | 'IT Setup' | 'Benefits' | 'Training'
+
 export interface OnboardingChecklistItem {
   id: string
   label: string
+  title?: string
+  description?: string
+  category?: ChecklistCategory
   completed: boolean
   completedAt?: string
 }
