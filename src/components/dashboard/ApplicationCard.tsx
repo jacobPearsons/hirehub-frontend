@@ -1,12 +1,13 @@
 import { motion } from 'framer-motion'
 import { Card } from '../ui'
+import { InterviewDetails } from '../interview/InterviewDetails'
 import type { Application, ApplicationStatus } from '../../types/application'
 
 const statusConfig: Record<ApplicationStatus, { label: string; color: string }> = {
   applied: { label: 'Applied', color: 'bg-accent/10 text-accent' },
   reviewing: { label: 'Under Review', color: 'bg-ink-muted/10 text-ink-muted' },
   interviewing: { label: 'Interviewing', color: 'bg-surface-2 text-ink' },
-  rejected: { label: 'Rejected', color: 'bg-danger/10 text-danger' },
+  rejected: { label: 'Rejected', color: 'bg-error/10 text-error' },
   offer: { label: 'Offer', color: 'bg-success/10 text-success' },
 }
 
@@ -44,6 +45,12 @@ export function ApplicationCard({ application }: ApplicationCardProps) {
             <p className="text-xs text-ink-tertiary mt-2">Submitted {submittedDate}</p>
           </div>
         </div>
+
+        {application.status === 'interviewing' && application.interviewDetails && (
+          <div className="mt-4 pt-4 border-t border-hairline">
+            <InterviewDetails details={application.interviewDetails} />
+          </div>
+        )}
       </Card>
     </motion.div>
   )
