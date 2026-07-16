@@ -6,7 +6,7 @@ import { listApplications } from '../../api/applications'
 import { SkeletonGrid } from '../ui/SkeletonGrid'
 import { EmptyState } from '../ui/EmptyState'
 import { ErrorState } from '../ui/ErrorState'
-import type { Application } from '../../types/application'
+import type { Application, ApplicationStatus } from '../../types/application'
 import { ApplicationCard } from './ApplicationCard'
 
 const containerVariants = {
@@ -29,6 +29,12 @@ export function ApplicationsTab() {
       })
       .catch(() => setError('Failed to load applications.'))
       .finally(() => setLoading(false))
+  }
+
+  function handleStatusUpdate(applicationId: string, status: ApplicationStatus) {
+    setApps((prev) =>
+      prev.map((app) => (app.id === applicationId ? { ...app, status } : app))
+    )
   }
 
   useEffect(() => {
@@ -66,7 +72,7 @@ export function ApplicationsTab() {
     >
       {apps.map((app) => (
         <motion.div key={app.id} variants={{ hidden: { opacity: 0, y: 8 }, visible: { opacity: 1, y: 0 } }}>
-          <ApplicationCard application={app} />
+          <ApplicationCard application={app} onStatusUpdate={handleStatusUpdate} />
         </motion.div>
       ))}
     </motion.div>

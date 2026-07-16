@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion'
 import { Card } from '../ui'
 import { InterviewDetails } from '../interview/InterviewDetails'
+import { OfferLetterView } from '../offer/OfferLetterView'
 import type { Application, ApplicationStatus } from '../../types/application'
 
 const statusConfig: Record<ApplicationStatus, { label: string; color: string }> = {
@@ -13,9 +14,10 @@ const statusConfig: Record<ApplicationStatus, { label: string; color: string }> 
 
 interface ApplicationCardProps {
   application: Application
+  onStatusUpdate?: (applicationId: string, status: ApplicationStatus) => void
 }
 
-export function ApplicationCard({ application }: ApplicationCardProps) {
+export function ApplicationCard({ application, onStatusUpdate }: ApplicationCardProps) {
   const status = statusConfig[application.status]
   const submittedDate = new Date(application.submittedAt).toLocaleDateString('en-US', {
     year: 'numeric',
@@ -49,6 +51,12 @@ export function ApplicationCard({ application }: ApplicationCardProps) {
         {application.status === 'interviewing' && application.interviewDetails && (
           <div className="mt-4 pt-4 border-t border-hairline">
             <InterviewDetails details={application.interviewDetails} />
+          </div>
+        )}
+
+        {application.status === 'offer' && application.offerDetails && onStatusUpdate && (
+          <div className="mt-4 pt-4 border-t border-hairline">
+            <OfferLetterView application={application} onStatusUpdate={onStatusUpdate} />
           </div>
         )}
       </Card>
