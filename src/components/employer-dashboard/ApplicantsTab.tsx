@@ -6,6 +6,7 @@ import { SkeletonGrid } from '../ui/SkeletonGrid'
 import { EmptyState } from '../ui/EmptyState'
 import { ErrorState } from '../ui/ErrorState'
 import { InterviewScheduleModal } from '../interview'
+import { OfferLetterModal } from '../offer'
 import { listApplications, updateApplicationStatus as updateAppStatusApi } from '../../api/applications'
 import { listJobs } from '../../api/jobs'
 import { useApp } from '../../context/AppContext'
@@ -31,6 +32,7 @@ export function ApplicantsTab() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [interviewModalApp, setInterviewModalApp] = useState<Application | null>(null)
+  const [offerModalApp, setOfferModalApp] = useState<Application | null>(null)
 
   function fetchData() {
     setLoading(true)
@@ -140,7 +142,7 @@ export function ApplicantsTab() {
                     )}
                     {app.status !== 'offer' && (
                       <button
-                        onClick={() => handleStatusChange(app.id, 'offer')}
+                        onClick={() => setOfferModalApp(app)}
                         className="text-xs font-medium text-success hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/40 rounded"
                       >
                         Make offer
@@ -179,6 +181,14 @@ export function ApplicantsTab() {
           open={!!interviewModalApp}
           onOpenChange={(open) => { if (!open) setInterviewModalApp(null) }}
           onSuccess={() => { setInterviewModalApp(null); fetchData() }}
+        />
+      )}
+      {offerModalApp && (
+        <OfferLetterModal
+          application={offerModalApp}
+          open={!!offerModalApp}
+          onOpenChange={(open) => { if (!open) setOfferModalApp(null) }}
+          onSuccess={() => { setOfferModalApp(null); fetchData() }}
         />
       )}
     </>
