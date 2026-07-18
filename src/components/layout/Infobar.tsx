@@ -23,6 +23,7 @@ export function Infobar({ onMenuToggle }: InfobarProps) {
   return (
     <div className="flex items-center justify-between px-4 md:px-6 h-14 border-b border-hairline bg-canvas shrink-0">
       <button
+        type="button"
         onClick={onMenuToggle}
         className="md:hidden text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/30 rounded-md p-1"
         aria-label="Open menu"
@@ -36,6 +37,7 @@ export function Infobar({ onMenuToggle }: InfobarProps) {
           <>
             <span className="text-sm text-ink-muted hidden sm:inline">{user.name}</span>
             <button
+              type="button"
               onClick={handleLogout}
               className="text-ink-muted hover:text-ink transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/30 rounded p-1"
               aria-label="Log out"
