@@ -7,6 +7,7 @@ import { ToastProvider } from './components/ui/Toast'
 import { ErrorBoundary } from './components/ui/ErrorBoundary'
 import { NotFoundPage } from './components/ui/NotFoundPage'
 import { ProtectedRoute } from './components/auth/ProtectedRoute'
+import { DashboardShell } from './components/layout/DashboardShell'
 
 const HomePage = lazy(() => import('./components/home/HomePage'))
 const JobBoardPage = lazy(() => import('./components/jobs/JobBoardPage'))
@@ -55,8 +56,20 @@ function App() {
               <Route path="/reset-password" element={<ErrorBoundary><ResetPasswordPage /></ErrorBoundary>} />
               <Route path="/about" element={<ErrorBoundary><AboutPage /></ErrorBoundary>} />
               <Route path="/contact" element={<ErrorBoundary><ContactPage /></ErrorBoundary>} />
-              <Route path="/dashboard" element={<ProtectedRoute allowedRoles={['seeker']}><ErrorBoundary><DashboardPage /></ErrorBoundary></ProtectedRoute>} />
-              <Route path="/employer/dashboard" element={<ProtectedRoute allowedRoles={['employer']}><ErrorBoundary><EmployerDashboardPage /></ErrorBoundary></ProtectedRoute>} />
+              <Route path="/dashboard" element={
+                <ProtectedRoute allowedRoles={['seeker']}>
+                  <DashboardShell>
+                    <ErrorBoundary><DashboardPage /></ErrorBoundary>
+                  </DashboardShell>
+                </ProtectedRoute>
+              } />
+              <Route path="/employer/dashboard" element={
+                <ProtectedRoute allowedRoles={['employer']}>
+                  <DashboardShell>
+                    <ErrorBoundary><EmployerDashboardPage /></ErrorBoundary>
+                  </DashboardShell>
+                </ProtectedRoute>
+              } />
               <Route path="/post-job" element={<ProtectedRoute allowedRoles={['employer']}><ErrorBoundary><PostJobPage /></ErrorBoundary></ProtectedRoute>} />
               <Route path="*" element={<NotFoundPage />} />
             </Routes>
