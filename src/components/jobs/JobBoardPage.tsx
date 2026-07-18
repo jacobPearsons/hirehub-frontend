@@ -4,6 +4,8 @@ import { Section, Container, Reveal } from '../ui'
 import { usePageMeta } from '../../utils/usePageMeta'
 import { SearchBar } from './SearchBar'
 import { FilterSidebar } from './FilterSidebar'
+import { FilterDrawer } from './FilterDrawer'
+import { ActiveFilterChips } from './ActiveFilterChips'
 import { JobCardGrid } from './JobCardGrid'
 import { Button } from '../ui/Button'
 import { listJobs } from '../../api/jobs'
@@ -22,6 +24,9 @@ export default function JobBoardPage() {
   const [total, setTotal] = useState(0)
   const [search, setSearch] = useState('')
   const [filters, setFilters] = useState({ category: '', seniority: '', remote: '' })
+  const [filterDrawerOpen, setFilterDrawerOpen] = useState(false)
+
+  const activeFilterCount = [filters.category, filters.seniority, filters.remote].filter(Boolean).length
 
   const searchRef = useRef(search)
   const filtersRef = useRef(filters)
@@ -95,9 +100,39 @@ export default function JobBoardPage() {
             <p className="text-lg text-ink-muted mt-2">Explore opportunities from top companies</p>
           </HeroContent>
 
-          <Reveal className="max-w-xl mb-8">
+          {/* Mobile: search + filter trigger */}
+          <div className="lg:hidden flex gap-3 mb-4">
+            <div className="flex-1">
+              <SearchBar value={search} onChange={handleSearchChange} />
+            </div>
+            <Button
+              variant="secondary"
+              size="md"
+              onClick={() => setFilterDrawerOpen(true)}
+              className="shrink-0"
+            >
+              Filters{activeFilterCount > 0 ? ` (${activeFilterCount})` : ''}
+            </Button>
+          </div>
+
+          {/* Desktop: search bar */}
+          <Reveal className="hidden lg:block max-w-xl mb-8">
             <SearchBar value={search} onChange={handleSearchChange} />
           </Reveal>
+
+          {/* Mobile: active filter chips */}
+          <div className="lg:hidden">
+            <ActiveFilterChips filters={filters} onFilterChange={handleFilterChange} />
+          </div>
+
+          {/* Filter drawer for mobile */}
+          <FilterDrawer
+            open={filterDrawerOpen}
+            onOpenChange={setFilterDrawerOpen}
+            filters={filters}
+            onFilterChange={handleFilterChange}
+            activeCount={activeFilterCount}
+          />
 
           {loading ? (
             <div className="text-center py-16">
@@ -109,23 +144,30 @@ export default function JobBoardPage() {
               <Button variant="primary" size="sm" onClick={() => loadJobs(true)}>Try again</Button>
             </div>
           ) : (
-            <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-8">
+            <div className="hidden lg:grid grid-cols-[280px_1fr] gap-8">
               <Reveal delay={0.05}><FilterSidebar filters={filters} onFilterChange={handleFilterChange} /></Reveal>
               <Reveal delay={0.1}>
                 <JobCardGrid jobs={filteredJobs} />
                 {hasMore && (
                   <div className="mt-8 text-center">
-                    <Button
-                      variant="ghost"
-                      size="md"
-                      onClick={() => loadJobs(false)}
-                      disabled={loadingMore}
-                    >
+                    <Button variant="ghost" size="md" onClick={() => loadJobs(false)} disabled={loadingMore}>
                       {loadingMore ? 'Loading more...' : `Load more (${filteredJobs.length} of ${total})`}
                     </Button>
                   </div>
                 )}
               </Reveal>
+            </div>
+
+            {/* Mobile: jobs grid without sidebar */}
+            <div className="lg:hidden">
+              <JobCardGrid jobs={filteredJobs} />
+              {hasMore && (
+                <div className="mt-8 text-center">
+                  <Button variant="ghost" size="md" onClick={() => loadJobs(false)} disabled={loadingMore}>
+                    {loadingMore ? 'Loading more...' : `Load more (${filteredJobs.length} of ${total})`}
+                  </Button>
+                </div>
+              )}
             </div>
           )}
         </Container>
