@@ -8,7 +8,7 @@ export function NotFoundPage() {
         <p className="text-lg text-ink-muted mb-6">Page not found</p>
         <Link
           to="/"
-          className="text-accent hover:underline text-sm font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/30 rounded"
+          className="text-accent hover:underline text-sm font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/30 rounded-md"
         >
           Go home
         </Link>
