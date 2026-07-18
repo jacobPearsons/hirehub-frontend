@@ -1,10 +1,11 @@
 import { lazy, Suspense } from 'react'
-import { Routes, Route, useLocation, Link } from 'react-router-dom'
+import { Routes, Route, useLocation } from 'react-router-dom'
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 import { ThemeProvider } from './context/ThemeContext'
 import Layout from './components/layout/Layout'
 import { ToastProvider } from './components/ui/Toast'
 import { ErrorBoundary } from './components/ui/ErrorBoundary'
+import { NotFoundPage } from './components/ui/NotFoundPage'
 import { ProtectedRoute } from './components/auth/ProtectedRoute'
 
 const HomePage = lazy(() => import('./components/home/HomePage'))
@@ -57,15 +58,7 @@ function App() {
               <Route path="/dashboard" element={<ProtectedRoute allowedRoles={['seeker']}><ErrorBoundary><DashboardPage /></ErrorBoundary></ProtectedRoute>} />
               <Route path="/employer/dashboard" element={<ProtectedRoute allowedRoles={['employer']}><ErrorBoundary><EmployerDashboardPage /></ErrorBoundary></ProtectedRoute>} />
               <Route path="/post-job" element={<ProtectedRoute allowedRoles={['employer']}><ErrorBoundary><PostJobPage /></ErrorBoundary></ProtectedRoute>} />
-              <Route path="*" element={
-                <main className="min-h-screen flex items-center justify-center bg-canvas">
-                  <div className="text-center">
-                    <h1 className="text-[56px] font-medium text-ink mb-4">404</h1>
-                    <p className="text-lg text-ink-muted mb-6">Page not found</p>
-                    <Link to="/" className="text-accent hover:underline text-sm font-medium">Go home</Link>
-                  </div>
-                </main>
-              } />
+              <Route path="*" element={<NotFoundPage />} />
             </Routes>
           </motion.div>
         </AnimatePresence>
