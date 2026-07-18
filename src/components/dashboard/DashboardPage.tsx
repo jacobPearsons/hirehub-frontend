@@ -29,6 +29,7 @@ export default function DashboardPage() {
         {tabs.map((tab) => (
           <button
             key={tab.id}
+            type="button"
             role="tab"
             aria-selected={activeTab === tab.id}
             onClick={() => setActiveTab(tab.id)}
