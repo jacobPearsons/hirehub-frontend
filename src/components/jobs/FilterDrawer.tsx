@@ -1,5 +1,4 @@
 import * as Dialog from '@radix-ui/react-dialog'
-import { motion, AnimatePresence } from 'framer-motion'
 import { X } from 'lucide-react'
 import { Button } from '../ui'
 
@@ -69,6 +68,7 @@ export function FilterDrawer({ open, onOpenChange, filters, onFilterChange, acti
             </Dialog.Title>
             <Dialog.Close asChild>
               <button
+                type="button"
                 className="p-1 text-ink-muted hover:text-ink rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/30"
                 aria-label="Close filters"
               >
