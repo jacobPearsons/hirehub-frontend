@@ -6,7 +6,7 @@ import { Card, Tag } from '../ui'
 import { SkeletonGrid } from '../ui/SkeletonGrid'
 import { EmptyState } from '../ui/EmptyState'
 import { ErrorState } from '../ui/ErrorState'
-import { listJobs } from '../../api/jobs'
+import { listEmployerJobs } from '../../api/jobs'
 import { useApp } from '../../context/AppContext'
 import type { Job } from '../../data/jobs'
 
@@ -16,7 +16,7 @@ const containerVariants = {
 }
 
 export function JobListingsTab() {
-  const { user, applications } = useApp()
+  const { applications } = useApp()
   const navigate = useNavigate()
   const [allJobs, setAllJobs] = useState<Job[]>([])
   const [loading, setLoading] = useState(true)
@@ -25,7 +25,7 @@ export function JobListingsTab() {
   function fetchJobs() {
     setLoading(true)
     setError(null)
-    listJobs({ take: 50 })
+    listEmployerJobs()
       .then(res => setAllJobs(res.data))
       .catch(() => setError('Failed to load job listings.'))
       .finally(() => setLoading(false))
@@ -35,9 +35,7 @@ export function JobListingsTab() {
     fetchJobs()
   }, [])
 
-  const jobs = user?.companyName
-    ? allJobs.filter(job => job.company.toLowerCase() === user.companyName!.toLowerCase())
-    : allJobs
+  const jobs = allJobs
 
   if (loading) {
     return <SkeletonGrid count={4} columns={2} />

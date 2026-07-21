@@ -7,8 +7,7 @@ import { EmptyState } from '../ui/EmptyState'
 import { ErrorState } from '../ui/ErrorState'
 import { InterviewScheduleModal } from '../interview'
 import { OfferLetterModal } from '../offer'
-import { listJobs } from '../../api/jobs'
-import { useApp } from '../../context/AppContext'
+import { listEmployerJobs } from '../../api/jobs'
 import { useApplications } from '../../context/ApplicationsContext'
 import type { Application, ApplicationStatus } from '../../types/application'
 
@@ -26,7 +25,6 @@ const containerVariants = {
 }
 
 export function ApplicantsTab() {
-  const { user } = useApp()
   const { applications: allApps, updateApplicationStatus: updateContextStatus } = useApplications()
   const [employerJobIds, setEmployerJobIds] = useState<string[]>([])
   const [loading, setLoading] = useState(true)
@@ -37,21 +35,14 @@ export function ApplicantsTab() {
   useEffect(() => {
     setLoading(true)
     setError(null)
-    if (user?.companyName) {
-      listJobs({ take: 100 })
-        .then(res => {
-          const jobIds = res.data
-            .filter(job => job.company.toLowerCase() === user.companyName!.toLowerCase())
-            .map(job => job.id)
-          setEmployerJobIds(jobIds)
-        })
-        .catch(() => setError('Failed to load jobs.'))
-        .finally(() => setLoading(false))
-    } else {
-      setEmployerJobIds([])
-      setLoading(false)
-    }
-  }, [user?.companyName])
+    listEmployerJobs()
+      .then(res => {
+        const jobIds = res.data.map(job => job.id)
+        setEmployerJobIds(jobIds)
+      })
+      .catch(() => setError('Failed to load jobs.'))
+      .finally(() => setLoading(false))
+  }, [])
 
   const apps = allApps.filter(app => employerJobIds.includes(app.jobId))
 
