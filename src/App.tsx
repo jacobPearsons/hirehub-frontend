@@ -24,6 +24,7 @@ const ContactPage = lazy(() => import('./components/contact/ContactPage'))
 const PostJobPage = lazy(() => import('./components/post-job/PostJobPage'))
 const DashboardPage = lazy(() => import('./components/dashboard/DashboardPage'))
 const EmployerDashboardPage = lazy(() => import('./components/employer-dashboard/EmployerDashboardPage'))
+const ProfilePage = lazy(() => import('./components/profile/ProfilePage'))
 
 function App() {
   const location = useLocation()
@@ -67,6 +68,13 @@ function App() {
                 <ProtectedRoute allowedRoles={['employer']}>
                   <DashboardShell>
                     <ErrorBoundary><EmployerDashboardPage /></ErrorBoundary>
+                  </DashboardShell>
+                </ProtectedRoute>
+              } />
+              <Route path="/dashboard/profile" element={
+                <ProtectedRoute allowedRoles={['seeker', 'employer']}>
+                  <DashboardShell>
+                    <ErrorBoundary><ProfilePage /></ErrorBoundary>
                   </DashboardShell>
                 </ProtectedRoute>
               } />
