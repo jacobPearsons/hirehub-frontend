@@ -41,6 +41,7 @@ export default function ProfilePage() {
   const {
     register,
     handleSubmit,
+    watch,
     formState: { errors, isSubmitting },
   } = useForm<ProfileFormData>({
     resolver: zodResolver(profileSchema),
@@ -52,6 +53,8 @@ export default function ProfilePage() {
       companyName: user?.companyName ?? '',
     },
   })
+
+  const bioValue = watch('bio')
 
   const {
     register: registerPassword,
@@ -181,7 +184,7 @@ export default function ProfilePage() {
               {...register('bio')}
             />
             <p className="mt-1 text-xs text-ink-muted text-right">
-              {user?.bio?.length ?? 0}/500
+              {(bioValue ?? '').length}/500
             </p>
           </div>
           {user?.role === 'employer' && (
