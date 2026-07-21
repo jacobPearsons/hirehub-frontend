@@ -1,17 +1,23 @@
-import { useState } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { HeroContent } from '../ui/HeroContent'
 import { usePageMeta } from '../../utils/usePageMeta'
 import { SavedJobsTab } from './SavedJobsTab'
 import { ApplicationsTab } from './ApplicationsTab'
 
 const tabs = [
+  { id: 'overview', label: 'Overview' },
   { id: 'saved', label: 'Saved Jobs' },
   { id: 'applications', label: 'My Applications' },
 ] as const
 
 export default function DashboardPage() {
-  const [activeTab, setActiveTab] = useState<'saved' | 'applications'>('saved')
+  const [searchParams, setSearchParams] = useSearchParams()
+  const activeTab = (searchParams.get('tab') as 'overview' | 'saved' | 'applications') ?? 'overview'
   const meta = usePageMeta({ title: 'Dashboard | HireHub Community', description: 'Manage your saved jobs and applications' })
+
+  function setActiveTab(tab: string) {
+    setSearchParams(tab === 'overview' ? {} : { tab })
+  }
 
   return (
     <>
@@ -44,6 +50,9 @@ export default function DashboardPage() {
         ))}
       </div>
 
+      {activeTab === 'overview' && (
+        <div className="text-ink-muted text-sm">Welcome to your dashboard. Use the tabs above to manage your saved jobs and applications.</div>
+      )}
       {activeTab === 'saved' && <SavedJobsTab />}
       {activeTab === 'applications' && <ApplicationsTab />}
     </>
