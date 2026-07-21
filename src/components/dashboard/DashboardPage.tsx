@@ -1,6 +1,7 @@
 import { useSearchParams } from 'react-router-dom'
 import { HeroContent } from '../ui/HeroContent'
 import { usePageMeta } from '../../utils/usePageMeta'
+import { OverviewTab } from './OverviewTab'
 import { SavedJobsTab } from './SavedJobsTab'
 import { ApplicationsTab } from './ApplicationsTab'
 
@@ -50,9 +51,7 @@ export default function DashboardPage() {
         ))}
       </div>
 
-      {activeTab === 'overview' && (
-        <div className="text-ink-muted text-sm">Welcome to your dashboard. Use the tabs above to manage your saved jobs and applications.</div>
-      )}
+      {activeTab === 'overview' && <OverviewTab />}
       {activeTab === 'saved' && <SavedJobsTab />}
       {activeTab === 'applications' && <ApplicationsTab />}
     </>

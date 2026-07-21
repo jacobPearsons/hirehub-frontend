@@ -1,4 +1,5 @@
 export { default as DashboardPage } from './DashboardPage'
+export { OverviewTab } from './OverviewTab'
 export { SavedJobsTab } from './SavedJobsTab'
 export { ApplicationsTab } from './ApplicationsTab'
 export { ApplicationCard } from './ApplicationCard'
