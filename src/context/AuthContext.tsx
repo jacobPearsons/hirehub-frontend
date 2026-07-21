@@ -8,6 +8,9 @@ export interface AppUser {
   email: string
   role: 'seeker' | 'employer'
   companyName?: string
+  phone?: string | null
+  bio?: string | null
+  avatarUrl?: string | null
 }
 
 interface AuthContextValue {
@@ -19,13 +22,16 @@ interface AuthContextValue {
 
 const AuthContext = createContext<AuthContextValue | null>(null)
 
-function mapApiUser(user: { id: string; name: string; email: string; role: string; companyName?: string }): AppUser {
+function mapApiUser(user: { id: string; name: string; email: string; role: string; companyName?: string; phone?: string | null; bio?: string | null; avatarUrl?: string | null }): AppUser {
   return {
     id: user.id,
     name: user.name,
     email: user.email,
     role: user.role === 'EMPLOYER' ? 'employer' : 'seeker',
     companyName: user.companyName,
+    phone: user.phone,
+    bio: user.bio,
+    avatarUrl: user.avatarUrl,
   }
 }
 

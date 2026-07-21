@@ -10,10 +10,11 @@ export interface AuthUser {
   id: string
   name: string
   email: string
-  role: 'SEEKER' | 'EMPLOYER'
+  role: 'seeker' | 'employer'
   companyName?: string
-  createdAt: string
-  updatedAt: string
+  phone?: string | null
+  bio?: string | null
+  avatarUrl?: string | null
 }
 
 export interface LoginResponse {

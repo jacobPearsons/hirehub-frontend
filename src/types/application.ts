@@ -21,4 +21,8 @@ export interface Application {
   onboardingChecklist?: OnboardingChecklistItem[]
   preBoardingChecklist?: OnboardingChecklistItem[]
   orientationDetails?: OrientationDetails
+  interviewData?: Record<string, unknown> | null
+  offerData?: Record<string, unknown> | null
+  preboardingData?: Array<Record<string, unknown>> | null
+  orientationData?: Record<string, unknown> | null
 }
