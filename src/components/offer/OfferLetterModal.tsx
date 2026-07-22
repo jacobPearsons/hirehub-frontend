@@ -188,7 +188,7 @@ export function OfferLetterModal({
                       {...register('startDate')}
                     />
 
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <Input
                         label="Hourly Rate"
                         type="number"
@@ -212,7 +212,7 @@ export function OfferLetterModal({
                       {...register('schedule')}
                     />
 
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <Input
                         label="Manager Name"
                         placeholder="Jane Smith"
