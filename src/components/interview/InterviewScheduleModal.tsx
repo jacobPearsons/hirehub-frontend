@@ -7,7 +7,6 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { Input, Textarea, Button } from '../ui'
 import { useToast } from '../ui/Toast'
-import { updateApplicationStatus } from '../../api/applications'
 import { sendInterviewInvitation } from '../../api/emails'
 import { useApplications } from '../../context/ApplicationsContext'
 import type { Application } from '../../types/application'
@@ -41,7 +40,7 @@ export function InterviewScheduleModal({
 }: InterviewScheduleModalProps) {
   const [submitting, setSubmitting] = useState(false)
   const { showToast } = useToast()
-  const { updateApplicationInterview } = useApplications()
+  const { updateApplicationInterview, updateApplicationStatus } = useApplications()
 
   const {
     register,

@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect, useMemo, useCallback, type ReactNode } from 'react'
-import { listApplications, updateHiringData } from '../api/applications'
+import { listApplications, updateHiringData, updateApplicationStatus as apiUpdateStatus } from '../api/applications'
 import { getAccessToken } from '../api/client'
 import type { Application } from '../types/application'
 import type { InterviewDetails, OfferDetails, OnboardingChecklistItem, OrientationDetails } from '../types/hiring-flow'
@@ -7,7 +7,7 @@ import type { InterviewDetails, OfferDetails, OnboardingChecklistItem, Orientati
 interface ApplicationsContextValue {
   applications: Application[]
   addApplication: (app: Application) => void
-  updateApplicationStatus: (id: string, status: Application['status']) => void
+  updateApplicationStatus: (id: string, status: Application['status']) => Promise<void>
   updateApplicationInterview: (id: string, details: InterviewDetails) => Promise<void>
   updateApplicationOffer: (id: string, details: OfferDetails) => Promise<void>
   updateApplicationChecklist: (id: string, items: OnboardingChecklistItem[]) => Promise<void>
@@ -30,7 +30,7 @@ export function ApplicationsProvider({ children }: { children: ReactNode }) {
         if (!controller.signal.aborted) {
           setApplications(res.data)
         }
-      } catch {}
+      } catch { /* intentionally empty */ }
     }
 
     init()
@@ -41,8 +41,9 @@ export function ApplicationsProvider({ children }: { children: ReactNode }) {
     setApplications(prev => [app, ...prev])
   }, [])
 
-  const updateApplicationStatus = useCallback((id: string, status: Application['status']) => {
-    setApplications(prev => prev.map(a => a.id === id ? { ...a, status } : a))
+  const updateApplicationStatus = useCallback(async (id: string, status: Application['status']) => {
+    const res = await apiUpdateStatus(id, status)
+    setApplications(prev => prev.map(a => a.id === id ? res.data : a))
   }, [])
 
   const updateApplicationInterview = useCallback(async (id: string, details: InterviewDetails) => {
@@ -82,6 +83,7 @@ export function ApplicationsProvider({ children }: { children: ReactNode }) {
   return <ApplicationsContext.Provider value={value}>{children}</ApplicationsContext.Provider>
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useApplications() {
   const ctx = useContext(ApplicationsContext)
   if (!ctx) throw new Error('useApplications must be used within ApplicationsProvider')
