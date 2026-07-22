@@ -107,7 +107,7 @@ export function ApplicantsTab() {
                       </span>
                     </div>
                     <p className="text-sm text-ink-muted mt-3 line-clamp-2">{app.coverLetter}</p>
-                    <div className="flex items-center gap-2 mt-3">
+                    <div className="flex flex-wrap items-center gap-2 mt-3">
                       {app.status !== 'reviewing' && (
                         <button
                           onClick={() => handleStatusChange(app.id, 'reviewing')}
