@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Card, Button } from '../ui'
 import { useToast } from '../ui/Toast'
+import { useApplications } from '../../context/ApplicationsContext'
 import type { Application, ApplicationStatus } from '../../types/application'
 
 interface OfferLetterViewProps {
@@ -10,6 +11,7 @@ interface OfferLetterViewProps {
 
 export function OfferLetterView({ application, onStatusUpdate }: OfferLetterViewProps) {
   const { showToast } = useToast()
+  const { updateApplicationOffer } = useApplications()
   const [accepted, setAccepted] = useState(application.offerDetails?.accepted ?? false)
   const [declined, setDeclined] = useState(false)
   const [confirming, setConfirming] = useState<'accept' | 'decline' | null>(null)
@@ -19,10 +21,31 @@ export function OfferLetterView({ application, onStatusUpdate }: OfferLetterView
 
   const formattedRate = `${offer.currency === 'USD' ? '$' : offer.currency + ' '}${offer.hourlyRate.toLocaleString()}/hr`
 
-  function handleAccept() {
-    setAccepted(true)
-    setConfirming(null)
-    showToast('success', 'Offer accepted! We\'ll be in touch with next steps.')
+  async function handleAccept() {
+    const o = application.offerDetails
+    if (!o) return
+    try {
+      await updateApplicationOffer(application.id, {
+        jobTitle: o.jobTitle,
+        employmentType: o.employmentType,
+        startDate: o.startDate,
+        hourlyRate: o.hourlyRate,
+        currency: o.currency,
+        schedule: o.schedule,
+        managerName: o.managerName,
+        managerTitle: o.managerTitle,
+        responsibilities: o.responsibilities,
+        contingencies: o.contingencies,
+        expirationDate: o.expirationDate,
+        accepted: true,
+        acceptedAt: new Date().toISOString(),
+      })
+      setAccepted(true)
+      setConfirming(null)
+      showToast('success', 'Offer accepted! We\'ll be in touch with next steps.')
+    } catch {
+      showToast('error', 'Failed to accept offer. Please try again.')
+    }
   }
 
   function handleDecline() {

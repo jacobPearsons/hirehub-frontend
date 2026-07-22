@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect, useMemo, useCallback, type ReactNode } from 'react'
-import { listApplications } from '../api/applications'
+import { listApplications, updateHiringData } from '../api/applications'
 import { getAccessToken } from '../api/client'
 import type { Application } from '../types/application'
 import type { InterviewDetails, OfferDetails, OnboardingChecklistItem, OrientationDetails } from '../types/hiring-flow'
@@ -8,10 +8,10 @@ interface ApplicationsContextValue {
   applications: Application[]
   addApplication: (app: Application) => void
   updateApplicationStatus: (id: string, status: Application['status']) => void
-  updateApplicationInterview: (id: string, details: InterviewDetails) => void
-  updateApplicationOffer: (id: string, details: OfferDetails) => void
-  updateApplicationChecklist: (id: string, items: OnboardingChecklistItem[]) => void
-  updateApplicationOrientation: (id: string, details: OrientationDetails) => void
+  updateApplicationInterview: (id: string, details: InterviewDetails) => Promise<void>
+  updateApplicationOffer: (id: string, details: OfferDetails) => Promise<void>
+  updateApplicationChecklist: (id: string, items: OnboardingChecklistItem[]) => Promise<void>
+  updateApplicationOrientation: (id: string, details: OrientationDetails) => Promise<void>
   setApplications: (apps: Application[]) => void
 }
 
@@ -19,17 +19,6 @@ const ApplicationsContext = createContext<ApplicationsContextValue | null>(null)
 
 export function ApplicationsProvider({ children }: { children: ReactNode }) {
   const [applications, setApplications] = useState<Application[]>([])
-
-  useEffect(() => {
-    try {
-      const saved = localStorage.getItem('hirehub-applications')
-      if (saved) setApplications(JSON.parse(saved))
-    } catch {}
-  }, [])
-
-  useEffect(() => {
-    localStorage.setItem('hirehub-applications', JSON.stringify(applications))
-  }, [applications])
 
   useEffect(() => {
     const controller = new AbortController()
@@ -56,20 +45,24 @@ export function ApplicationsProvider({ children }: { children: ReactNode }) {
     setApplications(prev => prev.map(a => a.id === id ? { ...a, status } : a))
   }, [])
 
-  const updateApplicationInterview = useCallback((id: string, details: InterviewDetails) => {
-    setApplications(prev => prev.map(a => a.id === id ? { ...a, interviewDetails: details } : a))
+  const updateApplicationInterview = useCallback(async (id: string, details: InterviewDetails) => {
+    const res = await updateHiringData(id, { interviewData: details })
+    setApplications(prev => prev.map(a => a.id === id ? res.data : a))
   }, [])
 
-  const updateApplicationOffer = useCallback((id: string, details: OfferDetails) => {
-    setApplications(prev => prev.map(a => a.id === id ? { ...a, offerDetails: details } : a))
+  const updateApplicationOffer = useCallback(async (id: string, details: OfferDetails) => {
+    const res = await updateHiringData(id, { offerData: details })
+    setApplications(prev => prev.map(a => a.id === id ? res.data : a))
   }, [])
 
-  const updateApplicationChecklist = useCallback((id: string, items: OnboardingChecklistItem[]) => {
-    setApplications(prev => prev.map(a => a.id === id ? { ...a, preBoardingChecklist: items } : a))
+  const updateApplicationChecklist = useCallback(async (id: string, items: OnboardingChecklistItem[]) => {
+    const res = await updateHiringData(id, { preboardingData: items })
+    setApplications(prev => prev.map(a => a.id === id ? res.data : a))
   }, [])
 
-  const updateApplicationOrientation = useCallback((id: string, details: OrientationDetails) => {
-    setApplications(prev => prev.map(a => a.id === id ? { ...a, orientationDetails: details } : a))
+  const updateApplicationOrientation = useCallback(async (id: string, details: OrientationDetails) => {
+    const res = await updateHiringData(id, { orientationData: details })
+    setApplications(prev => prev.map(a => a.id === id ? res.data : a))
   }, [])
 
   const value = useMemo(

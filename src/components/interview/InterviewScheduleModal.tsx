@@ -87,7 +87,7 @@ export function InterviewScheduleModal({
         scheduledAt: new Date().toISOString(),
       }
 
-      updateApplicationInterview(application.id, interviewDetails)
+      await updateApplicationInterview(application.id, interviewDetails)
 
       sendInterviewInvitation({
         to: application.applicantEmail,

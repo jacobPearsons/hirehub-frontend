@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { Card, Button } from '../ui'
+import { useApplications } from '../../context/ApplicationsContext'
 import { sendPreBoardingChecklist } from '../../api/emails'
 import type { Application } from '../../types/application'
 import type { OnboardingChecklistItem, ChecklistCategory } from '../../types/hiring-flow'
@@ -28,6 +29,7 @@ interface PreBoardingChecklistProps {
 }
 
 export function PreBoardingChecklist({ application, onCheckUpdate }: PreBoardingChecklistProps) {
+  const { updateApplicationChecklist } = useApplications()
   const [items, setItems] = useState<OnboardingChecklistItem[]>(() => {
     if (application.preBoardingChecklist && application.preBoardingChecklist.length > 0) {
       return application.preBoardingChecklist
@@ -41,16 +43,20 @@ export function PreBoardingChecklist({ application, onCheckUpdate }: PreBoarding
   const allComplete = completedCount === totalCount && totalCount > 0
   const progressPercent = totalCount > 0 ? (completedCount / totalCount) * 100 : 0
 
-  function toggleItem(id: string) {
-    setItems((prev) => {
-      const next = prev.map((item) =>
-        item.id === id
-          ? { ...item, completed: !item.completed, completedAt: !item.completed ? new Date().toISOString() : undefined }
-          : item,
-      )
-      onCheckUpdate?.(next)
-      return next
-    })
+  async function toggleItem(id: string) {
+    const next = items.map((item) =>
+      item.id === id
+        ? { ...item, completed: !item.completed, completedAt: !item.completed ? new Date().toISOString() : undefined }
+        : item,
+    )
+    setItems(next)
+    onCheckUpdate?.(next)
+    try {
+      await updateApplicationChecklist(application.id, next)
+    } catch {
+      // Revert on failure
+      setItems(items)
+    }
   }
 
   async function handleSendEmail() {
@@ -92,7 +98,7 @@ export function PreBoardingChecklist({ application, onCheckUpdate }: PreBoarding
             <li key={item.id}>
               <button
                 type="button"
-                onClick={() => toggleItem(item.id)}
+                onClick={() => { void toggleItem(item.id) }}
                 className="w-full flex items-start gap-3 text-left group"
               >
                 <span

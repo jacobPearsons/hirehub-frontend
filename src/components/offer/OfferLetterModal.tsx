@@ -92,7 +92,7 @@ export function OfferLetterModal({
         expirationDate: data.expirationDate,
       }
 
-      updateApplicationOffer(application.id, offerDetails)
+      await updateApplicationOffer(application.id, offerDetails)
 
       sendOfferLetter({
         to: application.applicantEmail,
