@@ -30,7 +30,7 @@ export function ApplicationCard({ application, onStatusUpdate }: ApplicationCard
   return (
     <motion.div whileHover={{ y: -2 }} transition={{ duration: 0.2, ease: 'easeOut' }}>
       <Card variant="default" className="p-5">
-        <div className="flex items-start gap-4">
+        <div className="flex items-start gap-3 sm:gap-4">
           <img
             src={application.companyLogo}
             alt={application.company}
