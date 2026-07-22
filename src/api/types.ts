@@ -6,6 +6,17 @@ import type { PricingTier } from '../data/pricing'
 export type { Job, Application, BlogPost, PricingTier }
 export type { ApplicationStatus }
 
+export interface ApiUser {
+  id: string
+  name: string
+  email: string
+  role: 'SEEKER' | 'EMPLOYER'
+  companyName?: string
+  phone?: string | null
+  bio?: string | null
+  avatarUrl?: string | null
+}
+
 export interface AuthUser {
   id: string
   name: string
@@ -18,12 +29,12 @@ export interface AuthUser {
 }
 
 export interface LoginResponse {
-  user: AuthUser
+  user: ApiUser
   accessToken: string
 }
 
 export interface RegisterResponse {
-  user: AuthUser
+  user: ApiUser
   accessToken: string
 }
 
