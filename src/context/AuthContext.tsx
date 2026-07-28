@@ -44,25 +44,31 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     async function init() {
       const token = getAccessToken()
+
       if (token) {
         try {
           const res = await getMe()
           if (!controller.signal.aborted) {
-            setUser(mapApiUser(res.data))
+            const user = mapApiUser(res.data)
+            setUser(user)
+            localStorage.setItem('hirehub-auth', JSON.stringify(user))
+            return // Exit here — API data is authoritative
           }
         } catch {
           if (!controller.signal.aborted) {
             setApiToken(null)
           }
+          // Fall through to localStorage fallback
         }
       }
 
+      // Fallback: try cached user from localStorage
       try {
         const saved = localStorage.getItem('hirehub-auth')
         if (saved && !controller.signal.aborted) {
           setUser(JSON.parse(saved))
         }
-      } catch {}
+      } catch { /* ignore parse errors */ }
 
       if (!controller.signal.aborted) {
         setLoading(false)
@@ -89,6 +95,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useAuth() {
   const ctx = useContext(AuthContext)
   if (!ctx) throw new Error('useAuth must be used within AuthProvider')
