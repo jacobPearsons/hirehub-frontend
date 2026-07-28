@@ -52,6 +52,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             const user = mapApiUser(res.data)
             setUser(user)
             localStorage.setItem('hirehub-auth', JSON.stringify(user))
+            setLoading(false)
             return // Exit here — API data is authoritative
           }
         } catch {

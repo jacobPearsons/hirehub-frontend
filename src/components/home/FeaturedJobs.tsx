@@ -55,7 +55,7 @@ export function FeaturedJobs() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {featured.map((job) => (
-              <Link key={job.id} to={`/jobs/${job.id}`} className="block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/40 rounded-lg group">
+              <Link key={job.id} to={`/jobs/${job.id}`} className="hover:text-accent block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/40 rounded-lg group">
                 <Card variant="default" className="p-6 transition-transform duration-200 group-hover:scale-[1.02]">
                   <div className="flex items-center gap-2 mb-2">
                     <CompanyLogo job={job} className="w-6 h-6 rounded" />

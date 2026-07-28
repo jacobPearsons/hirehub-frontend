@@ -71,7 +71,7 @@ export default function JobDetailPage() {
               <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-sm text-ink-muted">
                 <Link to="/jobs" className="hover:text-ink transition-colors">Jobs</Link>
                 <span aria-hidden="true">→</span>
-                <span aria-current="page">{job.title}</span>
+                <span aria-current="page" >{job.title}</span>
               </nav>
             </HeroContent>
             <SaveButton jobId={job.id} />

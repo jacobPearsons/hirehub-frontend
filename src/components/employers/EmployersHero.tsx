@@ -29,7 +29,7 @@ export function EmployersHero() {
             </p>
             <div className="flex items-center gap-6">
               <Link
-                to="#"
+                to="/dashboard"
                 className="inline-flex items-center justify-center rounded-md bg-accent text-white px-6 py-3 text-base font-medium hover:bg-accent/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/40"
               >
                 Post a job

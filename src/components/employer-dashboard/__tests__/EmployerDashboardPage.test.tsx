@@ -1,0 +1,53 @@
+import { render, screen } from '@testing-library/react'
+import { MemoryRouter } from 'react-router-dom'
+import EmployerDashboardPage from '../EmployerDashboardPage'
+
+vi.mock('../../../context/AppContext', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('../../../context/AppContext')>()
+  return {
+    ...actual,
+    useApp: vi.fn(() => ({
+      user: { id: '1', name: 'Employer User', role: 'employer' },
+      setUser: vi.fn(),
+    })),
+  }
+})
+
+vi.mock('../../../utils/usePageMeta', () => ({
+  usePageMeta: vi.fn(),
+}))
+
+vi.mock('../../../api/jobs', () => ({
+  listJobs: vi.fn(),
+}))
+
+vi.mock('../../../api/applications', () => ({
+  listApplications: vi.fn(),
+}))
+
+function renderEmployerDashboardPage() {
+  return render(
+    <MemoryRouter initialEntries={['/employer-dashboard']}>
+      <EmployerDashboardPage />
+    </MemoryRouter>
+  )
+}
+
+describe('EmployerDashboardPage', () => {
+  it('renders Employer Dashboard heading', () => {
+    renderEmployerDashboardPage()
+    expect(screen.getByRole('heading', { name: /employer dashboard/i })).toBeInTheDocument()
+  })
+
+  it('renders tab bar with Job Listings and Applicants tabs', () => {
+    renderEmployerDashboardPage()
+    expect(screen.getByRole('tab', { name: /job listings/i })).toBeInTheDocument()
+    expect(screen.getByRole('tab', { name: /applicants/i })).toBeInTheDocument()
+  })
+
+  it('defaults to Job Listings tab', () => {
+    renderEmployerDashboardPage()
+    expect(screen.getByRole('tab', { name: /job listings/i })).toHaveAttribute('aria-selected', 'true')
+    expect(screen.getByRole('tab', { name: /applicants/i })).toHaveAttribute('aria-selected', 'false')
+  })
+})

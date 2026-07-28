@@ -22,7 +22,7 @@ export function JobListingsTab() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
-  function fetchJobs() {
+  function handleRetry() {
     setLoading(true)
     setError(null)
     listEmployerJobs()
@@ -32,7 +32,12 @@ export function JobListingsTab() {
   }
 
   useEffect(() => {
-    fetchJobs()
+    let cancelled = false
+    listEmployerJobs()
+      .then(res => { if (!cancelled) setAllJobs(res.data) })
+      .catch(() => { if (!cancelled) setError('Failed to load job listings.') })
+      .finally(() => { if (!cancelled) setLoading(false) })
+    return () => { cancelled = true }
   }, [])
 
   const jobs = allJobs
@@ -42,7 +47,7 @@ export function JobListingsTab() {
   }
 
   if (error) {
-    return <ErrorState message={error} onRetry={fetchJobs} />
+    return <ErrorState message={error} onRetry={handleRetry} />
   }
 
   if (jobs.length === 0) {

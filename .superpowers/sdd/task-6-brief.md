@@ -1,93 +1,105 @@
-# Task 6: Stage 3 — Offer Letter View (Candidate) with Accept/Decline
+### Task 6: JobBoardPage Responsive Update
 
-## Task Description
+**Files:**
+- Modify: `src/components/jobs/JobBoardPage.tsx`
+- Modify: `src/components/jobs/FilterSidebar.tsx` (extract shared FilterOption)
 
-Build a styled offer letter view that candidates see when their application status is "offer", with accept and decline functionality.
+**Interfaces:**
+- Consumes: `FilterDrawer`, `ActiveFilterChips` from Task 5; existing `FilterSidebar`
+- Produces: Responsive JobBoardPage with conditional filter rendering
 
-## Files to Create
+- [ ] **Step 1: Extract FilterOption from FilterSidebar into shared helper**
 
-### `src/components/offer/OfferLetterView.tsx`
+Move the `FilterOption` sub-component to a shared location or keep it in FilterSidebar but export it for reuse by FilterDrawer. Since FilterDrawer uses a different layout (pill buttons instead of list items), keep them separate — no extraction needed.
 
-A styled offer letter component matching the formal letter format.
+- [ ] **Step 2: Update JobBoardPage with responsive filter rendering**
 
-**Layout:**
-- Header: "HireHub Community — Official Offer of Employment" with accent styling
-- Candidate name and address section
-- Formal letter body with all offer terms:
-  - Job Title
-  - Employment Type
-  - Start Date
-  - Hourly Rate (formatted as currency)
-  - Schedule
-  - Manager Name & Title
-- Key Responsibilities list
-- Contingencies section
-- Expiration date
-- Accept/Decline buttons
-- After acceptance: "Thank you for accepting! We'll be in touch with next steps." message
-- After decline: Status changes, a "We understand" message
-
-**Props:**
-```typescript
-interface OfferLetterViewProps {
-  application: Application
-  onStatusUpdate: (applicationId: string, status: ApplicationStatus) => void
-}
-```
-
-**Behavior:**
-- Accept button: Sets `offerDetails.accepted = true`, `offerDetails.acceptedAt = new Date().toISOString()`, updates local state, shows toast
-- Decline button: Changes status to `rejected`, shows toast
-- Both buttons should have confirmation (either a confirm dialog or a second click to confirm)
-- After accept/decline, hide the buttons and show the appropriate message
-
-**Styling:**
-- Formal letter appearance with border and padding
-- Use `Card` component from `../ui`
-- Accent color for header
-- Clean typography with proper spacing
-- Responsive layout
-
-## Files to Modify
-
-### `src/components/dashboard/ApplicationCard.tsx`
-
-Current state: Shows interview details for `interviewing` status (from Task 4).
-
-Changes needed:
-1. Import `OfferLetterView` from `../offer/OfferLetterView`
-2. When `application.status === 'offer'` and `application.offerDetails` exists, render `OfferLetterView` below the existing status info
-3. Pass `onStatusUpdate` callback to update the application status
-
-**Pattern:**
 ```tsx
-{application.status === 'offer' && application.offerDetails && (
-  <div className="mt-4 pt-4 border-t border-hairline">
-    <OfferLetterView application={application} onStatusUpdate={onStatusUpdate} />
+// Key changes in JobBoardPage.tsx:
+// 1. Add state for filter drawer open/close
+// 2. Conditionally render FilterSidebar (lg+) vs FilterDrawer trigger (<lg)
+// 3. Add ActiveFilterChips below search bar on mobile
+
+const [filterDrawerOpen, setFilterDrawerOpen] = useState(false)
+
+const activeFilterCount = [filters.category, filters.seniority, filters.remote].filter(Boolean).length
+
+// In the JSX, replace the grid section:
+<>
+  {/* Mobile: search + filter trigger */}
+  <div className="lg:hidden flex gap-3 mb-4">
+    <div className="flex-1">
+      <SearchBar value={search} onChange={handleSearchChange} />
+    </div>
+    <Button
+      variant="secondary"
+      size="md"
+      onClick={() => setFilterDrawerOpen(true)}
+      className="shrink-0"
+    >
+      Filters{activeFilterCount > 0 ? ` (${activeFilterCount})` : ''}
+    </Button>
   </div>
-)}
+
+  {/* Desktop: search bar */}
+  <Reveal className="hidden lg:block max-w-xl mb-8">
+    <SearchBar value={search} onChange={handleSearchChange} />
+  </Reveal>
+
+  {/* Mobile: active filter chips */}
+  <div className="lg:hidden">
+    <ActiveFilterChips filters={filters} onFilterChange={handleFilterChange} />
+  </div>
+
+  {/* Filter drawer for mobile */}
+  <FilterDrawer
+    open={filterDrawerOpen}
+    onOpenChange={setFilterDrawerOpen}
+    filters={filters}
+    onFilterChange={handleFilterChange}
+    activeCount={activeFilterCount}
+  />
+
+  {/* Desktop: sidebar layout */}
+  <div className="hidden lg:grid grid-cols-[280px_1fr] gap-8">
+    <Reveal delay={0.05}><FilterSidebar filters={filters} onFilterChange={handleFilterChange} /></Reveal>
+    <Reveal delay={0.1}>
+      <JobCardGrid jobs={filteredJobs} />
+      {hasMore && (
+        <div className="mt-8 text-center">
+          <Button variant="ghost" size="md" onClick={() => loadJobs(false)} disabled={loadingMore}>
+            {loadingMore ? 'Loading more...' : `Load more (${filteredJobs.length} of ${total})`}
+          </Button>
+        </div>
+      )}
+    </Reveal>
+  </div>
+
+  {/* Mobile: jobs grid without sidebar */}
+  <div className="lg:hidden">
+    <JobCardGrid jobs={filteredJobs} />
+    {hasMore && (
+      <div className="mt-8 text-center">
+        <Button variant="ghost" size="md" onClick={() => loadJobs(false)} disabled={loadingMore}>
+          {loadingMore ? 'Loading more...' : `Load more (${filteredJobs.length} of ${total})`}
+        </Button>
+      </div>
+    )}
+  </div>
+</>
 ```
 
-### `src/components/dashboard/ApplicationsTab.tsx`
-
-Changes needed:
-1. Add a `handleStatusUpdate` function that updates application status locally
-2. Pass this function to `ApplicationCard` as a prop
-3. The function should update the `apps` state array
-
-## Context
-
-- Types: `OfferDetails` from `../../types/hiring-flow`, `Application`, `ApplicationStatus` from `../../types/application`
-- UI: `Card`, `Button` from `../ui`
-- Toast: `useToast()` from `../ui/Toast`
-- The `OfferDetails` type has: `accepted?: boolean`, `acceptedAt?: string`
-- Existing `ApplicationCard` already handles interview details display
-
-## Verification
+- [ ] **Step 3: Run build to verify**
 
 Run: `npx tsc --noEmit`
-Expected: Clean compilation
+Expected: No errors
 
-## Report
+- [ ] **Step 4: Commit**
 
-Write your report to `/home/jacobp/Desktop/Projecs/hirehub-frontend/.superpowers/sdd/task-6-report.md`
+```bash
+git add src/components/jobs/JobBoardPage.tsx
+git commit -m "feat: responsive job board with mobile filter drawer and active filter chips"
+```
+
+---
+

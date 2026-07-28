@@ -1,4 +1,4 @@
-import { apiGet, apiPost } from './client'
+import { apiGet, apiPost, apiPatch, apiDelete } from './client'
 import type { Job, JobListParams } from './types'
 
 export interface CreateJobParams {
@@ -37,4 +37,16 @@ export async function listJobs(params?: JobListParams) {
 
 export async function getJobById(id: string) {
   return apiGet<Job>(`/jobs/${id}`)
+}
+
+export async function updateJob(id: string, data: Partial<CreateJobParams>) {
+  return apiPatch<Job>(`/jobs/${id}`, data)
+}
+
+export async function deleteJob(id: string) {
+  return apiDelete(`/jobs/${id}`)
+}
+
+export async function listEmployerJobs() {
+  return apiGet<Job[]>('/jobs/employer/me')
 }

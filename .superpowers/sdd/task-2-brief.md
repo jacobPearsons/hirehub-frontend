@@ -1,100 +1,180 @@
-# Task 2: Email Service Integration (EmailJS)
+### Task 2: Sidebar Component
 
-## Task Description
+**Files:**
+- Create: `src/components/layout/Sidebar.tsx`
+- Create: `src/components/layout/sidebar-constants.ts`
 
-Create the email service layer using EmailJS for sending styled HTML emails to candidates at each stage of the HireHub Community hiring pipeline.
+**Interfaces:**
+- Consumes: `NavLink`, `useLocation` from react-router-dom; `useApp` from AppContext; Lucide icons
+- Produces: `Sidebar` component with `mobile`, `isOpen`, `onClose` props
 
-## Files to Create
+- [ ] **Step 1: Create sidebar navigation constants**
 
-### `src/api/emails.ts`
+```ts
+// src/components/layout/sidebar-constants.ts
+import { LayoutDashboard, Bookmark, Briefcase, Search, FileText, Users, Plus } from 'lucide-react'
 
-This file should export:
+interface SidebarItem {
+  label: string
+  to: string
+  icon: React.ComponentType<{ className?: string }>
+}
 
-1. **Email parameter interfaces** for each email type:
-   - `InterviewEmailParams` — to, candidateName, jobTitle, interviewType, interviewDate, interviewTime, interviewerName, interviewerTitle, meetingLink, meetingLocation
-   - `PostInterviewEmailParams` — to, candidateName, jobTitle, expectedTimeline
-   - `OfferEmailParams` — to, candidateName, jobTitle, employmentType, startDate, hourlyRate, currency, schedule, managerName, managerTitle, expirationDate
-   - `PreBoardingEmailParams` — to, candidateName, deadline
-   - `OrientationEmailParams` — to, candidateName, date, time, location
+export const seekerNavItems: SidebarItem[] = [
+  { label: 'Dashboard', to: '/dashboard', icon: LayoutDashboard },
+  { label: 'Saved Jobs', to: '/dashboard', icon: Bookmark },
+  { label: 'Browse Jobs', to: '/jobs', icon: Search },
+]
 
-2. **HTML email templates** as template literal strings. Each template should be a complete HTML email with inline CSS:
-
-   **Interview Invitation Email:**
-   - Subject: "Interview Invitation: [Job Title] at HireHub Community"
-   - Body: Formal invitation with interview details, meeting link, preparation tips
-   - Style: Clean, professional, HireHub branding (orange accent #ff5600)
-
-   **Post-Interview Follow-Up Email:**
-   - Subject: "Thank You for Interviewing with HireHub Community"
-   - Body: Thank you message, next steps timeline
-   - Style: Same professional styling
-
-   **Offer Letter Email:**
-   - Subject: "Official Offer of Employment – HireHub Community"
-   - Body: Formal offer letter with all terms, contingencies, acceptance instructions
-   - Style: Formal letter format
-
-   **Pre-Boarding Checklist Email:**
-   - Subject: "Welcome to HireHub Community! Your Pre-Boarding Checklist"
-   - Body: Checklist items, pre-start tasks, deadline
-   - Style: Checklist format with checkboxes
-
-   **Orientation Details Email:**
-   - Subject: "Your First Day at HireHub Community – Orientation Details"
-   - Body: Date, time, location, agenda items
-   - Style: Clean schedule format
-
-3. **`sendEmail` function** that:
-   - Uses `@emailjs/browser` to send emails
-   - Reads config from environment variables: `VITE_EMAILJS_SERVICE_ID`, `VITE_EMAILJS_TEMPLATE_ID`, `VITE_EMAILJS_PUBLIC_KEY`
-   - Takes a template name and params, renders the HTML template, and sends via EmailJS
-   - Returns a promise that resolves on success
-   - Handles errors gracefully (logs but doesn't throw — email sending is best-effort)
-
-4. **Convenience functions:**
-   - `sendInterviewInvitation(params: InterviewEmailParams)`
-   - `sendPostInterviewFollowUp(params: PostInterviewEmailParams)`
-   - `sendOfferLetter(params: OfferEmailParams)`
-   - `sendPreBoardingChecklist(params: PreBoardingEmailParams)`
-   - `sendOrientationDetails(params: OrientationEmailParams)`
-
-## Files to Modify
-
-### `.env.example`
-
-Add these lines at the end:
-```
-VITE_EMAILJS_SERVICE_ID=your_service_id
-VITE_EMAILJS_TEMPLATE_ID=your_template_id
-VITE_EMAILJS_PUBLIC_KEY=your_public_key
+export const employerNavItems: SidebarItem[] = [
+  { label: 'Dashboard', to: '/employer/dashboard', icon: LayoutDashboard },
+  { label: 'Job Listings', to: '/employer/dashboard', icon: Briefcase },
+  { label: 'Applicants', to: '/employer/dashboard', icon: Users },
+  { label: 'Post Job', to: '/post-job', icon: Plus },
+]
 ```
 
-## Email Template Design Guidelines
+- [ ] **Step 2: Create the Sidebar component**
 
-- Use inline CSS (no external stylesheets — email clients don't support them)
-- Base font: system-ui, -apple-system, sans-serif
-- Max width: 600px, centered
-- Background: #f5f1ec (matching the app's canvas color)
-- Content background: #ffffff
-- Accent color: #ff5600 (HireHub orange)
-- Text color: #111111
-- Muted text: #626260
-- Header should have "HireHub Community" in the accent color with a brief mission tagline
-- Footer: "© 2025 HireHub Community. All rights reserved."
-- Professional, warm, supportive tone — connecting talent with opportunity
+```tsx
+// src/components/layout/Sidebar.tsx
+import { NavLink, Link, useNavigate } from 'react-router-dom'
+import { X, LogOut } from 'lucide-react'
+import { useApp } from '../../context/AppContext'
+import { logout } from '../../api/auth'
+import { setAccessToken } from '../../api/client'
+import { seekerNavItems, employerNavItems } from './sidebar-constants'
+import type { ReactNode } from 'react'
 
-## Context
+interface SidebarProps {
+  mobile?: boolean
+  isOpen?: boolean
+  onClose?: () => void
+}
 
-- EmailJS is already installed: `@emailjs/browser`
-- The app uses Vite, so env vars are accessed via `import.meta.env.VITE_*`
-- The existing API layer is at `src/api/` — this file should follow the same export patterns
-- HireHub Community is a modern job board platform connecting talent with opportunity
+function NavItem({ item, onClick }: { item: { label: string; to: string; icon: React.ComponentType<{ className?: string }> }; onClick?: () => void }) {
+  const Icon = item.icon
+  return (
+    <NavLink
+      to={item.to}
+      onClick={onClick}
+      className={({ isActive }) =>
+        `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/30 ${
+          isActive
+            ? 'bg-accent/10 text-accent'
+            : 'text-ink-muted hover:text-ink hover:bg-surface-2'
+        }`
+      }
+    >
+      <Icon className="h-5 w-5 shrink-0" />
+      <span>{item.label}</span>
+    </NavLink>
+  )
+}
 
-## Verification
+function SidebarContent({ onNavClick }: { onNavClick?: () => void }) {
+  const { user, setUser } = useApp()
+  const navigate = useNavigate()
+
+  const navItems = user?.role === 'employer' ? employerNavItems : seekerNavItems
+
+  const handleLogout = async () => {
+    try { await logout() } catch {}
+    setAccessToken(null)
+    setUser(null)
+    navigate('/')
+    onNavClick?.()
+  }
+
+  return (
+    <nav className="flex flex-col h-full bg-canvas">
+      {/* Logo */}
+      <div className="flex items-center gap-3 px-4 h-14 border-b border-hairline shrink-0">
+        <Link to="/" onClick={onNavClick} className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/30 rounded">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 52" fill="none" className="h-7" aria-hidden="true">
+            <rect x="4" y="6" width="40" height="40" rx="8" fill="#ff5600"/>
+            <path d="M16 16v20M16 26h16M32 16v20" stroke="white" strokeWidth="3.5" strokeLinecap="round"/>
+            <text x="54" y="32" fontFamily="Inter, system-ui, sans-serif" fontSize="22" fontWeight="500" fill="currentColor" letterSpacing="-0.3">HireHub</text>
+            <text x="54" y="45" fontFamily="Inter, system-ui, sans-serif" fontSize="11" fontWeight="400" fill="currentColor" opacity="0.6">Community</text>
+          </svg>
+        </Link>
+      </div>
+
+      {/* Navigation */}
+      <div className="flex-1 overflow-y-auto py-4 px-3 space-y-1">
+        {navItems.map((item) => (
+          <NavItem key={item.label} item={item} onClick={onNavClick} />
+        ))}
+      </div>
+
+      {/* Footer */}
+      <div className="border-t border-hairline p-3 shrink-0">
+        {user && (
+          <div className="flex items-center gap-3 px-3 py-2.5">
+            <span className="text-sm text-ink-muted truncate">{user.name}</span>
+            <button
+              onClick={handleLogout}
+              className="ml-auto text-ink-muted hover:text-ink transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/30 rounded"
+              aria-label="Log out"
+            >
+              <LogOut size={18} />
+            </button>
+          </div>
+        )}
+      </div>
+    </nav>
+  )
+}
+
+export function Sidebar({ mobile, isOpen, onClose }: SidebarProps) {
+  if (mobile) {
+    return (
+      <>
+        {isOpen && (
+          <div className="fixed inset-0 z-50 md:hidden">
+            <div className="fixed inset-0 bg-black/40" onClick={onClose} />
+            <div className="fixed left-0 top-0 bottom-0 w-[280px] max-w-[85vw] bg-canvas border-r border-hairline shadow-2xl flex flex-col">
+              <div className="flex items-center justify-between px-4 h-14 border-b border-hairline shrink-0">
+                <span className="font-medium text-ink text-sm">Menu</span>
+                <button
+                  onClick={onClose}
+                  className="p-2 text-ink-muted hover:text-ink rounded-lg hover:bg-surface-2 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/30"
+                  aria-label="Close menu"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+              <div className="flex-1 overflow-y-auto">
+                <SidebarContent onNavClick={onClose} />
+              </div>
+            </div>
+          </div>
+        )}
+      </>
+    )
+  }
+
+  return (
+    <div className="hidden md:flex w-56 shrink-0 border-r border-hairline">
+      <SidebarContent />
+    </div>
+  )
+}
+```
+
+Note: Replace `__import_useNavigate` with actual `useNavigate` import from react-router-dom. The component uses string concatenation with ternaries per HireHub convention, no `cn()` or `clsx()`.
+
+- [ ] **Step 3: Run build to verify**
 
 Run: `npx tsc --noEmit`
-Expected: Clean compilation
+Expected: No errors
 
-## Report
+- [ ] **Step 4: Commit**
 
-Write your report to `/home/jacobp/Desktop/Projecs/hirehub-frontend/.superpowers/sdd/task-2-report.md`
+```bash
+git add src/components/layout/Sidebar.tsx src/components/layout/sidebar-constants.ts
+git commit -m "feat: add responsive Sidebar component with role-based navigation"
+```
+
+---
+

@@ -1,101 +1,52 @@
-# Task 7: Stage 4 — Pre-Boarding Checklist (Candidate View)
+### Task 7: Responsive Overhaul — Public Pages
 
-## Task Description
+**Files:**
+- Modify: `src/components/home/HomePage.tsx` (and sub-components)
+- Modify: `src/components/about/AboutPage.tsx` (and sub-components)
+- Modify: `src/components/contact/ContactPage.tsx` (and sub-components)
+- Modify: `src/components/employers/EmployersPage.tsx` (and sub-components)
+- Modify: `src/components/jobs/JobDetailPage.tsx`
+- Modify: `src/components/blog/BlogPage.tsx`
 
-Build a pre-boarding checklist that appears when a candidate has accepted their offer (offerDetails.accepted === true). This is a visual checklist that the candidate works through before their start date.
+**Interfaces:**
+- Consumes: Existing component structure
+- Produces: Same components with responsive class updates
 
-## Files to Create
+- [ ] **Step 1: Update HomePage section padding and typography**
 
-### `src/components/preboarding/PreBoardingChecklist.tsx`
+Apply `py-12 md:py-24` to sections, verify hero text scales properly.
 
-An expandable checklist component.
+- [ ] **Step 2: Update AboutPage grid layouts**
 
-**Layout:**
-- Header: "Pre-Boarding Checklist" with a progress indicator (e.g. "3 of 7 completed")
-- Progress bar showing completion percentage
-- List of checklist items, each with:
-  - Checkbox (checked/unchecked)
-  - Item title
-  - Category badge (Documents, IT Setup, Training, Benefits)
-  - Description
-- Completion message when all items are checked
-- "Send Pre-Boarding Email" button that triggers the email
+Ensure 2-col story section stacks on mobile: `grid-cols-1 md:grid-cols-2`.
 
-**Props:**
-```typescript
-interface PreBoardingChecklistProps {
-  application: Application
-  onCheckUpdate?: (items: OnboardingChecklistItem[]) => void
-}
-```
+- [ ] **Step 3: Update ContactPage layout**
 
-**Behavior:**
-- Initialize with the default checklist items (5-7 items)
-- Allow toggling items via checkbox
-- Show progress (X of Y completed)
-- When all items complete, show a success message
-- Store checked state locally (on the component) + emit via onCheckUpdate
+Ensure 2-col layout stacks on mobile: `grid-cols-1 md:grid-cols-2`.
 
-**Default Checklist Items:**
-```typescript
-const defaultChecklistItems: OnboardingChecklistItem[] = [
-  { id: '1', title: 'Complete employment application', description: 'Fill out all required employment forms', category: 'Documents', completed: false },
-  { id: '2', title: 'Provide identification documents', description: 'Submit government-issued ID and proof of work authorization', category: 'Documents', completed: false },
-  { id: '3', title: 'Submit tax forms (W-4, I-9)', description: 'Complete federal and state tax withholding forms', category: 'Documents', completed: false },
-  { id: '4', title: 'Sign non-disclosure agreement', description: 'Review and sign the company NDA', category: 'Documents', completed: false },
-  { id: '5', title: 'Request IT equipment', description: 'Laptop, monitor, keyboard, mouse', category: 'IT Setup', completed: false },
-  { id: '6', title: 'Create company email account', description: 'Set up your @company.com email address', category: 'IT Setup', completed: false },
-  { id: '7', title: 'Complete benefits enrollment', description: 'Select health, dental, vision, and 401k options', category: 'Benefits', completed: false },
-]
-```
+- [ ] **Step 4: Update EmployersPage**
 
-**Styling:**
-- Use `Card` component from `../ui`
-- Progress bar: use a div with width percentage and accent color
-- Category badges: use `Tag` component or inline badges
-- Checked items: strikethrough text + muted color
-- Responsive layout
+Ensure pricing cards and features grids are responsive.
 
-### `src/components/preboarding/index.ts`
+- [ ] **Step 5: Update JobDetailPage**
 
-Barrel export:
-```typescript
-export { PreBoardingChecklist } from './PreBoardingChecklist'
-```
+Responsive header: `flex flex-col sm:flex-row sm:items-center justify-between gap-4`. Add mobile apply bar at bottom (`lg:hidden`).
 
-## Files to Modify
+- [ ] **Step 6: Update BlogPage card grid**
 
-### `src/components/dashboard/ApplicationCard.tsx`
+Ensure `grid-cols-1 md:grid-cols-2 lg:grid-cols-3`.
 
-Changes needed:
-1. Import `PreBoardingChecklist` from `../preboarding/PreBoardingChecklist`
-2. When `application.status === 'offer'` AND `application.offerDetails?.accepted === true` AND `application.preBoardingChecklist` exists, render `PreBoardingChecklist` below the offer details
-3. The pre-boarding checklist should only appear after the offer has been accepted
-
-**Pattern:**
-```tsx
-{application.status === 'offer' && 
- application.offerDetails?.accepted === true && 
- application.preBoardingChecklist && (
-  <div className="mt-4 pt-4 border-t border-hairline">
-    <PreBoardingChecklist application={application} />
-  </div>
-)}
-```
-
-## Context
-
-- Types: `OnboardingChecklistItem` from `../../types/hiring-flow`, `Application` from `../../types/application`
-- UI: `Card`, `Tag`, `Button` from `../ui`
-- The `OnboardingChecklistItem` type has: `id`, `title`, `description`, `category`, `completed`, `completedAt?`
-- The `Application` type has `preBoardingChecklist?: OnboardingChecklistItem[]`
-- Email function: `sendPreBoardingChecklist` from `../../api/emails`
-
-## Verification
+- [ ] **Step 7: Run build to verify**
 
 Run: `npx tsc --noEmit`
-Expected: Clean compilation
+Expected: No errors
 
-## Report
+- [ ] **Step 8: Commit**
 
-Write your report to `/home/jacobp/Desktop/Projecs/hirehub-frontend/.superpowers/sdd/task-7-report.md`
+```bash
+git add src/components/home/ src/components/about/ src/components/contact/ src/components/employers/ src/components/jobs/JobDetailPage.tsx src/components/blog/
+git commit -m "feat: mobile-first responsive overhaul for all public pages"
+```
+
+---
+

@@ -1,106 +1,170 @@
-# Task 5: Stage 3 — Offer Letter (Employer Modal) + Email
+### Task 5: FilterDrawer + ActiveFilterChips
 
-## Task Description
+**Files:**
+- Create: `src/components/jobs/FilterDrawer.tsx`
+- Create: `src/components/jobs/ActiveFilterChips.tsx`
 
-Build a modal for employers to create and send formal offer letters when moving a candidate to "offer" status.
+**Interfaces:**
+- Consumes: Same filter state as FilterSidebar (`filters`, `onFilterChange`); Radix Dialog; Framer Motion
+- Produces: `FilterDrawer` (mobile bottom sheet), `ActiveFilterChips` (chip row)
 
-## Files to Create
+- [ ] **Step 1: Create FilterDrawer component**
 
-### `src/components/offer/OfferLetterModal.tsx`
+A bottom sheet using Radix Dialog with slide-up animation. Contains the same filter groups as FilterSidebar.
 
-A Radix Dialog modal with react-hook-form + zod for creating offer letters.
+```tsx
+// src/components/jobs/FilterDrawer.tsx
+import * as Dialog from '@radix-ui/react-dialog'
+import { motion, AnimatePresence } from 'framer-motion'
+import { X } from 'lucide-react'
+import { Button } from '../ui/Button'
 
-**Form Fields:**
-- Job Title — text input (required)
-- Employment Type — select: full-time, part-time, contract (required)
-- Start Date — date input (required)
-- Hourly Rate — number input (required)
-- Currency — text input, default "USD" (required)
-- Schedule — text input, e.g. "Monday to Friday, 9:00 AM – 5:00 PM" (required)
-- Manager Name — text input (required)
-- Manager Title — text input (required)
-- Key Responsibilities — textarea, one per line (required)
-- Contingencies — textarea, one per line (required, e.g. "Background check", "Drug screening")
-- Offer Expiration Date — date input (required)
-
-**On submit:**
-1. Create an `OfferDetails` object with all form values
-2. Parse responsibilities and contingencies from textarea (split by newline, filter empty)
-3. Set `accepted: undefined` (not yet accepted)
-4. Update the application status to `offer` via API
-5. Send offer letter email via `sendOfferLetter` from `src/api/emails.ts`
-6. Call `onSuccess()` callback to close modal and refresh data
-7. Show a toast on success
-
-**Props:**
-```typescript
-interface OfferLetterModalProps {
-  application: Application
+interface FilterDrawerProps {
   open: boolean
   onOpenChange: (open: boolean) => void
-  onSuccess: () => void
+  filters: { category: string; seniority: string; remote: string }
+  onFilterChange: (key: string, value: string) => void
+  activeCount: number
+}
+
+const categories = ['All', 'Engineering', 'Design', 'Marketing', 'Sales', 'Operations']
+const seniorities = ['All', 'Junior', 'Mid', 'Senior', 'Lead', 'Executive']
+const locations = ['All', 'Remote', 'On-site', 'Hybrid']
+
+function FilterGroup({ label, options, value, onChange }: {
+  label: string
+  options: string[]
+  value: string
+  onChange: (val: string) => void
+}) {
+  return (
+    <fieldset className="border-0 p-0 m-0">
+      <legend className="text-sm font-medium mb-3 text-ink">{label}</legend>
+      <div className="flex flex-wrap gap-2">
+        {options.map((opt) => {
+          const optValue = opt === 'All' ? '' : (label === 'Seniority' ? opt.toLowerCase() : opt)
+          const isSelected = value === optValue
+          return (
+            <button
+              key={opt}
+              type="button"
+              onClick={() => onChange(optValue)}
+              className={`px-3 py-1.5 rounded-pill text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/30 ${
+                isSelected
+                  ? 'bg-accent text-white'
+                  : 'bg-surface-2 text-ink-muted hover:text-ink'
+              }`}
+            >
+              {opt}
+            </button>
+          )
+        })}
+      </div>
+    </fieldset>
+  )
+}
+
+export function FilterDrawer({ open, onOpenChange, filters, onFilterChange, activeCount }: FilterDrawerProps) {
+  const handleClear = () => {
+    onFilterChange('category', '')
+    onFilterChange('seniority', '')
+    onFilterChange('remote', '')
+  }
+
+  return (
+    <Dialog.Root open={open} onOpenChange={onOpenChange}>
+      <Dialog.Portal>
+        <Dialog.Overlay className="fixed inset-0 z-50 bg-black/40 md:hidden" />
+        <Dialog.Content
+          className="fixed inset-x-0 bottom-0 z-50 bg-canvas rounded-t-xl border-t border-hairline max-h-[80vh] overflow-y-auto md:hidden"
+          aria-label="Filter jobs"
+        >
+          <div className="sticky top-0 bg-canvas border-b border-hairline px-4 py-3 flex items-center justify-between">
+            <Dialog.Title className="text-base font-medium text-ink">
+              Filters {activeCount > 0 && <span className="text-ink-muted">({activeCount})</span>}
+            </Dialog.Title>
+            <Dialog.Close asChild>
+              <button
+                className="p-1 text-ink-muted hover:text-ink rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/30"
+                aria-label="Close filters"
+              >
+                <X size={20} />
+              </button>
+            </Dialog.Close>
+          </div>
+
+          <div className="p-4 space-y-6">
+            <FilterGroup label="Category" options={categories} value={filters.category} onChange={(v) => onFilterChange('category', v)} />
+            <FilterGroup label="Seniority" options={seniorities} value={filters.seniority} onChange={(v) => onFilterChange('seniority', v)} />
+            <FilterGroup label="Location" options={locations} value={filters.remote} onChange={(v) => onFilterChange('remote', v)} />
+          </div>
+
+          <div className="sticky bottom-0 bg-canvas border-t border-hairline px-4 py-3 flex gap-3">
+            <Button variant="ghost" size="md" className="flex-1" onClick={handleClear}>Clear all</Button>
+            <Dialog.Close asChild>
+              <Button variant="primary" size="md" className="flex-1">Show results</Button>
+            </Dialog.Close>
+          </div>
+        </Dialog.Content>
+      </Dialog.Portal>
+    </Dialog.Root>
+  )
 }
 ```
 
-**Zod Schema:**
-```typescript
-const offerSchema = z.object({
-  jobTitle: z.string().min(1, 'Job title is required'),
-  employmentType: z.enum(['full-time', 'part-time', 'contract']),
-  startDate: z.string().min(1, 'Start date is required'),
-  hourlyRate: z.number().min(0, 'Rate must be positive'),
-  currency: z.string().min(1, 'Currency is required').default('USD'),
-  schedule: z.string().min(1, 'Schedule is required'),
-  managerName: z.string().min(1, 'Manager name is required'),
-  managerTitle: z.string().min(1, 'Manager title is required'),
-  responsibilities: z.string().min(1, 'Responsibilities are required'),
-  contingencies: z.string().min(1, 'Contingencies are required'),
-  expirationDate: z.string().min(1, 'Expiration date is required'),
-})
+- [ ] **Step 2: Create ActiveFilterChips component**
+
+```tsx
+// src/components/jobs/ActiveFilterChips.tsx
+import { X } from 'lucide-react'
+
+interface ActiveFilterChipsProps {
+  filters: { category: string; seniority: string; remote: string }
+  onFilterChange: (key: string, value: string) => void
+}
+
+export function ActiveFilterChips({ filters, onFilterChange }: ActiveFilterChipsProps) {
+  const chips: { key: string; label: string }[] = []
+
+  if (filters.category) chips.push({ key: 'category', label: filters.category })
+  if (filters.seniority) chips.push({ key: 'seniority', label: filters.seniority })
+  if (filters.remote) chips.push({ key: 'remote', label: filters.remote })
+
+  if (chips.length === 0) return null
+
+  return (
+    <div className="flex flex-wrap gap-2 mb-4">
+      {chips.map((chip) => (
+        <span
+          key={chip.key}
+          className="inline-flex items-center gap-1 px-2.5 py-1 rounded-pill bg-surface-2 text-sm text-ink-muted"
+        >
+          {chip.label}
+          <button
+            onClick={() => onFilterChange(chip.key, '')}
+            className="text-ink-tertiary hover:text-ink transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/30 rounded"
+            aria-label={`Remove ${chip.label} filter`}
+          >
+            <X size={14} />
+          </button>
+        </span>
+      ))}
+    </div>
+  )
+}
 ```
 
-## Files to Modify
-
-### `src/components/employer-dashboard/ApplicantsTab.tsx`
-
-Current state: The "Make offer" button directly calls `handleStatusChange(app.id, 'offer')`.
-
-Changes needed:
-1. Import `OfferLetterModal` from `../offer/OfferLetterModal`
-2. Add state for `offerModalApp: Application | null`
-3. Replace the inline "Make offer" button with one that opens the modal:
-   ```tsx
-   <button onClick={() => setOfferModalApp(app)}>
-     Make Offer
-   </button>
-   ```
-4. Render `<OfferLetterModal>` at the bottom, passing the selected application
-5. On success callback, re-fetch applications
-
-## Context
-
-- Follow the exact same modal pattern as `InterviewScheduleModal.tsx` (Task 3)
-- Follow the exact same form pattern as `ApplyJobForm.tsx`
-- Use `Input`, `Textarea`, `Button` components from `../ui`
-- Use `useToast` for notifications
-- Email: `sendOfferLetter` from `../../api/emails`
-- Types: `Application` from `../../types/application`, `OfferDetails` from `../../types/hiring-flow`
-
-## Existing ApplicantsTab State
-
-The component already has:
-- `allApps` state with applications
-- `fetchData()` that fetches applications
-- `handleStatusChange(id, status)` that calls API and updates local state
-- `interviewModalApp` state and `InterviewScheduleModal` rendering (from Task 3)
-
-You need to add similar state and rendering for the offer modal.
-
-## Verification
+- [ ] **Step 3: Run build to verify**
 
 Run: `npx tsc --noEmit`
-Expected: Clean compilation
+Expected: No errors
 
-## Report
+- [ ] **Step 4: Commit**
 
-Write your report to `/home/jacobp/Desktop/Projecs/hirehub-frontend/.superpowers/sdd/task-5-report.md`
+```bash
+git add src/components/jobs/FilterDrawer.tsx src/components/jobs/ActiveFilterChips.tsx
+git commit -m "feat: add FilterDrawer bottom sheet and ActiveFilterChips for mobile"
+```
+
+---
+

@@ -8,7 +8,7 @@ interface ButtonProps extends ComponentPropsWithoutRef<typeof motion.button> {
 }
 
 const variantStyles: Record<ButtonProps['variant'], string> = {
-  primary: 'bg-ink text-white hover:bg-red/30 dark:bg-black dark:text-accent dark:hover:bg-[#3a3a3a]',
+  primary: 'bg-ink text-white hover:bg-accent dark:bg-white dark:text-accent dark:hover:bg-black',
   secondary: 'bg-surface-2 text-ink hover:bg-hairline',
   accent: 'bg-accent text-white hover:bg-[#e04d00] dark:hover:bg-[#e06000]',
   ghost: 'bg-transparent text-ink-muted hover:text-ink hover:bg-surface-2',

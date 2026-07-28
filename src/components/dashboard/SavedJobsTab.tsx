@@ -22,7 +22,7 @@ export function SavedJobsTab() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
-  function fetchJobs() {
+  function handleRetry() {
     setLoading(true)
     setError(null)
     listSavedJobs()
@@ -32,7 +32,15 @@ export function SavedJobsTab() {
   }
 
   useEffect(() => {
-    fetchJobs()
+    let cancelled = false
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setLoading(true)
+    setError(null)
+    listSavedJobs()
+      .then(res => { if (!cancelled) setSavedJobs(res.data) })
+      .catch(() => { if (!cancelled) setError('Failed to load saved jobs.') })
+      .finally(() => { if (!cancelled) setLoading(false) })
+    return () => { cancelled = true }
   }, [savedJobIds])
 
   if (loading) {
@@ -40,7 +48,7 @@ export function SavedJobsTab() {
   }
 
   if (error) {
-    return <ErrorState message={error} onRetry={fetchJobs} />
+    return <ErrorState message={error} onRetry={handleRetry} />
   }
 
   if (savedJobs.length === 0) {

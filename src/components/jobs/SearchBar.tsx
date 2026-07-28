@@ -10,6 +10,7 @@ export function SearchBar({ value, onChange }: SearchBarProps) {
   const [localValue, setLocalValue] = useState(value)
   const timerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
 
+  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => { setLocalValue(value) }, [value])
   useEffect(() => { return () => clearTimeout(timerRef.current) }, [])
 

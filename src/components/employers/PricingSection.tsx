@@ -40,17 +40,17 @@ export function PricingSection() {
             <motion.div key={tier.tier} whileHover={{ y: -6 }} transition={{ duration: 0.25, ease: 'easeOut' }}>
               <Card variant="pricing" className={`${tier.featured ? 'relative' : ''}`} featured={tier.featured}>
                 {tier.featured && <span className="inline-block text-xs font-medium text-accent mb-2">Most Popular</span>}
-                <h3 className="text-xl font-medium mb-1">{tier.tier}</h3>
-                <p className={`text-[40px] font-medium ${tier.featured ? 'text-inverse-ink' : 'text-ink'}`}>
+                <h3 className="text-xl text-black dark:text-inverse-ink/70 font-medium mb-1">{tier.tier}</h3>
+                <p className={`text-[40px] font-medium ${tier.featured ? 'text-black dark:text-inverse-ink/70' : 'text-ink'}`}>
                   {tier.price === 0 ? 'Custom' : `$${tier.price}`}
                 </p>
                 <p className="text-sm text-ink-muted mb-1">{tier.period === 'custom' ? '' : '/month'}</p>
-                <p className={`text-sm mb-6 ${tier.featured ? 'text-inverse-ink/70' : 'text-ink-muted'}`}>{tier.description}</p>
+                <p className={`text-sm mb-6 ${tier.featured ? 'text-black dark:text-inverse-ink/70' : 'text-ink-muted'}`}>{tier.description}</p>
                 <ul className="space-y-3 mb-8">
                   {tier.features.map((feature) => (
                     <li key={feature} className="flex items-start gap-2">
                       <Check className="w-4 h-4 text-accent mt-0.5 flex-shrink-0" aria-hidden="true" />
-                      <span className={`text-sm ${tier.featured ? 'text-inverse-ink' : 'text-ink'}`}>{feature}</span>
+                      <span className={`text-sm ${tier.featured ? 'text-black dark:text-inverse-ink/70' : 'text-ink'}`}>{feature}</span>
                     </li>
                   ))}
                 </ul>

@@ -16,8 +16,8 @@ export default function HomePage() {
       {meta}
       <HeroSection />
       <Reveal><TrustBar /></Reveal>
-      <Reveal delay={0.05}><ValueProps /></Reveal>
       <Reveal delay={0.1}><FeaturedJobs /></Reveal>
+      <Reveal delay={0.05}><ValueProps /></Reveal>
       <Reveal delay={0.05}><TestimonialStrip /></Reveal>
       <Reveal delay={0.1}><WhyUs /></Reveal>
       <Reveal delay={0.05}><CTABanner /></Reveal>

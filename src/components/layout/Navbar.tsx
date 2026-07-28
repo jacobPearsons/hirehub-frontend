@@ -24,7 +24,7 @@ export function Navbar() {
   const handleLogout = async () => {
     try {
       await logout()
-    } catch {}
+    } catch { /* intentionally empty */ }
     setAccessToken(null)
     setUser(null)
     navigate('/')
@@ -49,7 +49,7 @@ export function Navbar() {
                 key={link.to}
                 to={link.to}
                 className={({ isActive }) =>
-                  `text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/40 rounded ${isActive ? 'text-ink' : 'text-ink-muted hover:text-ink'}`
+                  `text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/40 rounded ${isActive ? 'text-accent' : 'text-ink-muted hover:text-accent'}`
                 }
               >
                 {link.label}
@@ -58,14 +58,14 @@ export function Navbar() {
             <span className="w-px h-4 bg-hairline" aria-hidden="true" />
             {user?.role === 'employer' && (
               <NavLink to="/employer/dashboard" className={({ isActive }) =>
-                `text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/40 rounded ${isActive ? 'text-ink' : 'text-ink-muted hover:text-ink'}`
+                `text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/40 rounded ${isActive ? 'text-accent' : 'text-ink-muted hover:text-accent'}`
               }>
                 Dashboard
               </NavLink>
             )}
             {user?.role === 'seeker' && (
               <NavLink to="/dashboard" className={({ isActive }) =>
-                `text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/40 rounded ${isActive ? 'text-ink' : 'text-ink-muted hover:text-ink'}`
+                `text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/40 rounded ${isActive ? 'text-accent' : 'text-ink-muted hover:text-accent'}`
               }>
                 Dashboard
               </NavLink>
@@ -77,7 +77,7 @@ export function Navbar() {
             {user ? (
               <>
                 <span className="text-sm text-ink-muted">{user.name}</span>
-                <button onClick={handleLogout} className="text-sm text-ink-muted hover:text-ink transition-colors" aria-label="Log out">
+                <button onClick={handleLogout} className="text-sm text-ink-muted hover:text-red-400 transition-colors" aria-label="Log out">
                   <LogOut size={18} />
                 </button>
                 {user.role === 'employer' && (
@@ -95,7 +95,7 @@ export function Navbar() {
           <Dialog.Root open={mobileOpen} onOpenChange={setMobileOpen}>
             <Dialog.Trigger asChild>
               <button
-                className="md:hidden text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/40 rounded-md"
+                className="md:hidden hover:text-accent text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/40 rounded-md"
                 aria-label="Open menu"
               >
                 <Menu size={24} />
@@ -116,7 +116,7 @@ export function Navbar() {
                 {navLinks.map((link) => (
                   <NavLink key={link.to} to={link.to} onClick={() => setMobileOpen(false)}
                     className={({ isActive }) =>
-                      `text-lg font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/40 rounded ${isActive ? 'text-ink' : 'text-ink-muted hover:text-ink'}`
+                      `text-lg font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/40 rounded ${isActive ? 'text-accent' : 'text-ink-muted hover:text-accent'}`
                     }
                   >
                     {link.label}
@@ -129,7 +129,7 @@ export function Navbar() {
                     {user.role === 'seeker' && (
                       <NavLink to="/dashboard" onClick={() => setMobileOpen(false)}
                         className={({ isActive }) =>
-                          `text-lg font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/40 rounded ${isActive ? 'text-ink' : 'text-ink-muted hover:text-ink'}`
+                          `text-lg font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/40 rounded ${isActive ? 'text-accent' : 'text-ink-muted hover:text-accent'}`
                         }
                       >
                         Dashboard
@@ -138,14 +138,14 @@ export function Navbar() {
                     {user.role === 'employer' && (
                       <NavLink to="/employer/dashboard" onClick={() => setMobileOpen(false)}
                         className={({ isActive }) =>
-                          `text-lg font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/40 rounded ${isActive ? 'text-ink' : 'text-ink-muted hover:text-ink'}`
+                          `text-lg font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/40 rounded ${isActive ? 'text-accent' : 'text-ink-muted hover:text-accent'}`
                         }
                       >
                         Employer Dashboard
                       </NavLink>
                     )}
                     <button onClick={() => { handleLogout(); setMobileOpen(false) }}
-                      className="text-lg font-medium text-ink-muted hover:text-ink transition-colors"
+                      className="text-lg font-medium text-ink-muted hover:text-accent transition-colors"
                     >
                       Sign Out
                     </button>
@@ -154,14 +154,14 @@ export function Navbar() {
                   <>
                     <NavLink to="/dashboard" onClick={() => setMobileOpen(false)}
                       className={({ isActive }) =>
-                        `text-lg font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/40 rounded ${isActive ? 'text-ink' : 'text-ink-muted hover:text-ink'}`
+                        `text-lg font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/40 rounded ${isActive ? 'text-accent' : 'text-ink-muted hover:text-accent'}`
                       }
                     >
                       Dashboard
                     </NavLink>
                     <NavLink to="/employer/dashboard" onClick={() => setMobileOpen(false)}
                       className={({ isActive }) =>
-                        `text-lg font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/40 rounded ${isActive ? 'text-ink' : 'text-ink-muted hover:text-ink'}`
+                        `text-lg font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/40 rounded ${isActive ? 'text-accent' : 'text-ink-muted hover:text-accent'}`
                       }
                     >
                       Employer Dashboard

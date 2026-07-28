@@ -38,7 +38,7 @@ function SidebarContent({ onNavClick }: { onNavClick?: () => void }) {
   const navItems = user?.role === 'employer' ? employerNavItems : seekerNavItems
 
   const handleLogout = async () => {
-    try { await logout() } catch {}
+    try { await logout() } catch { /* intentionally empty */ }
     setAccessToken(null)
     setUser(null)
     navigate('/')

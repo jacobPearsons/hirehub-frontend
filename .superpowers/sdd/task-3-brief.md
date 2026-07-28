@@ -1,111 +1,79 @@
-# Task 3: Stage 2 — Interview Scheduling (Employer Modal)
+### Task 3: Infobar Component
 
-## Task Description
+**Files:**
+- Create: `src/components/layout/Infobar.tsx`
 
-Build a modal for employers to schedule interviews when moving a candidate to "interviewing" status.
+**Interfaces:**
+- Consumes: `useApp` from AppContext; `ThemeToggle` from ui/ThemeToggle; Lucide icons
+- Produces: `Infobar` component with hamburger trigger, theme toggle, user info, logout
 
-## Files to Create
+- [ ] **Step 1: Create Infobar component**
 
-### `src/components/interview/InterviewScheduleModal.tsx`
+```tsx
+// src/components/layout/Infobar.tsx
+import { Menu, LogOut } from 'lucide-react'
+import { useApp } from '../../context/AppContext'
+import { logout } from '../../api/auth'
+import { setAccessToken } from '../../api/client'
+import { ThemeToggle } from '../ui/ThemeToggle'
+import { useNavigate } from 'react-router-dom'
 
-A Radix Dialog modal with react-hook-form + zod for scheduling interviews.
+interface InfobarProps {
+  onMenuToggle: () => void
+}
 
-**Form Fields:**
-- Interview Type — select: phone, video, in-person
-- Date — date input (required)
-- Time — time input (required)
-- Interviewer Name — text input (required)
-- Interviewer Title — text input (required)
-- Meeting Link — text input (shown when type is "video")
-- Meeting Location — text input (shown when type is "in-person")
-- Notes — textarea (optional)
+export function Infobar({ onMenuToggle }: InfobarProps) {
+  const { user, setUser } = useApp()
+  const navigate = useNavigate()
 
-**On submit:**
-1. Create an `InterviewDetails` object with all form values + `scheduledAt: new Date().toISOString()`
-2. Update the application via `updateApplicationStatus` API (the application object needs to carry the interviewDetails)
-3. Send interview invitation email via `sendInterviewInvitation` from `src/api/emails.ts`
-4. Call `onSuccess()` callback to close modal and refresh data
-5. Show a toast on success
+  const handleLogout = async () => {
+    try { await logout() } catch {}
+    setAccessToken(null)
+    setUser(null)
+    navigate('/')
+  }
 
-**Props:**
-```typescript
-interface InterviewScheduleModalProps {
-  application: Application
-  open: boolean
-  onOpenChange: (open: boolean) => void
-  onSuccess: () => void
+  return (
+    <div className="flex items-center justify-between px-4 md:px-6 h-14 border-b border-hairline bg-canvas shrink-0">
+      <button
+        onClick={onMenuToggle}
+        className="md:hidden text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/30 rounded-md p-1"
+        aria-label="Open menu"
+      >
+        <Menu size={22} />
+      </button>
+
+      <div className="flex items-center gap-3 ml-auto">
+        <ThemeToggle />
+        {user && (
+          <>
+            <span className="text-sm text-ink-muted hidden sm:inline">{user.name}</span>
+            <button
+              onClick={handleLogout}
+              className="text-ink-muted hover:text-ink transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/30 rounded p-1"
+              aria-label="Log out"
+            >
+              <LogOut size={18} />
+            </button>
+          </>
+        )}
+      </div>
+    </div>
+  )
 }
 ```
 
-**Zod Schema:**
-```typescript
-const interviewSchema = z.object({
-  interviewType: z.enum(['phone', 'video', 'in-person']),
-  interviewDate: z.string().min(1, 'Date is required'),
-  interviewTime: z.string().min(1, 'Time is required'),
-  interviewerName: z.string().min(1, 'Interviewer name is required'),
-  interviewerTitle: z.string().min(1, 'Interviewer title is required'),
-  meetingLink: z.string().url('Must be a valid URL').optional().or(z.literal('')),
-  meetingLocation: z.string().optional(),
-  notes: z.string().optional(),
-})
-```
-
-## Files to Modify
-
-### `src/components/employer-dashboard/ApplicantsTab.tsx`
-
-Current state: The "Mark interviewing" button directly calls `handleStatusChange(app.id, 'interviewing')`.
-
-Changes needed:
-1. Import `InterviewScheduleModal`
-2. Add state for `interviewModalApp: Application | null`
-3. Replace the inline "Mark interviewing" button with one that opens the modal:
-   ```tsx
-   <button onClick={() => setInterviewModalApp(app)}>
-     Schedule Interview
-   </button>
-   ```
-4. Render `<InterviewScheduleModal>` at the bottom, passing the selected application
-5. On success callback, re-fetch applications
-
-## Context
-
-- Existing patterns: Radix Dialog modals with Framer Motion animations (see `ApplyJobModal.tsx`)
-- Form patterns: react-hook-form + zod resolver (see `ApplyJobForm.tsx`)
-- Toast: `useToast()` from `../ui/Toast`
-- API: `updateApplicationStatus` from `../../api/applications`
-- Email: `sendInterviewInvitation` from `../../api/emails`
-- Types: `Application` from `../../types/application`, `InterviewDetails` from `../../types/hiring-flow`
-- Existing ApplicantsTab already has `allApps` state and `fetchData` function
-
-## Existing ApplicantsTab Structure
-
-The component already has:
-- `allApps` state with applications
-- `fetchData()` that fetches applications
-- `handleStatusChange(id, status)` that calls API and updates local state
-- Status action buttons (Mark reviewing, Mark interviewing, Make offer, Reject)
-
-You need to:
-1. Add a new `handleScheduleInterview(application: Application, details: InterviewDetails)` function that:
-   - Updates the application object with `interviewDetails` field
-   - Calls `updateApplicationStatus(application.id, 'interviewing')` 
-   - Updates local state
-2. Wire the modal's onSuccess to re-fetch data
-
-## Important Notes
-
-- The `updateApplicationStatus` API only sends `{ status }` — the interview details need to be stored locally (in state + localStorage via the ApplicationsContext)
-- The modal should follow the exact same styling pattern as `ApplyJobModal.tsx`
-- Use the `Input`, `Textarea`, `Button` components from `../ui`
-- The modal title should be "Schedule Interview" with the candidate name
-
-## Verification
+- [ ] **Step 2: Run build to verify**
 
 Run: `npx tsc --noEmit`
-Expected: Clean compilation
+Expected: No errors
 
-## Report
+- [ ] **Step 3: Commit**
 
-Write your report to `/home/jacobp/Desktop/Projecs/hirehub-frontend/.superpowers/sdd/task-3-report.md`
+```bash
+git add src/components/layout/Infobar.tsx
+git commit -m "feat: add Infobar component for dashboard layout"
+```
+
+---
+

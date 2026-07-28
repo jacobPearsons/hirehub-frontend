@@ -1,58 +1,32 @@
-# Task 2 Report: Email Service Integration (EmailJS)
+# Task 2: Sidebar Component — Report
 
 ## What I Implemented
 
-Created `src/api/emails.ts` — a complete email service layer using `@emailjs/browser` for sending styled HTML emails at each stage of the HireHub Community hiring pipeline.
+- **`src/components/layout/sidebar-constants.ts`** — Navigation item definitions for seeker and employer roles, using Lucide icons.
+- **`src/components/layout/Sidebar.tsx`** — Responsive sidebar with:
+  - Desktop: fixed 224px sidebar, hidden on mobile (`md:flex` / `hidden md:flex`)
+  - Mobile: slide-in overlay with backdrop, controlled by `mobile`, `isOpen`, `onClose` props
+  - Role-based nav: employer nav vs seeker nav based on `user.role`
+  - Logout functionality: calls `logout()`, clears access token, resets user, navigates to `/`
+  - Logo link to `/`
+  - All interactive elements have `focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/30`
+  - Active link styling via `NavLink` with `isActive`
 
-### Exports
+## Deviations from Brief
 
-**Interfaces (5):**
-- `InterviewEmailParams`
-- `PostInterviewEmailParams`
-- `OfferEmailParams`
-- `PreBoardingEmailParams`
-- `OrientationEmailParams`
+Removed two unused imports that would have failed `noUnusedLocals: true`:
+- `FileText` from `lucide-react` in `sidebar-constants.ts`
+- `ReactNode` from `react` in `Sidebar.tsx`
 
-**Convenience functions (5):**
-- `sendInterviewInvitation(params)` — interview invitation with full details, meeting link, prep tips
-- `sendPostInterviewFollowUp(params)` — thank-you with timeline
-- `sendOfferLetter(params)` — formal offer with employment terms
-- `sendPreBoardingChecklist(params)` — welcome checklist with checkboxes
-- `sendOrientationDetails(params)` — day-one details with agenda table
+## Test Results
 
-**Internal `sendEmail(templateName, params)`** function that:
-- Reads config from `VITE_EMAILJS_SERVICE_ID`, `VITE_EMAILJS_TEMPLATE_ID`, `VITE_EMAILJS_PUBLIC_KEY`
-- Renders HTML via template function map
-- Sends via `emailjs.send()` with public key auth
-- Catches and logs errors without throwing (best-effort)
+- `npx tsc --noEmit` — **passed** (zero errors)
 
-### Template Design
+## Files Changed
 
-All emails follow the spec's design guidelines:
-- Inline CSS only (email-client compatible)
-- 600px max-width centered layout
-- `#f5f1ec` canvas background, `#ffffff` content cards
-- `#ff5600` orange accent header with "HireHub Community" branding
-- System font stack, professional warm tone
-- Footer: "© 2025 HireHub Community. All rights reserved."
-- `role="presentation"` on layout tables for accessibility
-
-### Files Modified
-
-- `src/api/emails.ts` — created (new)
-- `.env.example` — added `VITE_EMAILJS_SERVICE_ID`, `VITE_EMAILJS_TEMPLATE_ID`, `VITE_EMAILJS_PUBLIC_KEY`
-- `src/api/index.ts` — added `export * from './emails'`
-
-## What I Tested
-
-- **TypeScript compilation**: `npx tsc --noEmit` — clean, zero errors
-- **Export verification**: All interfaces and convenience functions properly exported and re-exported from `src/api/index.ts`
-
-## Self-Review Findings
-
-No issues found. The implementation matches the task brief spec exactly.
+- Created: `src/components/layout/sidebar-constants.ts`
+- Created: `src/components/layout/Sidebar.tsx`
 
 ## Issues or Concerns
 
-- EmailJS requires an account and service/template configuration. The `.env.example` provides placeholder values — real values must be set before emails will actually send.
-- Email sending is best-effort by design (errors logged, not thrown). This is intentional for a hiring pipeline where email failures shouldn't block the UI flow.
+None. All spec code was implemented faithfully with minor unused-import cleanup.

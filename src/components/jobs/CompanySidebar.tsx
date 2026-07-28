@@ -1,7 +1,8 @@
 import { useState } from 'react'
-import { Building2, Users, Clock } from 'lucide-react'
+import { Building2, Users, Clock, MapPin } from 'lucide-react'
 import { Card, Button } from '../ui'
 import { ApplyJobModal } from '../apply/ApplyJobModal'
+import { getCompanyBrief } from '../../data/companyBriefs'
 import type { Job } from '../../data/jobs'
 
 interface CompanySidebarProps {
@@ -11,6 +12,7 @@ interface CompanySidebarProps {
 export function CompanySidebar({ job }: CompanySidebarProps) {
   const [modalOpen, setModalOpen] = useState(false)
   const [logoError, setLogoError] = useState(false)
+  const brief = getCompanyBrief(job.company)
 
   return (
     <>
@@ -32,23 +34,41 @@ export function CompanySidebar({ job }: CompanySidebarProps) {
         </div>
 
         <h2 className="text-lg font-medium mb-2">About the company</h2>
-        <p className="text-sm text-ink-muted mb-6">
-          A leading tech company building innovative solutions for millions of users worldwide.
-        </p>
+        {brief ? (
+          <p className="text-sm text-ink-muted mb-6">
+            {brief.description}
+          </p>
+        ) : (
+          <p className="text-sm text-ink-muted mb-6">
+            A leading company building innovative solutions.
+          </p>
+        )}
 
         <div className="space-y-3 mb-6">
-          <div className="flex items-center gap-2 text-sm text-ink-muted">
-            <Building2 className="w-4 h-4" aria-hidden="true" />
-            <span>Industry: Technology</span>
-          </div>
-          <div className="flex items-center gap-2 text-sm text-ink-muted">
-            <Users className="w-4 h-4" aria-hidden="true" />
-            <span>Company size: 50-200 employees</span>
-          </div>
-          <div className="flex items-center gap-2 text-sm text-ink-muted">
-            <Clock className="w-4 h-4" aria-hidden="true" />
-            <span>Founded: 2020</span>
-          </div>
+          {brief?.industry && (
+            <div className="flex items-center gap-2 text-sm text-ink-muted">
+              <Building2 className="w-4 h-4" aria-hidden="true" />
+              <span>{brief.industry}</span>
+            </div>
+          )}
+          {brief?.size && (
+            <div className="flex items-center gap-2 text-sm text-ink-muted">
+              <Users className="w-4 h-4" aria-hidden="true" />
+              <span>{brief.size}</span>
+            </div>
+          )}
+          {brief?.founded && brief.founded !== 'N/A' && (
+            <div className="flex items-center gap-2 text-sm text-ink-muted">
+              <Clock className="w-4 h-4" aria-hidden="true" />
+              <span>Founded: {brief.founded}</span>
+            </div>
+          )}
+          {brief?.headquarters && brief.headquarters !== 'N/A' && (
+            <div className="flex items-center gap-2 text-sm text-ink-muted">
+              <MapPin className="w-4 h-4" aria-hidden="true" />
+              <span>{brief.headquarters}</span>
+            </div>
+          )}
         </div>
 
         <Button variant="accent" size="lg" className="w-full" onClick={() => setModalOpen(true)}>

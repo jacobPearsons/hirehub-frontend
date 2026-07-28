@@ -1,34 +1,28 @@
-# Task 4: Stage 2 — Interview Details (Candidate View)
+# Task 4: DashboardShell Component — Report
 
-## What Was Implemented
+## What I implemented
 
-Created `InterviewDetails` component that displays interview info when a candidate's application status is `interviewing`. The component renders inside `ApplicationCard` below a hairline separator.
+1. **Created `src/components/layout/DashboardShell.tsx`** — Wraps children with mobile sidebar (overlay), desktop sidebar, and infobar. Manages sidebar open/close state.
 
-**InterviewDetails** shows:
-- Color-coded type badge (phone=accent, video=ink-muted, in-person=success)
-- Date and time in a 2-column grid
-- Interviewer name and title
-- Clickable meeting link (video only, opens in new tab with `rel="noopener noreferrer"`)
-- Location (in-person only)
-- Notes (if present)
+2. **Updated `src/components/dashboard/DashboardPage.tsx`** — Removed `Section`/`Container` wrappers and "Browse jobs" link. Simplified header with responsive font sizes. Added `overflow-x-auto` + `whitespace-nowrap` to tablist.
 
-## Files Created/Changed
+3. **Updated `src/components/employer-dashboard/EmployerDashboardPage.tsx`** — Same pattern: removed `Section`/`Container` wrappers and "Post a new job" link. Simplified header with responsive font sizes. Added `overflow-x-auto` + `whitespace-nowrap` to tablist.
 
-| File | Action |
-|------|--------|
-| `src/components/interview/InterviewDetails.tsx` | Created |
-| `src/components/interview/index.ts` | Modified (added export) |
-| `src/components/dashboard/ApplicationCard.tsx` | Modified (import + conditional render) |
+4. **Updated `src/App.tsx`** — Wrapped both `/dashboard` (seeker) and `/employer/dashboard` routes in `<DashboardShell>`.
 
-## Testing
+5. **Updated focus-visible rings** — Changed from `ring-ink/40` to `ring-ink/30` on dashboard tab buttons to match site-wide convention.
 
-- `npx tsc --noEmit` — passed cleanly, no errors
-- No runtime tests exist in the project yet; verification is type-check only per brief
+## What I tested
 
-## Self-Review Findings
+- `npx tsc --noEmit` — **Passed** (no errors)
 
-None. The implementation follows existing patterns:
-- Uses the same `rounded-pill` badge styling as status badges in `ApplicationCard`
-- Uses project color tokens (`text-ink`, `text-ink-muted`, `text-ink-tertiary`, `text-accent`, `bg-surface-2`, `border-hairline`)
-- Conditional rendering matches the brief exactly
-- Imported `InterviewDetails` directly (not from barrel) to avoid circular dependency risk — consistent with how `ApplicationsTab` imports `ApplicationCard`
+## Files changed
+
+- `src/components/layout/DashboardShell.tsx` (created)
+- `src/components/dashboard/DashboardPage.tsx` (modified)
+- `src/components/employer-dashboard/EmployerDashboardPage.tsx` (modified)
+- `src/App.tsx` (modified)
+
+## Issues or concerns
+
+None. All changes match the brief exactly.

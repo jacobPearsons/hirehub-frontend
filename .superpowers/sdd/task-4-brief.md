@@ -1,105 +1,143 @@
-# Task 4: Stage 2 — Interview Details (Candidate View)
+### Task 4: DashboardShell Layout
 
-## Task Description
+**Files:**
+- Create: `src/components/layout/DashboardShell.tsx`
+- Modify: `src/components/dashboard/DashboardPage.tsx`
+- Modify: `src/components/employer-dashboard/EmployerDashboardPage.tsx`
+- Modify: `src/App.tsx`
 
-Build a component that displays interview details to the candidate when their application status is "interviewing".
+**Interfaces:**
+- Consumes: `Sidebar`, `Infobar` from this task batch; `useState` from React
+- Produces: `DashboardShell` component wrapping children with sidebar + infobar layout
 
-## Files to Create
+- [ ] **Step 1: Create DashboardShell component**
 
-### `src/components/interview/InterviewDetails.tsx`
+```tsx
+// src/components/layout/DashboardShell.tsx
+import { useState } from 'react'
+import { Sidebar } from './Sidebar'
+import { Infobar } from './Infobar'
+import type { ReactNode } from 'react'
 
-A card component that displays interview details when application status is `interviewing`.
+interface DashboardShellProps {
+  children: ReactNode
+}
 
-**Layout:**
-- Card with interview type badge (phone/video/in-person)
-- Date and time display
-- Interviewer name and title
-- Meeting link (clickable, opens in new tab) — only shown for video interviews
-- Meeting location — only shown for in-person interviews
-- Notes section — only shown if notes exist
+export function DashboardShell({ children }: DashboardShellProps) {
+  const [sidebarOpen, setSidebarOpen] = useState(false)
 
-**Props:**
-```typescript
-interface InterviewDetailsProps {
-  details: InterviewDetails
+  return (
+    <div className="flex h-screen overflow-hidden bg-canvas">
+      <Sidebar mobile isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+      <Sidebar />
+      <div className="flex-1 flex flex-col min-w-0">
+        <Infobar onMenuToggle={() => setSidebarOpen(true)} />
+        <main className="flex-1 overflow-y-auto">
+          <div className="p-4 md:p-6 lg:p-8">
+            {children}
+          </div>
+        </main>
+      </div>
+    </div>
+  )
 }
 ```
 
-**Styling:**
-- Use `Card` component from `../ui`
-- Interview type badge: use `Tag` component or inline badge with appropriate colors
-  - phone: info color
-  - video: accent color
-  - in-person: success color
-- Clean, readable layout with proper spacing
-- Meeting link should be a clickable `<a>` tag with accent color
+- [ ] **Step 2: Update DashboardPage to work inside DashboardShell**
 
-### `src/components/interview/index.ts`
-
-Barrel export:
-```typescript
-export { InterviewScheduleModal } from './InterviewScheduleModal'
-export { InterviewDetails } from './InterviewDetails'
-```
-
-## Files to Modify
-
-### `src/components/dashboard/ApplicationCard.tsx`
-
-Current state: Shows company logo, job title, company name, status badge, and submitted date.
-
-Changes needed:
-1. Import `InterviewDetails` from `../interview/InterviewDetails`
-2. When `application.status === 'interviewing'` and `application.interviewDetails` exists, render the `InterviewDetails` component below the existing status info
-3. The interview details should appear as an expandable section or inline below the card
-
-**Pattern:**
-```tsx
-{/* After the existing status/date row */}
-{application.status === 'interviewing' && application.interviewDetails && (
-  <div className="mt-4 pt-4 border-t border-hairline">
-    <InterviewDetails details={application.interviewDetails} />
-  </div>
-)}
-```
-
-## Context
-
-- Types: `InterviewDetails` from `../../types/hiring-flow`
-- UI components: `Card`, `Tag` from `../ui`
-- Existing `ApplicationCard` is at `src/components/dashboard/ApplicationCard.tsx`
-- The card already uses `motion.div` with `whileHover` for hover effect
-- The card uses the existing `statusConfig` map for status badges
-
-## Existing ApplicationCard Structure
+Remove the outer `Section`/`Container` wrapper and the header's "Browse jobs" link (now accessible via sidebar). Simplify the header:
 
 ```tsx
-<motion.div whileHover={{ y: -2 }} transition={{ duration: 0.2, ease: 'easeOut' }}>
-  <Card variant="default" className="p-5">
-    <div className="flex items-start gap-4">
-      <img ... />
-      <div className="flex-1 min-w-0">
-        <div className="flex items-start justify-between gap-3">
+// src/components/dashboard/DashboardPage.tsx
+import { useState } from 'react'
+import { HeroContent } from '../ui/HeroContent'
+import { usePageMeta } from '../../utils/usePageMeta'
+import { SavedJobsTab } from './SavedJobsTab'
+import { ApplicationsTab } from './ApplicationsTab'
+
+const tabs = [
+  { id: 'saved', label: 'Saved Jobs' },
+  { id: 'applications', label: 'My Applications' },
+] as const
+
+export default function DashboardPage() {
+  const [activeTab, setActiveTab] = useState<'saved' | 'applications'>('saved')
+  const meta = usePageMeta({ title: 'Dashboard | HireHub Community', description: 'Manage your saved jobs and applications' })
+
+  return (
+    <>
+      {meta}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+        <HeroContent variant="accent">
           <div>
-            <h3>{application.jobTitle}</h3>
-            <p>{application.company}</p>
+            <h1 className="text-3xl md:text-[40px] leading-[1.15] tracking-[-0.8px] font-medium">Dashboard</h1>
+            <p className="text-ink-muted mt-1">Manage your saved jobs and applications</p>
           </div>
-          <span className={status.color}>{status.label}</span>
-        </div>
-        <p className="text-xs text-ink-tertiary mt-2">Submitted {submittedDate}</p>
+        </HeroContent>
       </div>
-    </div>
-  </Card>
-</motion.div>
+
+      <div role="tablist" aria-label="Dashboard tabs" className="flex overflow-x-auto gap-1 border-b border-hairline mb-6">
+        {tabs.map((tab) => (
+          <button
+            key={tab.id}
+            role="tab"
+            aria-selected={activeTab === tab.id}
+            onClick={() => setActiveTab(tab.id)}
+            className={`px-4 py-2.5 text-sm font-medium transition-colors border-b-2 -mb-px whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/30 rounded-t ${
+              activeTab === tab.id
+                ? 'border-ink text-ink'
+                : 'border-transparent text-ink-muted hover:text-ink hover:border-ink/30'
+            }`}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </div>
+
+      {activeTab === 'saved' && <SavedJobsTab />}
+      {activeTab === 'applications' && <ApplicationsTab />}
+    </>
+  )
+}
 ```
 
-Add the interview details section after the closing `</div>` of the flex container but before the closing `</Card>`.
+- [ ] **Step 3: Update EmployerDashboardPage similarly**
 
-## Verification
+Same pattern — remove `Section`/`Container`, simplify header, add `overflow-x-auto` to tabs, responsive heading.
+
+- [ ] **Step 4: Update App.tsx routes to wrap dashboards in DashboardShell**
+
+```tsx
+import { DashboardShell } from './components/layout/DashboardShell'
+
+// In Routes:
+<Route path="/dashboard" element={
+  <ProtectedRoute allowedRoles={['seeker']}>
+    <DashboardShell>
+      <ErrorBoundary><DashboardPage /></ErrorBoundary>
+    </DashboardShell>
+  </ProtectedRoute>
+} />
+<Route path="/employer/dashboard" element={
+  <ProtectedRoute allowedRoles={['employer']}>
+    <DashboardShell>
+      <ErrorBoundary><EmployerDashboardPage /></ErrorBoundary>
+    </DashboardShell>
+  </ProtectedRoute>
+} />
+```
+
+- [ ] **Step 5: Run build to verify**
 
 Run: `npx tsc --noEmit`
-Expected: Clean compilation
+Expected: No errors
 
-## Report
+- [ ] **Step 6: Commit**
 
-Write your report to `/home/jacobp/Desktop/Projecs/hirehub-frontend/.superpowers/sdd/task-4-report.md`
+```bash
+git add src/components/layout/DashboardShell.tsx src/components/dashboard/DashboardPage.tsx src/components/employer-dashboard/EmployerDashboardPage.tsx src/App.tsx
+git commit -m "feat: add DashboardShell layout with sidebar and infobar"
+```
+
+---
+

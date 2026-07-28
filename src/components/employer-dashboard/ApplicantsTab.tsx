@@ -33,15 +33,15 @@ export function ApplicantsTab() {
   const [offerModalApp, setOfferModalApp] = useState<Application | null>(null)
 
   useEffect(() => {
-    setLoading(true)
-    setError(null)
+    let cancelled = false
     listEmployerJobs()
       .then(res => {
         const jobIds = res.data.map(job => job.id)
-        setEmployerJobIds(jobIds)
+        if (!cancelled) setEmployerJobIds(jobIds)
       })
-      .catch(() => setError('Failed to load jobs.'))
-      .finally(() => setLoading(false))
+      .catch(() => { if (!cancelled) setError('Failed to load jobs.') })
+      .finally(() => { if (!cancelled) setLoading(false) })
+    return () => { cancelled = true }
   }, [])
 
   const apps = allApps.filter(app => employerJobIds.includes(app.jobId))

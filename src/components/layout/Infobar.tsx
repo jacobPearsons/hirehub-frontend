@@ -14,7 +14,7 @@ export function Infobar({ onMenuToggle }: InfobarProps) {
   const navigate = useNavigate()
 
   const handleLogout = async () => {
-    try { await logout() } catch {}
+    try { await logout() } catch { /* intentionally empty */ }
     setAccessToken(null)
     setUser(null)
     navigate('/')

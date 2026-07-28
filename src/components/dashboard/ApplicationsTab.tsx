@@ -20,13 +20,11 @@ export function ApplicationsTab() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
-  function fetchApps() {
+  function handleRetry() {
     setLoading(true)
     setError(null)
     listApplications()
-      .then((res) => {
-        setApps(res.data)
-      })
+      .then((res) => setApps(res.data))
       .catch(() => setError('Failed to load applications.'))
       .finally(() => setLoading(false))
   }
@@ -38,7 +36,12 @@ export function ApplicationsTab() {
   }
 
   useEffect(() => {
-    fetchApps()
+    let cancelled = false
+    listApplications()
+      .then((res) => { if (!cancelled) setApps(res.data) })
+      .catch(() => { if (!cancelled) setError('Failed to load applications.') })
+      .finally(() => { if (!cancelled) setLoading(false) })
+    return () => { cancelled = true }
   }, [])
 
   if (loading) {
@@ -48,7 +51,7 @@ export function ApplicationsTab() {
   }
 
   if (error) {
-    return <ErrorState message={error} onRetry={fetchApps} />
+    return <ErrorState message={error} onRetry={handleRetry} />
   }
 
   if (apps.length === 0) {

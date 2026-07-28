@@ -15,7 +15,7 @@ export function JobHeader({ job }: JobHeaderProps) {
   return (
     <div className="flex items-start gap-4 mb-8">
       {logoError ? (
-        <div className="w-14 h-14 rounded-lg bg-accent/10 text-accent flex items-center justify-center text-xl font-semibold flex-shrink-0">
+        <div className="w-14 h-14 rounded-lg bg-accent/10 text-accent flex items-center justify-center sm:text-lg text-xl font-semibold flex-shrink-0">
           {job.company.charAt(0)}
         </div>
       ) : (

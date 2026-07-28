@@ -51,7 +51,7 @@ export default function JobBoardPage() {
       if (filtersRef.current.category) params.category = filtersRef.current.category
       if (filtersRef.current.seniority) params.seniority = filtersRef.current.seniority
 
-      const res = await listJobs(params as any)
+      const res = await listJobs(params as Record<string, string | number>)
       setAllJobs(prev => reset ? res.data : [...prev, ...res.data])
       setCursor(res.pagination?.cursor ?? null)
       setTotal(res.pagination?.total ?? 0)
@@ -64,6 +64,7 @@ export default function JobBoardPage() {
   }, [])
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     loadJobs(true)
   }, [search, filters, loadJobs])
 
@@ -144,9 +145,23 @@ export default function JobBoardPage() {
               <Button variant="primary" size="sm" onClick={() => loadJobs(true)}>Try again</Button>
             </div>
           ) : (
-            <div className="hidden lg:grid grid-cols-[280px_1fr] gap-8">
-              <Reveal delay={0.05}><FilterSidebar filters={filters} onFilterChange={handleFilterChange} /></Reveal>
-              <Reveal delay={0.1}>
+            <>
+              <div className="hidden lg:grid grid-cols-[280px_1fr] gap-8">
+                <Reveal delay={0.05}><FilterSidebar filters={filters} onFilterChange={handleFilterChange} /></Reveal>
+                <Reveal delay={0.1}>
+                  <JobCardGrid jobs={filteredJobs} />
+                  {hasMore && (
+                    <div className="mt-8 text-center">
+                      <Button variant="ghost" size="md" onClick={() => loadJobs(false)} disabled={loadingMore}>
+                        {loadingMore ? 'Loading more...' : `Load more (${filteredJobs.length} of ${total})`}
+                      </Button>
+                    </div>
+                  )}
+                </Reveal>
+              </div>
+
+              {/* Mobile: jobs grid without sidebar */}
+              <div className="lg:hidden">
                 <JobCardGrid jobs={filteredJobs} />
                 {hasMore && (
                   <div className="mt-8 text-center">
@@ -155,20 +170,8 @@ export default function JobBoardPage() {
                     </Button>
                   </div>
                 )}
-              </Reveal>
-            </div>
-
-            {/* Mobile: jobs grid without sidebar */}
-            <div className="lg:hidden">
-              <JobCardGrid jobs={filteredJobs} />
-              {hasMore && (
-                <div className="mt-8 text-center">
-                  <Button variant="ghost" size="md" onClick={() => loadJobs(false)} disabled={loadingMore}>
-                    {loadingMore ? 'Loading more...' : `Load more (${filteredJobs.length} of ${total})`}
-                  </Button>
-                </div>
-              )}
-            </div>
+              </div>
+            </>
           )}
         </Container>
       </Section>

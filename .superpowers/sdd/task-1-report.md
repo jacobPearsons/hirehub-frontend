@@ -1,25 +1,23 @@
-# Task 1 Report: Extend Data Types
+## Task 1: 404 Page Component — Report
 
-## What I Implemented
+### What I Implemented
 
-- Created `src/types/hiring-flow.ts` with four new types: `InterviewDetails`, `OfferDetails`, `OnboardingChecklistItem`, and `OrientationDetails`, plus the union types `InterviewType` and `EmploymentType`.
-- Modified `src/types/application.ts` to import these types and add four optional fields to the `Application` interface: `interviewDetails`, `offerDetails`, `onboardingChecklist`, and `orientationDetails`.
+Extracted the inline 404 page from `App.tsx` into a standalone `NotFoundPage` component. Changes:
 
-## Test Results
+- Created `src/components/ui/NotFoundPage.tsx` with responsive typography (`text-5xl` → `md:text-[56px]`), `bg-canvas`, `px-4` for mobile safe area, and `focus-visible` ring on the "Go home" link
+- Updated `src/App.tsx` to import and use `<NotFoundPage />` in the catch-all route, removing the unused `Link` import from react-router-dom
 
-- `npx tsc --noEmit` — clean compilation, zero errors.
+### What I Tested
 
-## Files Changed
+- Ran `npx tsc --noEmit` — **0 type errors**
 
-| File | Action |
-|---|---|
-| `src/types/hiring-flow.ts` | Created |
-| `src/types/application.ts` | Modified |
+### Files Changed
 
-## Self-Review Findings
+| File | Change |
+|------|--------|
+| `src/components/ui/NotFoundPage.tsx` | Created |
+| `src/App.tsx` | Replaced inline 404 JSX (lines 60-68) with component, added import, removed unused `Link` import |
 
-None. Types match the brief exactly; all fields are optional on `Application`; all imports use `import type`.
-
-## Concerns
+### Issues / Concerns
 
 None.

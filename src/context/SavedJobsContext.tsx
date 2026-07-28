@@ -23,8 +23,9 @@ export function SavedJobsProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     try {
       const saved = localStorage.getItem('hirehub-saved-jobs')
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       if (saved) setSavedJobIds(JSON.parse(saved))
-    } catch {}
+    } catch { /* intentionally empty */ }
   }, [])
 
   useEffect(() => {
@@ -39,9 +40,9 @@ export function SavedJobsProvider({ children }: { children: ReactNode }) {
       try {
         const res = await listSavedJobs()
         if (!controller.signal.aborted) {
-          setSavedJobIds(res.data.map((j: any) => j.id))
+          setSavedJobIds(res.data.map((j: { id: string }) => j.id))
         }
-      } catch {}
+      } catch { /* intentionally empty */ }
     }
 
     init()
@@ -81,6 +82,7 @@ export function SavedJobsProvider({ children }: { children: ReactNode }) {
   return <SavedJobsContext.Provider value={value}>{children}</SavedJobsContext.Provider>
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useSavedJobs() {
   const ctx = useContext(SavedJobsContext)
   if (!ctx) throw new Error('useSavedJobs must be used within SavedJobsProvider')

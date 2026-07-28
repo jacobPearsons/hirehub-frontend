@@ -1,34 +1,18 @@
-# Task 3 Report: Stage 2 — Interview Scheduling (Employer Modal)
+## Task 3: Infobar Component — Report
 
-## What Was Implemented
+### What was implemented
+Created `src/components/layout/Infobar.tsx` exactly per the task brief. The component renders a top bar with:
+- Hamburger menu button (mobile only, hidden on `md+`) wired to `onMenuToggle` prop
+- `ThemeToggle` integration
+- User name display (hidden on small screens via `hidden sm:inline`)
+- Logout button that calls `logout()`, clears the access token, resets user state, and navigates to `/`
+- Proper focus-visible rings and `aria-label` on all interactive elements
 
-- **InterviewScheduleModal.tsx** — A Radix Dialog modal with react-hook-form + Zod validation for scheduling interviews. Includes all specified fields (interview type, date, time, interviewer name/title, meeting link/location, notes) with conditional rendering for video vs in-person fields.
-- **ApplicantsTab.tsx** — Replaced the inline "Mark interviewing" button with one that opens the InterviewScheduleModal. On success, the modal calls back to re-fetch application data.
-- **index.ts** — Barrel export for the interview module.
+### Test results
+- `npx tsc --noEmit` — **passed** (zero type errors)
 
-## Files Changed
+### Files changed
+- Created: `src/components/layout/Infobar.tsx`
 
-| File | Action |
-|------|--------|
-| `src/components/interview/InterviewScheduleModal.tsx` | Created |
-| `src/components/interview/index.ts` | Created |
-| `src/components/employer-dashboard/ApplicantsTab.tsx` | Modified |
-
-## What Was Tested
-
-- TypeScript compilation: `npx tsc --noEmit` — **Clean, zero errors**
-- Pattern conformance: Modal follows exact same structure as ApplyJobModal.tsx (Radix Dialog + Framer Motion overlay/content)
-- Form conformance: Uses react-hook-form + zodResolver, same Input/Textarea/Button imports as ApplyJobForm.tsx
-- Toast: Uses useToast for success/error notifications
-- Email: Calls sendInterviewInvitation (fire-and-forget, errors caught)
-- API: Calls updateApplicationStatus on submit
-
-## Self-Review Findings
-
-1. **Email fire-and-forget is intentional** — The `sendInterviewInvitation` call is non-blocking (`.catch(() => {})`) so the modal closes immediately even if email fails. This is acceptable for a demo app but would need error handling in production.
-2. **InterviewDetails not persisted to API** — The task brief notes that `updateApplicationStatus` only sends `{ status }`, so interview details are created in the form but not stored on the application object in the backend. The details are used only for the email. A future enhancement could add a dedicated API endpoint or include interviewDetails in the PATCH payload.
-3. **No local state update for interviewDetails** — Unlike the task brief's `handleScheduleInterview` suggestion, the ApplicantsTab does not update `allApps` with interviewDetails since the API doesn't persist them. The `fetchData()` call on success re-fetches from the API, which is the correct approach.
-
-## Issues or Concerns
-
-- None significant. The implementation is clean and follows existing patterns.
+### Issues or concerns
+- The barrel `src/components/layout/index.ts` was not updated per the brief (no instruction to do so). Consumers will need a direct import path for now.

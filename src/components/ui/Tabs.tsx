@@ -55,7 +55,7 @@ export function TabsList({ children, 'aria-label': ariaLabel }: ListProps) {
       const currentIndex = tabs.findIndex((t) => t.getAttribute('data-value') === activeTab)
       if (currentIndex === -1) return
 
-      let nextIndex = currentIndex
+      let nextIndex: number
 
       switch (e.key) {
         case 'ArrowRight':

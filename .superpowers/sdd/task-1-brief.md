@@ -1,124 +1,58 @@
-# Task 1: Extend Data Types
+### Task 1: 404 Page Component
 
-## Task Description
+**Files:**
+- Create: `src/components/ui/NotFoundPage.tsx`
+- Modify: `src/App.tsx` (lines 60-68, replace inline 404 JSX)
 
-Extend the Application type to support the full PATHMATCH hiring pipeline (interview details, offer details, pre-boarding checklist, orientation details).
+**Interfaces:**
+- Consumes: `Link` from react-router-dom
+- Produces: Exported `NotFoundPage` component used by App.tsx catch-all route
 
-## Files to Create
+- [ ] **Step 1: Create NotFoundPage component**
 
-### `src/types/hiring-flow.ts`
+```tsx
+import { Link } from 'react-router-dom'
 
-Create a new file with these types:
-
-```typescript
-export type InterviewType = 'phone' | 'video' | 'in-person'
-
-export interface InterviewDetails {
-  interviewType: InterviewType
-  interviewDate: string
-  interviewTime: string
-  interviewerName: string
-  interviewerTitle: string
-  meetingLink?: string
-  meetingLocation?: string
-  notes?: string
-  scheduledAt: string
-}
-
-export type EmploymentType = 'full-time' | 'part-time' | 'contract'
-
-export interface OfferDetails {
-  jobTitle: string
-  employmentType: EmploymentType
-  startDate: string
-  hourlyRate: number
-  currency: string
-  schedule: string
-  managerName: string
-  managerTitle: string
-  responsibilities: string[]
-  contingencies: string[]
-  expirationDate: string
-  accepted?: boolean
-  acceptedAt?: string
-}
-
-export interface OnboardingChecklistItem {
-  id: string
-  label: string
-  completed: boolean
-  completedAt?: string
-}
-
-export interface OrientationDetails {
-  date: string
-  time: string
-  location: string
-  agenda: string[]
+export function NotFoundPage() {
+  return (
+    <main className="min-h-screen flex items-center justify-center bg-canvas px-4">
+      <div className="text-center">
+        <h1 className="text-5xl md:text-[56px] font-medium text-ink mb-4">404</h1>
+        <p className="text-lg text-ink-muted mb-6">Page not found</p>
+        <Link
+          to="/"
+          className="text-accent hover:underline text-sm font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/30 rounded"
+        >
+          Go home
+        </Link>
+      </div>
+    </main>
+  )
 }
 ```
 
-## Files to Modify
+- [ ] **Step 2: Update App.tsx to use NotFoundPage**
 
-### `src/types/application.ts`
+Replace the inline 404 JSX in the catch-all route (lines 60-68) with:
 
-Current content:
-```typescript
-export type ApplicationStatus = 'applied' | 'reviewing' | 'interviewing' | 'rejected' | 'offer'
+```tsx
+import { NotFoundPage } from './components/ui/NotFoundPage'
 
-export interface Application {
-  id: string
-  jobId: string
-  jobTitle: string
-  company: string
-  companyLogo: string
-  applicantName: string
-  applicantEmail: string
-  applicantPhone?: string
-  coverLetter: string
-  portfolioUrl?: string
-  resumeFileName?: string
-  status: ApplicationStatus
-  submittedAt: string
-}
+// In the Routes:
+<Route path="*" element={<NotFoundPage />} />
 ```
 
-Add import for new types and add optional fields:
-```typescript
-import type { InterviewDetails, OfferDetails, OnboardingChecklistItem, OrientationDetails } from './hiring-flow'
-
-export type ApplicationStatus = 'applied' | 'reviewing' | 'interviewing' | 'rejected' | 'offer'
-
-export interface Application {
-  id: string
-  jobId: string
-  jobTitle: string
-  company: string
-  companyLogo: string
-  applicantName: string
-  applicantEmail: string
-  applicantPhone?: string
-  coverLetter: string
-  portfolioUrl?: string
-  resumeFileName?: string
-  status: ApplicationStatus
-  submittedAt: string
-  interviewDetails?: InterviewDetails
-  offerDetails?: OfferDetails
-  onboardingChecklist?: OnboardingChecklistItem[]
-  orientationDetails?: OrientationDetails
-}
-```
-
-## Verification
+- [ ] **Step 3: Run build to verify no type errors**
 
 Run: `npx tsc --noEmit`
-Expected: Clean compilation (pre-existing test file errors are OK)
+Expected: No errors
 
-## Context
+- [ ] **Step 4: Commit**
 
-This is the HireHub frontend project at `/home/jacobp/Desktop/Projecs/hirehub-frontend`. It uses React 19, TypeScript 6, Tailwind CSS 3, Vite 8. The project follows a feature-based component organization in `src/components/`.
+```bash
+git add src/components/ui/NotFoundPage.tsx src/App.tsx
+git commit -m "feat: extract 404 page into proper component with responsive typography"
+```
 
-## Report
+---
 
-Write your report to `/home/jacobp/Desktop/Projecs/hirehub-frontend/.superpowers/sdd/task-1-report.md`
