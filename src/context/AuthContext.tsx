@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useEffect, useMemo, type ReactNode } from 'react'
 import { setAccessToken as setApiToken, getAccessToken } from '../api/client'
-import { getMe } from '../api/auth'
+import { getMe, refreshToken } from '../api/auth'
 
 export interface AppUser {
   id: string
@@ -43,6 +43,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const controller = new AbortController()
 
     async function init() {
+      if (!getAccessToken()) {
+        try {
+          const refreshRes = await refreshToken()
+          if (refreshRes.success) {
+            setApiToken(refreshRes.data.accessToken)
+          }
+        } catch {
+          // No valid refresh cookie — user must log in
+        }
+      }
+
       const token = getAccessToken()
 
       if (token) {
