@@ -1,4 +1,5 @@
 import { Navigate } from 'react-router-dom'
+import { Loader2 } from 'lucide-react'
 import { useApp } from '../../context/AppContext'
 
 interface ProtectedRouteProps {
@@ -9,7 +10,13 @@ interface ProtectedRouteProps {
 export function ProtectedRoute({ children, allowedRoles }: ProtectedRouteProps) {
   const { user, loading } = useApp()
 
-  if (loading) return null
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <Loader2 className="size-6 text-accent animate-spin" />
+      </div>
+    )
+  }
 
   if (!user) return <Navigate to="/login" replace />
 
