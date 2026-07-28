@@ -36,7 +36,17 @@ function mapApiUser(user: { id: string; name: string; email: string; role: strin
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<AppUser | null>(null)
+  const [user, setUser] = useState<AppUser | null>(() => {
+    const stored = localStorage.getItem('hirehub-auth')
+    if (stored) {
+      try {
+        return JSON.parse(stored) as AppUser
+      } catch {
+        localStorage.removeItem('hirehub-auth')
+      }
+    }
+    return null
+  })
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -69,18 +79,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         } catch {
           if (!controller.signal.aborted) {
             setApiToken(null)
+            setUser(null)
           }
-          // Fall through to localStorage fallback
         }
       }
-
-      // Fallback: try cached user from localStorage
-      try {
-        const saved = localStorage.getItem('hirehub-auth')
-        if (saved && !controller.signal.aborted) {
-          setUser(JSON.parse(saved))
-        }
-      } catch { /* ignore parse errors */ }
 
       if (!controller.signal.aborted) {
         setLoading(false)

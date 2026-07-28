@@ -151,27 +151,12 @@ export function Navbar() {
                     </button>
                   </>
                 ) : (
-                  <>
-                    <NavLink to="/dashboard" onClick={() => setMobileOpen(false)}
-                      className={({ isActive }) =>
-                        `text-lg font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/40 rounded ${isActive ? 'text-accent' : 'text-ink-muted hover:text-accent'}`
-                      }
-                    >
-                      Dashboard
-                    </NavLink>
-                    <NavLink to="/employer/dashboard" onClick={() => setMobileOpen(false)}
-                      className={({ isActive }) =>
-                        `text-lg font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/40 rounded ${isActive ? 'text-accent' : 'text-ink-muted hover:text-accent'}`
-                      }
-                    >
-                      Employer Dashboard
-                    </NavLink>
-                    <div className="flex flex-col items-center gap-3 mt-4">
+                  <div className="flex flex-col items-center gap-3 mt-4">
                       <Link to="/login"><Button variant="ghost" size="sm">Sign In</Button></Link>
                       <Link to="/post-job"><Button variant="primary" size="sm">Post a Job</Button></Link>
                     </div>
-                  </>
-                )}
+                  )
+                }
               </Dialog.Content>
             </Dialog.Portal>
           </Dialog.Root>
