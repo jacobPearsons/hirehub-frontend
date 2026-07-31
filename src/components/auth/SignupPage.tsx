@@ -41,8 +41,9 @@ export default function SignupPage() {
         email: res.data.user.email,
         role: res.data.user.role === 'EMPLOYER' ? 'employer' : 'seeker',
         companyName: res.data.user.companyName,
+        onboardingCompleted: res.data.user.onboardingCompleted,
       })
-      navigate(res.data.user.role === 'EMPLOYER' ? '/employer/dashboard' : '/dashboard')
+      navigate('/onboarding')
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Registration failed')
     } finally {

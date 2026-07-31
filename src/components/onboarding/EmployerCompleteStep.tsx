@@ -7,11 +7,7 @@ import { updateProfile } from '../../api/auth'
 import { Card } from '../ui/Card'
 import { Button } from '../ui/Button'
 
-interface EmployerCompleteStepProps {
-  onSaved: () => void
-}
-
-export function EmployerCompleteStep(_props: EmployerCompleteStepProps) {
+export function EmployerCompleteStep() {
   const { user, setUser } = useApp()
   const navigate = useNavigate()
   const [error, setError] = useState('')

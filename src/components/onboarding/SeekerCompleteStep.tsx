@@ -7,11 +7,7 @@ import { updateProfile } from '../../api/auth'
 import { Card } from '../ui/Card'
 import { Button } from '../ui/Button'
 
-interface SeekerCompleteStepProps {
-  onSaved: () => void
-}
-
-export function SeekerCompleteStep(_props: SeekerCompleteStepProps) {
+export function SeekerCompleteStep() {
   const { user, setUser } = useApp()
   const navigate = useNavigate()
   const [error, setError] = useState('')

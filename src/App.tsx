@@ -19,6 +19,7 @@ const LoginPage = lazy(() => import('./components/auth/LoginPage'))
 const SignupPage = lazy(() => import('./components/auth/SignupPage'))
 const ForgotPasswordPage = lazy(() => import('./components/auth/ForgotPasswordPage'))
 const ResetPasswordPage = lazy(() => import('./components/auth/ResetPasswordPage'))
+const OnboardingWizard = lazy(() => import('./components/onboarding/OnboardingWizard'))
 const AboutPage = lazy(() => import('./components/about/AboutPage'))
 const ContactPage = lazy(() => import('./components/contact/ContactPage'))
 const PostJobPage = lazy(() => import('./components/post-job/PostJobPage'))
@@ -79,6 +80,11 @@ function App() {
                 </ProtectedRoute>
               } />
               <Route path="/post-job" element={<ProtectedRoute allowedRoles={['employer']}><ErrorBoundary><PostJobPage /></ErrorBoundary></ProtectedRoute>} />
+              <Route path="/onboarding" element={
+                <ProtectedRoute>
+                  <ErrorBoundary><OnboardingWizard /></ErrorBoundary>
+                </ProtectedRoute>
+              } />
               <Route path="*" element={<NotFoundPage />} />
             </Routes>
           </motion.div>
