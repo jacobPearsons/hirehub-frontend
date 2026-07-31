@@ -11,6 +11,17 @@ export interface AppUser {
   phone?: string | null
   bio?: string | null
   avatarUrl?: string | null
+  headline?: string | null
+  location?: string | null
+  skills?: string[]
+  resumePath?: string | null
+  resumeFileName?: string | null
+  salaryMin?: number | null
+  salaryMax?: number | null
+  currency?: string | null
+  remoteOnly?: boolean | null
+  employmentType?: string | null
+  onboardingCompleted?: boolean
 }
 
 interface AuthContextValue {
@@ -22,7 +33,27 @@ interface AuthContextValue {
 
 const AuthContext = createContext<AuthContextValue | null>(null)
 
-function mapApiUser(user: { id: string; name: string; email: string; role: string; companyName?: string; phone?: string | null; bio?: string | null; avatarUrl?: string | null }): AppUser {
+function mapApiUser(user: {
+  id: string
+  name: string
+  email: string
+  role: string
+  companyName?: string
+  phone?: string | null
+  bio?: string | null
+  avatarUrl?: string | null
+  headline?: string | null
+  location?: string | null
+  skills?: string[]
+  resumePath?: string | null
+  resumeFileName?: string | null
+  salaryMin?: number | null
+  salaryMax?: number | null
+  currency?: string | null
+  remoteOnly?: boolean | null
+  employmentType?: string | null
+  onboardingCompleted?: boolean
+}): AppUser {
   return {
     id: user.id,
     name: user.name,
@@ -32,6 +63,17 @@ function mapApiUser(user: { id: string; name: string; email: string; role: strin
     phone: user.phone,
     bio: user.bio,
     avatarUrl: user.avatarUrl,
+    headline: user.headline,
+    location: user.location,
+    skills: user.skills,
+    resumePath: user.resumePath,
+    resumeFileName: user.resumeFileName,
+    salaryMin: user.salaryMin,
+    salaryMax: user.salaryMax,
+    currency: user.currency,
+    remoteOnly: user.remoteOnly,
+    employmentType: user.employmentType,
+    onboardingCompleted: user.onboardingCompleted,
   }
 }
 

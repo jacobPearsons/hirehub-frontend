@@ -108,6 +108,13 @@ export function apiPatch<T>(endpoint: string, body?: unknown) {
   })
 }
 
+export function apiPut<T>(endpoint: string, body?: unknown) {
+  return apiFetch<T>(endpoint, {
+    method: 'PUT',
+    body: body ? JSON.stringify(body) : undefined,
+  })
+}
+
 export function apiDelete(endpoint: string) {
   return apiFetch<void>(endpoint, { method: 'DELETE' })
 }

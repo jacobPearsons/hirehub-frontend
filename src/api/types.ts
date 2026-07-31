@@ -15,6 +15,17 @@ export interface ApiUser {
   phone?: string | null
   bio?: string | null
   avatarUrl?: string | null
+  headline?: string | null
+  location?: string | null
+  skills?: string[]
+  resumePath?: string | null
+  resumeFileName?: string | null
+  salaryMin?: number | null
+  salaryMax?: number | null
+  currency?: string | null
+  remoteOnly?: boolean | null
+  employmentType?: string | null
+  onboardingCompleted?: boolean
 }
 
 export interface AuthUser {
@@ -26,6 +37,17 @@ export interface AuthUser {
   phone?: string | null
   bio?: string | null
   avatarUrl?: string | null
+  headline?: string | null
+  location?: string | null
+  skills?: string[]
+  resumePath?: string | null
+  resumeFileName?: string | null
+  salaryMin?: number | null
+  salaryMax?: number | null
+  currency?: string | null
+  remoteOnly?: boolean | null
+  employmentType?: string | null
+  onboardingCompleted?: boolean
 }
 
 export interface LoginResponse {
