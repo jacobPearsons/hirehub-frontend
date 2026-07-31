@@ -7,6 +7,7 @@ import { EmptyState } from '../ui/EmptyState'
 import { ErrorState } from '../ui/ErrorState'
 import { InterviewScheduleModal } from '../interview'
 import { OfferLetterModal } from '../offer'
+import { CandidateDetailDrawer } from '../candidate'
 import { listEmployerJobs } from '../../api/jobs'
 import { useApplications } from '../../context/ApplicationsContext'
 import type { Application, ApplicationStatus } from '../../types/application'
@@ -31,6 +32,7 @@ export function ApplicantsTab() {
   const [error, setError] = useState<string | null>(null)
   const [interviewModalApp, setInterviewModalApp] = useState<Application | null>(null)
   const [offerModalApp, setOfferModalApp] = useState<Application | null>(null)
+  const [viewApp, setViewApp] = useState<Application | null>(null)
 
   useEffect(() => {
     let cancelled = false
@@ -108,6 +110,12 @@ export function ApplicantsTab() {
                     </div>
                     <p className="text-sm text-ink-muted mt-3 line-clamp-2">{app.coverLetter}</p>
                     <div className="flex flex-wrap items-center gap-2 mt-3">
+                      <button
+                        onClick={() => setViewApp(app)}
+                        className="text-xs font-medium text-accent hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/40 rounded"
+                      >
+                        View profile
+                      </button>
                       {app.status !== 'reviewing' && (
                         <button
                           onClick={() => handleStatusChange(app.id, 'reviewing')}
@@ -172,6 +180,14 @@ export function ApplicantsTab() {
           open={!!offerModalApp}
           onOpenChange={(open) => { if (!open) setOfferModalApp(null) }}
           onSuccess={() => setOfferModalApp(null)}
+        />
+      )}
+      {viewApp && (
+        <CandidateDetailDrawer
+          application={viewApp}
+          open={!!viewApp}
+          onOpenChange={(open) => { if (!open) setViewApp(null) }}
+          onActionComplete={() => setViewApp(null)}
         />
       )}
     </>
