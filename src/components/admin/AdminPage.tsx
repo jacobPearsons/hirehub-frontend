@@ -113,7 +113,7 @@ function AdminApplicationsList() {
           application={viewApp}
           open={!!viewApp}
           onOpenChange={(open) => { if (!open) setViewApp(null) }}
-          onActionComplete={() => refresh(true)}
+          onActionComplete={() => { setViewApp(null); refresh(true) }}
         />
       )}
     </>

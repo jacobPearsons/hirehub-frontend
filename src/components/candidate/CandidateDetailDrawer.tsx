@@ -105,6 +105,9 @@ export function CandidateDetailDrawer({
               >
                 <div className="sticky top-0 bg-surface-1/95 backdrop-blur-sm border-b border-hairline px-6 py-4 flex items-center justify-between">
                   <Dialog.Title className="text-lg font-semibold text-ink">Candidate Profile</Dialog.Title>
+                  <Dialog.Description className="sr-only">
+                    Full candidate profile, resume, and hiring actions.
+                  </Dialog.Description>
                   <Dialog.Close asChild>
                     <button
                       className="p-1 rounded-md text-ink-tertiary hover:text-ink hover:bg-surface-2 transition-colors"
