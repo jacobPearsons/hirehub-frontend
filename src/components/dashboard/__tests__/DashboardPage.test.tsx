@@ -1,6 +1,7 @@
 import { render, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import DashboardPage from '../DashboardPage'
+import { ApplicationsProvider } from '../../../context/ApplicationsContext'
 
 vi.mock('../../../context/AppContext', async (importOriginal) => {
   const actual = await importOriginal<typeof import('../../../context/AppContext')>()
@@ -9,6 +10,7 @@ vi.mock('../../../context/AppContext', async (importOriginal) => {
     useApp: vi.fn(() => ({
       user: null,
       setUser: vi.fn(),
+      savedJobIds: [],
     })),
   }
 })
@@ -20,7 +22,9 @@ vi.mock('../../../utils/usePageMeta', () => ({
 function renderDashboardPage() {
   return render(
     <MemoryRouter initialEntries={['/dashboard']}>
-      <DashboardPage />
+      <ApplicationsProvider>
+        <DashboardPage />
+      </ApplicationsProvider>
     </MemoryRouter>
   )
 }
@@ -37,9 +41,10 @@ describe('DashboardPage', () => {
     expect(screen.getByRole('tab', { name: /my applications/i })).toBeInTheDocument()
   })
 
-  it('defaults to Saved Jobs tab', () => {
+  it('defaults to Overview tab', () => {
     renderDashboardPage()
-    expect(screen.getByRole('tab', { name: /saved jobs/i })).toHaveAttribute('aria-selected', 'true')
+    expect(screen.getByRole('tab', { name: /overview/i })).toHaveAttribute('aria-selected', 'true')
+    expect(screen.getByRole('tab', { name: /saved jobs/i })).toHaveAttribute('aria-selected', 'false')
     expect(screen.getByRole('tab', { name: /my applications/i })).toHaveAttribute('aria-selected', 'false')
   })
 })

@@ -19,6 +19,7 @@ vi.mock('../../../utils/usePageMeta', () => ({
 
 vi.mock('../../../api/jobs', () => ({
   listJobs: vi.fn(),
+  listEmployerJobs: vi.fn().mockResolvedValue({ data: [] }),
 }))
 
 vi.mock('../../../api/applications', () => ({

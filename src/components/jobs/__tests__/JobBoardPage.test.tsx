@@ -1,5 +1,6 @@
 import { render, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { ToastProvider } from '../../ui/Toast'
 import JobBoardPage from '../JobBoardPage'
 
@@ -7,17 +8,31 @@ vi.mock('../../../api/jobs', () => ({
   listJobs: vi.fn(),
 }))
 
+vi.mock('../../../context/AppContext', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('../../../context/AppContext')>()
+  return {
+    ...actual,
+    useApp: vi.fn(() => ({
+      isSaved: vi.fn(() => false),
+      toggleSaveJob: vi.fn(),
+    })),
+  }
+})
+
 vi.mock('../../../utils/usePageMeta', () => ({
   usePageMeta: vi.fn(),
 }))
 
 function renderJobBoardPage() {
+  const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } })
   return render(
-    <MemoryRouter initialEntries={['/jobs']}>
-      <ToastProvider>
-        <JobBoardPage />
-      </ToastProvider>
-    </MemoryRouter>
+    <QueryClientProvider client={queryClient}>
+      <MemoryRouter initialEntries={['/jobs']}>
+        <ToastProvider>
+          <JobBoardPage />
+        </ToastProvider>
+      </MemoryRouter>
+    </QueryClientProvider>
   )
 }
 
@@ -45,7 +60,7 @@ describe('JobBoardPage', () => {
     })
 
     renderJobBoardPage()
-    expect(screen.getByPlaceholderText('Search jobs...')).toBeInTheDocument()
+    expect(screen.getAllByPlaceholderText('Search jobs...').length).toBeGreaterThanOrEqual(1)
   })
 
   it('renders filter options for category, seniority, and remote', async () => {
@@ -56,9 +71,9 @@ describe('JobBoardPage', () => {
     })
 
     renderJobBoardPage()
-    expect(screen.getByText('Category')).toBeInTheDocument()
-    expect(screen.getByText('Seniority')).toBeInTheDocument()
-    expect(screen.getByText('Location')).toBeInTheDocument()
+    expect(await screen.findByText('Category')).toBeInTheDocument()
+    expect(await screen.findByText('Seniority')).toBeInTheDocument()
+    expect(await screen.findByText('Location')).toBeInTheDocument()
   })
 
   it('shows loading state initially', async () => {
@@ -79,7 +94,7 @@ describe('JobBoardPage', () => {
     })
 
     renderJobBoardPage()
-    expect(await screen.findByText(/no jobs match/i)).toBeInTheDocument()
+    expect((await screen.findAllByText(/no jobs match/i)).length).toBeGreaterThanOrEqual(1)
   })
 
   it('renders job cards when jobs are returned', async () => {
@@ -110,6 +125,6 @@ describe('JobBoardPage', () => {
     })
 
     renderJobBoardPage()
-    expect(await screen.findByText('Frontend Engineer')).toBeInTheDocument()
+    expect((await screen.findAllByText('Frontend Engineer')).length).toBeGreaterThanOrEqual(1)
   })
 })
