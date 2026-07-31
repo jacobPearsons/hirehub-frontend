@@ -1,5 +1,6 @@
 import { useState, type ReactNode } from 'react'
 import { CheckCircle } from 'lucide-react'
+import { useApp } from '../../context/AppContext'
 import { Button } from '../ui/Button'
 import { OnboardingProgress } from './OnboardingProgress'
 import { SeekerBasicsStep } from './SeekerBasicsStep'
@@ -7,6 +8,10 @@ import { SeekerResumeStep } from './SeekerResumeStep'
 import { SeekerSkillsStep } from './SeekerSkillsStep'
 import { SeekerPreferencesStep } from './SeekerPreferencesStep'
 import { SeekerCompleteStep } from './SeekerCompleteStep'
+import { EmployerCompanyStep } from './EmployerCompanyStep'
+import { EmployerProfileStep } from './EmployerProfileStep'
+import { EmployerInviteStep } from './EmployerInviteStep'
+import { EmployerCompleteStep } from './EmployerCompleteStep'
 
 interface StepDef {
   title: string
@@ -22,18 +27,24 @@ const SEEKER_STEPS: StepDef[] = [
   { title: 'Done', optional: false, component: SeekerCompleteStep },
 ]
 
+const EMPLOYER_STEPS: StepDef[] = [
+  { title: 'Company', optional: false, component: EmployerCompanyStep },
+  { title: 'Profile', optional: true, component: EmployerProfileStep },
+  { title: 'Team', optional: true, component: EmployerInviteStep },
+  { title: 'Done', optional: false, component: EmployerCompleteStep },
+]
+
 export default function OnboardingWizard() {
+  const { user } = useApp()
   const [stepIndex, setStepIndex] = useState(0)
-  const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
 
-  const steps = SEEKER_STEPS
+  const steps = user?.role === 'employer' ? EMPLOYER_STEPS : SEEKER_STEPS
   const step = steps[stepIndex]
   const StepComponent = step.component
   const isLast = stepIndex === steps.length - 1
 
   const handleSaved = () => {
-    setSaving(false)
     setSaved(true)
     setStepIndex((i) => Math.min(i + 1, steps.length - 1))
     window.setTimeout(() => setSaved(false), 2000)
@@ -71,8 +82,6 @@ export default function OnboardingWizard() {
                 size="md"
                 type="submit"
                 form="onboarding-step"
-                disabled={saving}
-                onClick={() => setSaving(true)}
               >
                 Continue
               </Button>
