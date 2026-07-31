@@ -36,7 +36,7 @@ export function ContactForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
+    <form aria-label="Contact form" onSubmit={handleSubmit(onSubmit)}>
       {error && <p role="alert" className="text-sm text-error bg-error/10 px-3 py-2 rounded-md mb-4">{error}</p>}
       <Input label="Name" placeholder="Your name" error={errors.name?.message} {...register('name')} />
       <div className="mt-4">
