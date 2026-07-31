@@ -1,6 +1,6 @@
-import { LayoutDashboard, Bookmark, FileText, Briefcase, Search, Users, Plus, User } from 'lucide-react'
+import { LayoutDashboard, Bookmark, FileText, Briefcase, Search, Users, Plus, User, Building2 } from 'lucide-react'
 
-interface SidebarItem {
+export interface SidebarItem {
   label: string
   to: string
   icon: React.ComponentType<{ className?: string }>
@@ -20,4 +20,10 @@ export const employerNavItems: SidebarItem[] = [
   { label: 'Applicants', to: '/employer/dashboard?tab=applicants', icon: Users },
   { label: 'Post Job', to: '/post-job', icon: Plus },
   { label: 'Profile', to: '/dashboard/profile', icon: User },
+]
+
+export const adminNavItems: SidebarItem[] = [
+  { label: 'Overview', to: '/admin', icon: LayoutDashboard },
+  { label: 'Applications', to: '/admin?tab=applications', icon: FileText },
+  { label: 'Employers', to: '/admin?tab=employers', icon: Building2 },
 ]

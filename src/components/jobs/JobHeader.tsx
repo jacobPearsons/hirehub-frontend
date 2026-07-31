@@ -11,6 +11,7 @@ interface JobHeaderProps {
 
 export function JobHeader({ job }: JobHeaderProps) {
   const [logoError, setLogoError] = useState(false)
+  const salary = formatSalary(job.salaryMin, job.salaryMax, job.currency)
 
   return (
     <div className="flex items-start gap-4 mb-8">
@@ -35,9 +36,9 @@ export function JobHeader({ job }: JobHeaderProps) {
           <MapPin className="w-4 h-4 text-ink-muted" aria-hidden="true" />
           <span className="text-sm text-ink-muted">{job.location}</span>
         </div>
-        <p className="text-base font-medium text-ink mt-1">
-          {formatSalary(job.salaryMin, job.salaryMax, job.currency)}
-        </p>
+        {salary && (
+          <p className="text-base font-medium text-ink mt-1">{salary}</p>
+        )}
         <div className="flex flex-wrap gap-2 mt-3">
           {job.tags.map((tag) => (
             <Tag key={tag} variant="default">

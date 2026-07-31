@@ -6,7 +6,7 @@ export interface AppUser {
   id: string
   name: string
   email: string
-  role: 'seeker' | 'employer'
+  role: 'seeker' | 'employer' | 'admin'
   companyName?: string
   phone?: string | null
   bio?: string | null
@@ -58,7 +58,7 @@ function mapApiUser(user: {
     id: user.id,
     name: user.name,
     email: user.email,
-    role: user.role === 'EMPLOYER' ? 'employer' : 'seeker',
+    role: user.role === 'EMPLOYER' ? 'employer' : user.role === 'ADMIN' ? 'admin' : 'seeker',
     companyName: user.companyName,
     phone: user.phone,
     bio: user.bio,

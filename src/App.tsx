@@ -26,6 +26,7 @@ const PostJobPage = lazy(() => import('./components/post-job/PostJobPage'))
 const DashboardPage = lazy(() => import('./components/dashboard/DashboardPage'))
 const EmployerDashboardPage = lazy(() => import('./components/employer-dashboard/EmployerDashboardPage'))
 const ProfilePage = lazy(() => import('./components/profile/ProfilePage'))
+const AdminPage = lazy(() => import('./components/admin/AdminPage').then((m) => ({ default: m.AdminPage })))
 
 function App() {
   const location = useLocation()
@@ -69,6 +70,13 @@ function App() {
                 <ProtectedRoute allowedRoles={['employer']}>
                   <DashboardShell>
                     <ErrorBoundary><EmployerDashboardPage /></ErrorBoundary>
+                  </DashboardShell>
+                </ProtectedRoute>
+              } />
+              <Route path="/admin" element={
+                <ProtectedRoute allowedRoles={['admin']}>
+                  <DashboardShell>
+                    <ErrorBoundary><AdminPage /></ErrorBoundary>
                   </DashboardShell>
                 </ProtectedRoute>
               } />

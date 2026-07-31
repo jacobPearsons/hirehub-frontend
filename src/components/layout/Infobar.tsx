@@ -1,5 +1,6 @@
 import { Menu, LogOut } from 'lucide-react'
 import { useApp } from '../../context/AppContext'
+import { Avatar } from '../ui/Avatar'
 import { logout } from '../../api/auth'
 import { setAccessToken } from '../../api/client'
 import { ThemeToggle } from '../ui/ThemeToggle'
@@ -35,7 +36,8 @@ export function Infobar({ onMenuToggle }: InfobarProps) {
         <ThemeToggle />
         {user && (
           <>
-            <span className="text-sm text-ink-muted hidden sm:inline">{user.name}</span>
+            <Avatar name={user.name} src={user.avatarUrl} size="sm" />
+            <span className="text-sm text-ink font-medium hidden sm:inline">{user.name}</span>
             <button
               type="button"
               onClick={handleLogout}

@@ -30,10 +30,14 @@ export default function LoginPage() {
         id: res.data.user.id,
         name: res.data.user.name,
         email: res.data.user.email,
-        role: res.data.user.role === 'EMPLOYER' ? 'employer' : 'seeker',
+        role: res.data.user.role === 'EMPLOYER' ? 'employer' : res.data.user.role === 'ADMIN' ? 'admin' : 'seeker',
         companyName: res.data.user.companyName,
       })
-      navigate(res.data.user.role === 'EMPLOYER' ? '/employer/dashboard' : '/dashboard')
+      navigate(
+        res.data.user.role === 'EMPLOYER' ? '/employer/dashboard'
+        : res.data.user.role === 'ADMIN' ? '/admin'
+        : '/dashboard',
+      )
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Login failed')
     } finally {

@@ -31,6 +31,7 @@ function CompanyLogo({ job, className }: { job: Job; className?: string }) {
 export function FeaturedJobs() {
   const [featured, setFeatured] = useState<Job[]>([])
   const [loading, setLoading] = useState(true)
+  const salary = (job: Job) => formatSalary(job.salaryMin, job.salaryMax, job.currency)
 
   useEffect(() => {
     listJobs({ take: 20 }).then(res => {
@@ -66,9 +67,11 @@ export function FeaturedJobs() {
                     <MapPin className="w-3.5 h-3.5" aria-hidden="true" />
                     {job.location}
                   </div>
-                  <p className="text-sm font-medium text-ink mb-3">
-                    {formatSalary(job.salaryMin, job.salaryMax, job.currency)}
-                  </p>
+                  {salary(job) && (
+                    <p className="text-sm font-medium text-ink mb-3">
+                      {salary(job)}
+                    </p>
+                  )}
                   <div className="flex flex-wrap gap-2">
                     {job.tags.map((tag) => (
                       <span key={tag} className="inline-flex items-center px-2.5 py-0.5 rounded-full text-sm font-medium bg-surface-2 text-ink-muted">{tag}</span>

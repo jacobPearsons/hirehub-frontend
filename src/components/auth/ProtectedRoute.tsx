@@ -4,7 +4,7 @@ import { useApp } from '../../context/AppContext'
 
 interface ProtectedRouteProps {
   children: React.ReactNode
-  allowedRoles?: ('seeker' | 'employer')[]
+  allowedRoles?: ('seeker' | 'employer' | 'admin')[]
 }
 
 export function ProtectedRoute({ children, allowedRoles }: ProtectedRouteProps) {
@@ -25,7 +25,7 @@ export function ProtectedRoute({ children, allowedRoles }: ProtectedRouteProps) 
     return <Navigate to="/" replace />
   }
 
-  if (user && !user.onboardingCompleted && location.pathname !== '/onboarding') {
+  if (user && user.role !== 'admin' && !user.onboardingCompleted && location.pathname !== '/onboarding') {
     return <Navigate to="/onboarding" replace />
   }
 

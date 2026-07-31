@@ -54,41 +54,52 @@ export default function OnboardingWizard() {
   const goNext = () => setStepIndex((i) => Math.min(i + 1, steps.length - 1))
 
   return (
-    <div className="min-h-screen bg-canvas">
-      <OnboardingProgress current={stepIndex} total={steps.length} labels={steps.map((s) => s.title)} />
-      <main className="mx-auto max-w-3xl px-6 py-10">
-        <h1 className="text-2xl font-semibold text-ink mb-1">Let's get your profile ready</h1>
-        <p className="text-sm text-ink-muted mb-8">{step.optional ? 'Optional — skip any time.' : 'A few details help employers find you.'}</p>
-        {isLast ? (
-          <StepComponent onSaved={handleSaved} />
-        ) : (
-          <>
+    <div className="min-h-screen bg-canvas relative">
+      <div className="absolute inset-0 opacity-30" aria-hidden="true">
+        <img
+          src={isLast ? '/onboarding-complete-bg.png' : '/onboarding-bg.png'}
+          alt=""
+          className="w-full h-full object-cover"
+          loading="eager"
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-canvas/60 via-canvas/20 to-canvas/80" />
+      </div>
+      <div className="relative">
+        <OnboardingProgress current={stepIndex} total={steps.length} labels={steps.map((s) => s.title)} />
+        <main className="mx-auto max-w-3xl px-6 py-10">
+          <h1 className="text-2xl font-semibold text-ink mb-1">Let's get your profile ready</h1>
+          <p className="text-sm text-ink-muted mb-8">{step.optional ? 'Optional — skip any time.' : 'A few details help employers find you.'}</p>
+          {isLast ? (
             <StepComponent onSaved={handleSaved} />
-            <div className="sticky bottom-0 mt-8 -mx-6 px-6 py-4 bg-canvas/95 backdrop-blur border-t border-hairline flex items-center gap-3">
-              {stepIndex > 0 && (
-                <Button variant="ghost" size="md" onClick={goBack}>Back</Button>
-              )}
-              {step.optional && (
-                <Button variant="ghost" size="md" onClick={goNext}>Skip</Button>
-              )}
-              <span className="flex-1" />
-              {saved && (
-                <span className="inline-flex items-center gap-1 text-sm text-success">
-                  <CheckCircle className="w-4 h-4" /> Saved
-                </span>
-              )}
-              <Button
-                variant="primary"
-                size="md"
-                type="submit"
-                form="onboarding-step"
-              >
-                Continue
-              </Button>
-            </div>
-          </>
-        )}
-      </main>
+          ) : (
+            <>
+              <StepComponent onSaved={handleSaved} />
+              <div className="sticky bottom-0 mt-8 -mx-6 px-6 py-4 bg-canvas/95 backdrop-blur border-t border-hairline flex items-center gap-3">
+                {stepIndex > 0 && (
+                  <Button variant="ghost" size="md" onClick={goBack}>Back</Button>
+                )}
+                {step.optional && (
+                  <Button variant="ghost" size="md" onClick={goNext}>Skip</Button>
+                )}
+                <span className="flex-1" />
+                {saved && (
+                  <span className="inline-flex items-center gap-1 text-sm text-success">
+                    <CheckCircle className="w-4 h-4" /> Saved
+                  </span>
+                )}
+                <Button
+                  variant="primary"
+                  size="md"
+                  type="submit"
+                  form="onboarding-step"
+                >
+                  Continue
+                </Button>
+              </div>
+            </>
+          )}
+        </main>
+      </div>
     </div>
   )
 }

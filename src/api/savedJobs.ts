@@ -1,8 +1,16 @@
 import { apiGet, apiPost, apiDelete } from './client'
 import type { Job } from './types'
 
+interface SavedJobRecord {
+  id: string
+  userId: string
+  jobId: string
+  job: Job
+}
+
 export async function listSavedJobs() {
-  return apiGet<Job[]>('/saved-jobs')
+  const res = await apiGet<SavedJobRecord[]>('/saved-jobs')
+  return { ...res, data: res.data.map((record) => record.job) }
 }
 
 export async function saveJob(jobId: string) {

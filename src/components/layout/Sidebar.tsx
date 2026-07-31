@@ -1,9 +1,10 @@
-import { NavLink, Link, useNavigate } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { X, LogOut } from 'lucide-react'
 import { useApp } from '../../context/AppContext'
+import { Avatar } from '../ui/Avatar'
 import { logout } from '../../api/auth'
 import { setAccessToken } from '../../api/client'
-import { seekerNavItems, employerNavItems } from './sidebar-constants'
+import { seekerNavItems, employerNavItems, adminNavItems, type SidebarItem } from './sidebar-constants'
 
 interface SidebarProps {
   mobile?: boolean
@@ -11,23 +12,35 @@ interface SidebarProps {
   onClose?: () => void
 }
 
-function NavItem({ item, onClick }: { item: { label: string; to: string; icon: React.ComponentType<{ className?: string }> }; onClick?: () => void }) {
+function isNavActive(pathname: string, search: string, to: string): boolean {
+  const [toPath, toSearch] = to.split('?')
+  if (toSearch) {
+    return pathname === toPath && search === `?${toSearch}`
+  }
+  if (pathname === toPath) {
+    return search === ''
+  }
+  return toPath === '/jobs' && pathname.startsWith('/jobs/')
+}
+
+function NavItem({ item, onClick }: { item: SidebarItem; onClick?: () => void }) {
   const Icon = item.icon
+  const { pathname, search } = useLocation()
+  const active = isNavActive(pathname, search, item.to)
   return (
-    <NavLink
+    <Link
       to={item.to}
       onClick={onClick}
-      className={({ isActive }) =>
-        `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/30 ${
-          isActive
-            ? 'bg-accent/10 text-accent'
-            : 'text-ink-muted hover:text-ink hover:bg-surface-2'
-        }`
-      }
+      aria-current={active ? 'page' : undefined}
+      className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/30 ${
+        active
+          ? 'bg-accent/10 text-accent'
+          : 'text-ink-muted hover:text-ink hover:bg-surface-2'
+      }`}
     >
       <Icon className="h-5 w-5 shrink-0" />
       <span>{item.label}</span>
-    </NavLink>
+    </Link>
   )
 }
 
@@ -35,7 +48,8 @@ function SidebarContent({ onNavClick }: { onNavClick?: () => void }) {
   const { user, setUser } = useApp()
   const navigate = useNavigate()
 
-  const navItems = user?.role === 'employer' ? employerNavItems : seekerNavItems
+  const navItems =
+    user?.role === 'employer' ? employerNavItems : user?.role === 'admin' ? adminNavItems : seekerNavItems
 
   const handleLogout = async () => {
     try { await logout() } catch { /* intentionally empty */ }
@@ -70,7 +84,8 @@ function SidebarContent({ onNavClick }: { onNavClick?: () => void }) {
       <div className="border-t border-hairline p-3 shrink-0">
         {user && (
           <div className="flex items-center gap-3 px-3 py-2.5">
-            <span className="text-sm text-ink-muted truncate">{user.name}</span>
+            <Avatar name={user.name} src={user.avatarUrl} size="sm" />
+            <span className="text-sm text-ink font-medium truncate">{user.name}</span>
             <button
               type="button"
               onClick={handleLogout}

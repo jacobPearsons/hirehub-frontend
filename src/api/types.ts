@@ -10,7 +10,7 @@ export interface ApiUser {
   id: string
   name: string
   email: string
-  role: 'SEEKER' | 'EMPLOYER'
+  role: 'SEEKER' | 'EMPLOYER' | 'ADMIN'
   companyName?: string
   phone?: string | null
   bio?: string | null
@@ -32,7 +32,7 @@ export interface AuthUser {
   id: string
   name: string
   email: string
-  role: 'seeker' | 'employer'
+  role: 'seeker' | 'employer' | 'admin'
   companyName?: string
   phone?: string | null
   bio?: string | null

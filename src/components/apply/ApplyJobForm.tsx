@@ -7,7 +7,6 @@ import { useToast } from '../ui/Toast'
 import { useApp } from '../../context/AppContext'
 import { apiUpload } from '../../api/client'
 import { applicationSchema, type ApplicationFormData } from '../../schemas/auth'
-import type { Application } from '../../api/types'
 import type { Job } from '../../data/jobs'
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024
@@ -56,28 +55,28 @@ export function ApplyJobForm({ job, onSuccess }: ApplyJobFormProps) {
 
   const onSubmit = async (data: ApplicationFormData) => {
     try {
-      let res
+      const { createApplication } = await import('../../api/applications')
+      let resumePath: string | undefined
+      let uploadedFileName: string | undefined
       if (resumeFile) {
         const formData = new FormData()
-        formData.append('jobId', job.id)
-        formData.append('applicantName', data.fullName)
-        formData.append('applicantEmail', data.email)
-        formData.append('coverLetter', data.coverLetter)
         formData.append('resume', resumeFile)
-        res = await apiUpload<Application>('/applications', formData)
-      } else {
-        const { createApplication } = await import('../../api/applications')
-        res = await createApplication({
-          jobId: job.id,
-          applicantName: data.fullName,
-          applicantEmail: data.email,
-          coverLetter: data.coverLetter,
-        })
+        const res = await apiUpload<{ resumePath: string; resumeFileName: string }>('/upload/resume', formData)
+        resumePath = res.data.resumePath
+        uploadedFileName = res.data.resumeFileName
       }
+      const res = await createApplication({
+        jobId: job.id,
+        applicantName: data.fullName,
+        applicantEmail: data.email,
+        coverLetter: data.coverLetter,
+        resumePath,
+        resumeFileName: uploadedFileName,
+      })
       addApplication(res.data)
-      onSuccess(resumeFileName || undefined)
+      onSuccess(uploadedFileName || resumeFileName || undefined)
     } catch (err) {
-      throw err instanceof Error ? err : new Error('Application failed')
+      showToast('error', err instanceof Error ? err.message : 'Application failed')
     }
   }
 
