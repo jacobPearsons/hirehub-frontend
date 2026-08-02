@@ -14,7 +14,12 @@ const isDashboardPath = (pathname: string) =>
   pathname.startsWith('/dashboard/') ||
   pathname === '/employer/dashboard' ||
   pathname.startsWith('/employer/dashboard/') ||
-  pathname === '/admin'
+  pathname === '/admin' ||
+  pathname === '/login' ||
+  pathname === '/signup' ||
+  pathname === '/forgot-password' ||
+  pathname === '/reset-password' ||
+  pathname === '/onboarding'
 
 export default function Layout({ children }: LayoutProps) {
   const { pathname } = useLocation()
