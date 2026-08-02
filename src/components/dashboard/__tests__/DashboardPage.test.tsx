@@ -1,40 +1,45 @@
 import { render, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import DashboardPage from '../DashboardPage'
-import { ApplicationsProvider } from '../../../context/ApplicationsContext'
 
-vi.mock('../../../context/AppContext', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('../../../context/AppContext')>()
-  return {
-    ...actual,
-    useApp: vi.fn(() => ({
-      user: null,
-      setUser: vi.fn(),
-      savedJobIds: [],
-    })),
-  }
-})
+vi.mock('../../../context/AppContext', () => ({
+  useApp: () => ({ user: null }),
+}))
 
 vi.mock('../../../utils/usePageMeta', () => ({
   usePageMeta: vi.fn(),
 }))
 
-function renderDashboardPage() {
+vi.mock('../OverviewTab', () => ({ OverviewTab: () => <div>OverviewTab</div> }))
+vi.mock('../SavedJobsTab', () => ({ SavedJobsTab: () => <div>SavedJobsTab</div> }))
+vi.mock('../ApplicationsTab', () => ({ ApplicationsTab: () => <div>ApplicationsTab</div> }))
+
+function renderDashboardPage(initialEntry = '/dashboard') {
   return render(
-    <MemoryRouter initialEntries={['/dashboard']}>
-      <ApplicationsProvider>
-        <DashboardPage />
-      </ApplicationsProvider>
-    </MemoryRouter>
+    <MemoryRouter initialEntries={[initialEntry]}>
+      <DashboardPage />
+    </MemoryRouter>,
   )
 }
 
-describe('DashboardPage', () => {
-  it('renders Dashboard heading', () => {
+describe('DashboardPage header', () => {
+  it('shows Overview heading by default', () => {
     renderDashboardPage()
-    expect(screen.getByRole('heading', { name: /dashboard/i })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: /overview/i, level: 1 })).toBeInTheDocument()
   })
 
+  it('shows Saved Jobs heading when tab=saved', () => {
+    renderDashboardPage('/dashboard?tab=saved')
+    expect(screen.getByRole('heading', { name: /saved jobs/i, level: 1 })).toBeInTheDocument()
+  })
+
+  it('shows My Applications heading when tab=applications', () => {
+    renderDashboardPage('/dashboard?tab=applications')
+    expect(screen.getByRole('heading', { name: /my applications/i, level: 1 })).toBeInTheDocument()
+  })
+})
+
+describe('DashboardPage tabs', () => {
   it('renders tab bar with Saved Jobs and My Applications tabs', () => {
     renderDashboardPage()
     expect(screen.getByRole('tab', { name: /saved jobs/i })).toBeInTheDocument()

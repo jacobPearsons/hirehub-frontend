@@ -13,11 +13,17 @@ const tabs = [
   { id: 'applications', label: 'My Applications' },
 ] as const
 
+const tabMeta = {
+  overview: { title: 'Overview', subtitle: 'Your activity at a glance' },
+  saved: { title: 'Saved Jobs', subtitle: 'Jobs you’ve bookmarked' },
+  applications: { title: 'My Applications', subtitle: 'Track every application and hiring stage' },
+} as const
+
 export default function DashboardPage() {
   const { user } = useApp()
   const [searchParams, setSearchParams] = useSearchParams()
   const activeTab = (searchParams.get('tab') as 'overview' | 'saved' | 'applications') ?? 'overview'
-  const meta = usePageMeta({ title: 'Dashboard | HireHub Community', description: 'Manage your saved jobs and applications' })
+  const meta = usePageMeta({ title: tabMeta[activeTab].title, description: tabMeta[activeTab].subtitle })
 
   function setActiveTab(tab: string) {
     setSearchParams(tab === 'overview' ? {} : { tab })
@@ -29,8 +35,10 @@ export default function DashboardPage() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <HeroContent variant="accent">
           <div>
-            <h1 className="text-3xl md:text-[40px] leading-[1.15] tracking-[-0.8px] font-medium">Dashboard</h1>
-            <p className="text-ink-muted mt-1">Manage your saved jobs and applications</p>
+            <h1 className="text-3xl md:text-[40px] leading-[1.15] tracking-[-0.8px] font-medium">
+              {tabMeta[activeTab].title}
+            </h1>
+            <p className="text-ink-muted mt-1">{tabMeta[activeTab].subtitle}</p>
           </div>
         </HeroContent>
       </div>
