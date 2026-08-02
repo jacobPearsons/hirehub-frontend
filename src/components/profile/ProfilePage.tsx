@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react'
-import { useForm } from 'react-hook-form'
+import { useForm, useWatch } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { Camera } from 'lucide-react'
@@ -41,7 +41,7 @@ export default function ProfilePage() {
   const {
     register,
     handleSubmit,
-    watch,
+    control,
     formState: { errors, isSubmitting },
   } = useForm<ProfileFormData>({
     resolver: zodResolver(profileSchema),
@@ -54,7 +54,7 @@ export default function ProfilePage() {
     },
   })
 
-  const bioValue = watch('bio')
+  const bioValue = useWatch({ control, name: 'bio' })
 
   const {
     register: registerPassword,

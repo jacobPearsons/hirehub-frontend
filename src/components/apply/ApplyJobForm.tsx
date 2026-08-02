@@ -1,5 +1,5 @@
 import { useState, useRef, type ChangeEvent } from 'react'
-import { useForm } from 'react-hook-form'
+import { useForm, useWatch } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { X, File as FileIcon } from 'lucide-react'
 import { Input, Button, Textarea } from '../ui'
@@ -23,7 +23,7 @@ export function ApplyJobForm({ job, onSuccess }: ApplyJobFormProps) {
   const { user, addApplication } = useApp()
   const { showToast } = useToast()
 
-  const { register, handleSubmit, watch, formState: { errors, isSubmitting } } = useForm<ApplicationFormData>({
+  const { register, handleSubmit, control, formState: { errors, isSubmitting } } = useForm<ApplicationFormData>({
     resolver: zodResolver(applicationSchema),
     defaultValues: {
       fullName: user?.name || '',
@@ -32,7 +32,7 @@ export function ApplyJobForm({ job, onSuccess }: ApplyJobFormProps) {
     },
   })
 
-  const coverLetterValue = watch('coverLetter')
+  const coverLetterValue = useWatch({ control, name: 'coverLetter' })
   const COVER_LETTER_MAX = 2000
 
   function handleFileChange(e: ChangeEvent<HTMLInputElement>) {

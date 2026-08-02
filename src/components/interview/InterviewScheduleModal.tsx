@@ -2,7 +2,7 @@ import { useState } from 'react'
 import * as Dialog from '@radix-ui/react-dialog'
 import { AnimatePresence, motion } from 'framer-motion'
 import { X } from 'lucide-react'
-import { useForm } from 'react-hook-form'
+import { useForm, useWatch } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { Input, Textarea, Button } from '../ui'
@@ -45,7 +45,7 @@ export function InterviewScheduleModal({
   const {
     register,
     handleSubmit,
-    watch,
+    control,
     reset,
     formState: { errors },
   } = useForm<InterviewFormData>({
@@ -62,7 +62,7 @@ export function InterviewScheduleModal({
     },
   })
 
-  const interviewType = watch('interviewType')
+  const interviewType = useWatch({ control, name: 'interviewType' })
 
   function handleClose() {
     reset()
