@@ -116,7 +116,15 @@ export function OverviewTab() {
         </Card>
       )}
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <div className="relative overflow-hidden rounded-xl">
+        <img
+          src="/overview-grid-bg.svg"
+          alt=""
+          aria-hidden="true"
+          loading="lazy"
+          className="absolute inset-0 w-full h-full object-cover pointer-events-none text-ink"
+        />
+        <div className="relative grid grid-cols-1 sm:grid-cols-3 gap-4">
         {statCards.map((card, i) => {
           const Icon = card.icon
           const count = counts[i]
@@ -149,6 +157,7 @@ export function OverviewTab() {
             </Link>
           )
         })}
+        </div>
       </div>
     </div>
   )

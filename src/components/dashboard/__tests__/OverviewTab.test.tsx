@@ -50,4 +50,11 @@ describe('OverviewTab counts', () => {
     expect(screen.getAllByText('0')).toHaveLength(2) // applications + interviewing fallback
     expect(screen.getByText('2')).toBeInTheDocument() // saved jobs
   })
+
+  it('renders the decorative grid background image', () => {
+    renderOverviewTab()
+    const bg = screen.getByAltText('')
+    expect(bg).toHaveAttribute('src', '/overview-grid-bg.svg')
+    expect(bg).toHaveAttribute('aria-hidden', 'true')
+  })
 })
