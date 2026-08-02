@@ -34,17 +34,29 @@ vi.mock('../JobBody', () => ({
   ),
 }))
 
-vi.mock('../CompanySidebar', () => ({
-  CompanySidebar: () => (
-    <div data-testid="company-sidebar">
-      <a href="https://example.com/apply">Apply Now</a>
-    </div>
-  ),
-}))
-
 vi.mock('../SaveButton', () => ({
   SaveButton: () => <button>Save</button>,
 }))
+
+const mockJob = {
+  id: 'test-id',
+  title: 'Senior Engineer',
+  company: 'Acme Corp',
+  companyLogo: '',
+  location: 'Remote',
+  remote: true,
+  salaryMin: 120000,
+  salaryMax: 180000,
+  currency: 'USD',
+  tags: ['React', 'TypeScript'],
+  category: 'Engineering',
+  seniority: 'senior',
+  description: 'Build amazing products',
+  requirements: [],
+  responsibilities: [],
+  postedDate: '2026-01-01',
+  featured: false,
+}
 
 function renderJobDetailPage() {
   return render(
@@ -73,60 +85,31 @@ describe('JobDetailPage', () => {
 
   it('renders job details when loaded', async () => {
     const { getJobById } = await import('../../../api/jobs')
-    ;(getJobById as ReturnType<typeof vi.fn>).mockResolvedValue({
-      data: {
-        id: 'test-id',
-        title: 'Senior Engineer',
-        company: 'Acme Corp',
-        companyLogo: '',
-        location: 'Remote',
-        remote: true,
-        salaryMin: 120000,
-        salaryMax: 180000,
-        currency: 'USD',
-        tags: ['React', 'TypeScript'],
-        category: 'Engineering',
-        seniority: 'senior',
-        description: 'Build amazing products',
-        requirements: [],
-        responsibilities: [],
-        postedDate: '2026-01-01',
-        featured: false,
-      },
-    })
+    ;(getJobById as ReturnType<typeof vi.fn>).mockResolvedValue({ data: mockJob })
 
     renderJobDetailPage()
     expect(await screen.findByRole('heading', { name: 'Senior Engineer' })).toBeInTheDocument()
-    expect(screen.getByText('Acme Corp')).toBeInTheDocument()
+    expect(screen.getAllByText('Acme Corp').length).toBeGreaterThan(0)
     expect(screen.getByText('Build amazing products')).toBeInTheDocument()
   })
 
   it('renders Apply Now button', async () => {
     const { getJobById } = await import('../../../api/jobs')
+    ;(getJobById as ReturnType<typeof vi.fn>).mockResolvedValue({ data: mockJob })
+
+    renderJobDetailPage()
+    expect(await screen.findByRole('button', { name: /apply now/i })).toBeInTheDocument()
+  })
+
+  it('shows an expired banner when the job is past expiry', async () => {
+    const { getJobById } = await import('../../../api/jobs')
     ;(getJobById as ReturnType<typeof vi.fn>).mockResolvedValue({
-      data: {
-        id: 'test-id',
-        title: 'Senior Engineer',
-        company: 'Acme Corp',
-        companyLogo: '',
-        location: 'Remote',
-        remote: true,
-        salaryMin: 120000,
-        salaryMax: 180000,
-        currency: 'USD',
-        tags: ['React', 'TypeScript'],
-        category: 'Engineering',
-        seniority: 'senior',
-        description: 'Build amazing products',
-        requirements: [],
-        responsibilities: [],
-        postedDate: '2026-01-01',
-        featured: false,
-      },
+      data: { ...mockJob, expiresAt: '2020-01-01T00:00:00.000Z' },
     })
 
     renderJobDetailPage()
-    expect(await screen.findByRole('link', { name: /apply now/i })).toBeInTheDocument()
+    expect(await screen.findByText(/this job has expired/i)).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /apply now/i })).not.toBeInTheDocument()
   })
 
   it('renders "Job not found" state when API returns error', async () => {

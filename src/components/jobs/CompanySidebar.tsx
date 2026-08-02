@@ -12,7 +12,9 @@ interface CompanySidebarProps {
 export function CompanySidebar({ job }: CompanySidebarProps) {
   const [modalOpen, setModalOpen] = useState(false)
   const [logoError, setLogoError] = useState(false)
+  const [now] = useState(() => Date.now())
   const brief = getCompanyBrief(job.company)
+  const expired = job.expiresAt ? new Date(job.expiresAt).getTime() < now : false
 
   return (
     <>
@@ -71,9 +73,15 @@ export function CompanySidebar({ job }: CompanySidebarProps) {
           )}
         </div>
 
-        <Button variant="accent" size="lg" className="w-full" onClick={() => setModalOpen(true)}>
-          Apply Now
-        </Button>
+        {expired ? (
+          <Button variant="accent" size="lg" className="w-full" disabled>
+            Applications Closed
+          </Button>
+        ) : (
+          <Button variant="accent" size="lg" className="w-full" onClick={() => setModalOpen(true)}>
+            Apply Now
+          </Button>
+        )}
       </Card>
 
       <ApplyJobModal

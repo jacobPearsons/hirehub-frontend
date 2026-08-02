@@ -15,6 +15,7 @@ export default function JobDetailPage() {
   const [job, setJob] = useState<Job | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const [now] = useState(() => Date.now())
 
   useEffect(() => {
     if (!id) return
@@ -61,6 +62,8 @@ export default function JobDetailPage() {
     )
   }
 
+  const expired = job.expiresAt ? new Date(job.expiresAt).getTime() < now : false
+
   return (
     <>
       {meta}
@@ -78,6 +81,11 @@ export default function JobDetailPage() {
           </div>
           <div className="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-12">
             <div>
+              {expired && (
+                <div className="mb-6 p-4 rounded-lg border border-accent/30 bg-accent/5 text-sm text-ink">
+                  This job has expired. Applications are now closed.
+                </div>
+              )}
               <JobHeader job={job} />
               <JobBody job={job} />
             </div>
