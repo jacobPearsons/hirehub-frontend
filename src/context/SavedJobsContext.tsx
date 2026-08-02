@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect, useMemo, useCallback, useOptimistic, type ReactNode } from 'react'
+import { createContext, useContext, useState, useEffect, useMemo, useCallback, useRef, useOptimistic, type ReactNode } from 'react'
 import { listSavedJobs, saveJob, removeSavedJob } from '../api/savedJobs'
 import { getAccessToken } from '../api/client'
 
@@ -49,7 +49,11 @@ export function SavedJobsProvider({ children }: { children: ReactNode }) {
     return () => controller.abort()
   }, [])
 
+  const pendingSavesRef = useRef<Set<string>>(new Set())
+
   const toggleSaveJob = useCallback(async (jobId: string) => {
+    if (pendingSavesRef.current.has(jobId)) return
+    pendingSavesRef.current.add(jobId)
     const isCurrentlySaved = optimisticSavedIds.includes(jobId)
     setOptimisticSavedIds({ jobId, action: isCurrentlySaved ? 'remove' : 'add' })
 
@@ -59,13 +63,15 @@ export function SavedJobsProvider({ children }: { children: ReactNode }) {
         setSavedJobIds(prev => prev.filter(id => id !== jobId))
       } else {
         await saveJob(jobId)
-        setSavedJobIds(prev => [...prev, jobId])
+        setSavedJobIds(prev => (prev.includes(jobId) ? prev : [...prev, jobId]))
       }
     } catch {
       setSavedJobIds(prev => {
-        if (isCurrentlySaved) return [...prev, jobId]
+        if (isCurrentlySaved) return prev.includes(jobId) ? prev : [...prev, jobId]
         return prev.filter(id => id !== jobId)
       })
+    } finally {
+      pendingSavesRef.current.delete(jobId)
     }
   }, [optimisticSavedIds, setOptimisticSavedIds])
 
