@@ -1,4 +1,5 @@
 import { render, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router-dom'
 import { ApplicationCard } from '../ApplicationCard'
 import type { Application } from '../../../types/application'
@@ -25,5 +26,16 @@ describe('ApplicationCard', () => {
     )
     const link = screen.getByRole('link', { name: /View Job/i })
     expect(link).toHaveAttribute('href', '/jobs/job-1')
+  })
+
+  it('opens the hiring flow modal', async () => {
+    const user = userEvent.setup()
+    render(
+      <MemoryRouter>
+        <ApplicationCard application={app} />
+      </MemoryRouter>,
+    )
+    await user.click(screen.getByRole('button', { name: /Hiring Flow/i }))
+    expect(screen.getByText(/Hiring Flow — Frontend Engineer/i)).toBeInTheDocument()
   })
 })
