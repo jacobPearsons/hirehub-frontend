@@ -24,6 +24,8 @@ export function ApplyJobForm({ job, onSuccess }: ApplyJobFormProps) {
   const { showToast } = useToast()
   const existingResumePath = user?.resumePath ?? null
   const existingResumeFileName = user?.resumeFileName ?? null
+  const hasResume = Boolean(user?.resumeFileName || user?.resumePath)
+  const coverOnly = Boolean(user && hasResume)
 
   const { register, handleSubmit, control, formState: { errors, isSubmitting } } = useForm<ApplicationFormData>({
     resolver: zodResolver(applicationSchema),
@@ -84,44 +86,50 @@ export function ApplyJobForm({ job, onSuccess }: ApplyJobFormProps) {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-      <Input label="Full Name" placeholder="John Doe" error={errors.fullName?.message} {...register('fullName')} />
-      <Input label="Email" type="email" placeholder="john@example.com" error={errors.email?.message} {...register('email')} />
+      {!coverOnly && (
+        <>
+          <Input label="Full Name" placeholder="John Doe" error={errors.fullName?.message} {...register('fullName')} />
+          <Input label="Email" type="email" placeholder="john@example.com" error={errors.email?.message} {...register('email')} />
+        </>
+      )}
       <div>
         <Textarea label="Cover Letter" id="coverLetter" rows={5} placeholder="Tell us why you're a great fit..." className="min-h-[120px]" error={errors.coverLetter?.message} {...register('coverLetter')} />
         <p className="mt-1 text-xs text-ink-tertiary text-right">
           {coverLetterValue?.length ?? 0}/{COVER_LETTER_MAX} characters
         </p>
       </div>
-      <div>
-        {existingResumePath ? (
-          <div className="flex items-center gap-2 px-3 py-2.5 rounded-md border border-hairline bg-surface-1">
-            <FileIcon className="w-4 h-4 text-ink-muted shrink-0" aria-hidden="true" />
-            <span className="text-sm text-ink truncate flex-1">
-              Resume on file: {existingResumeFileName ?? 'your saved resume'}
-            </span>
-          </div>
-        ) : (
-          <>
-            <label className="block text-sm font-medium text-ink mb-1">Resume (optional)</label>
-            {resumeFileName ? (
-              <div className="flex items-center gap-2 px-3 py-2.5 rounded-md border border-hairline bg-surface-1">
-                <FileIcon className="w-4 h-4 text-ink-muted shrink-0" aria-hidden="true" />
-                <span className="text-sm text-ink truncate flex-1">{resumeFileName}</span>
-                <button type="button" onClick={handleClearFile} className="p-0.5 rounded text-ink-tertiary hover:text-error transition-colors" aria-label="Remove resume">
-                  <X className="w-4 h-4" />
-                </button>
-              </div>
-            ) : (
-              <label className="flex cursor-pointer items-center justify-center gap-2 px-4 py-6 rounded-md border-2 border-dashed border-hairline bg-surface-1 hover:border-ink/40 transition-colors">
-                <input ref={fileInputRef} type="file" accept=".pdf" onChange={handleFileChange} className="sr-only" aria-label="Upload resume (PDF)" />
-                <FileIcon className="w-5 h-5 text-ink-muted" aria-hidden="true" />
-                <span className="text-sm text-ink-muted">Click to upload PDF resume</span>
-              </label>
-            )}
-            <p className="mt-1 text-xs text-ink-tertiary">Accepted: PDF only, up to 10MB</p>
-          </>
-        )}
-      </div>
+      {!coverOnly && (
+        <div>
+          {existingResumePath ? (
+            <div className="flex items-center gap-2 px-3 py-2.5 rounded-md border border-hairline bg-surface-1">
+              <FileIcon className="w-4 h-4 text-ink-muted shrink-0" aria-hidden="true" />
+              <span className="text-sm text-ink truncate flex-1">
+                Resume on file: {existingResumeFileName ?? 'your saved resume'}
+              </span>
+            </div>
+          ) : (
+            <>
+              <label className="block text-sm font-medium text-ink mb-1">Resume (optional)</label>
+              {resumeFileName ? (
+                <div className="flex items-center gap-2 px-3 py-2.5 rounded-md border border-hairline bg-surface-1">
+                  <FileIcon className="w-4 h-4 text-ink-muted shrink-0" aria-hidden="true" />
+                  <span className="text-sm text-ink truncate flex-1">{resumeFileName}</span>
+                  <button type="button" onClick={handleClearFile} className="p-0.5 rounded text-ink-tertiary hover:text-error transition-colors" aria-label="Remove resume">
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+              ) : (
+                <label className="flex cursor-pointer items-center justify-center gap-2 px-4 py-6 rounded-md border-2 border-dashed border-hairline bg-surface-1 hover:border-ink/40 transition-colors">
+                  <input ref={fileInputRef} type="file" accept=".pdf" onChange={handleFileChange} className="sr-only" aria-label="Upload resume (PDF)" />
+                  <FileIcon className="w-5 h-5 text-ink-muted" aria-hidden="true" />
+                  <span className="text-sm text-ink-muted">Click to upload PDF resume</span>
+                </label>
+              )}
+              <p className="mt-1 text-xs text-ink-tertiary">Accepted: PDF only, up to 10MB</p>
+            </>
+          )}
+        </div>
+      )}
       <Button variant="accent" size="lg" className="w-full" type="submit" disabled={isSubmitting}>
         {isSubmitting ? 'Submitting...' : 'Submit Application'}
       </Button>
