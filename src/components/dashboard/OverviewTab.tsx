@@ -34,10 +34,12 @@ export function OverviewTab() {
   const { applications } = useApplications()
   const { user, savedJobIds } = useApp()
 
+  const applicationsList = Array.isArray(applications) ? applications : []
+
   const counts = [
-    applications.length,
+    applicationsList.length,
     savedJobIds.length,
-    applications.filter(a => a.status === 'interviewing').length,
+    applicationsList.filter(a => a?.status === 'interviewing').length,
   ]
 
   const salary = user ? formatSalary(user.salaryMin, user.salaryMax, user.currency) : null
