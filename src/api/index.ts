@@ -2,6 +2,7 @@ export { setAccessToken, getAccessToken, apiFetch, apiGet, apiPost, apiPatch, ap
 export * from './auth'
 export * from './jobs'
 export * from './applications'
+export * from './notifications'
 export * from './savedJobs'
 export * from './blog'
 export * from './pricing'

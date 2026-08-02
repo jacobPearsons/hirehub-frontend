@@ -4,6 +4,7 @@ import { Avatar } from '../ui/Avatar'
 import { logout } from '../../api/auth'
 import { setAccessToken } from '../../api/client'
 import { ThemeToggle } from '../ui/ThemeToggle'
+import { NotificationBell } from './NotificationBell'
 import { useNavigate } from 'react-router-dom'
 
 interface InfobarProps {
@@ -33,6 +34,7 @@ export function Infobar({ onMenuToggle }: InfobarProps) {
       </button>
 
       <div className="flex items-center gap-3 ml-auto">
+        <NotificationBell />
         <ThemeToggle />
         {user && (
           <>

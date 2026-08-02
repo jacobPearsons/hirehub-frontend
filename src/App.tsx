@@ -2,6 +2,7 @@ import { lazy, Suspense } from 'react'
 import { Routes, Route, useLocation } from 'react-router-dom'
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 import { ThemeProvider } from './context/ThemeContext'
+import { NotificationsProvider } from './context/NotificationsContext'
 import Layout from './components/layout/Layout'
 import { ToastProvider } from './components/ui/Toast'
 import { ErrorBoundary } from './components/ui/ErrorBoundary'
@@ -34,7 +35,9 @@ function App() {
 
   return (
     <ToastProvider>
-    <ThemeProvider><Layout>
+    <ThemeProvider>
+    <NotificationsProvider>
+    <Layout>
       <Suspense fallback={
         <main className="min-h-screen flex items-center justify-center bg-canvas">
           <div className="text-center text-ink-muted">Loading...</div>
@@ -98,7 +101,9 @@ function App() {
           </motion.div>
         </AnimatePresence>
       </Suspense>
-    </Layout></ThemeProvider>
+    </Layout>
+    </NotificationsProvider>
+    </ThemeProvider>
     </ToastProvider>
   )
 }

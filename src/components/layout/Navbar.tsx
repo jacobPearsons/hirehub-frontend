@@ -7,6 +7,7 @@ import { Container } from '../ui/Container'
 import { useApp } from '../../context/AppContext'
 import { logout } from '../../api/auth'
 import { ThemeToggle } from '../ui/ThemeToggle'
+import { NotificationBell } from './NotificationBell'
 import { setAccessToken } from '../../api/client'
 
 const navLinks = [
@@ -80,6 +81,7 @@ export function Navbar() {
           </div>
 
           <div className="hidden md:flex items-center gap-3">
+            <NotificationBell />
             <ThemeToggle />
             {user ? (
               <>
@@ -135,6 +137,7 @@ export function Navbar() {
 
                 {user ? (
                   <>
+                    <NotificationBell />
                     {user.role === 'seeker' && (
                       <NavLink to="/dashboard" onClick={() => setMobileOpen(false)}
                         className={({ isActive }) =>
