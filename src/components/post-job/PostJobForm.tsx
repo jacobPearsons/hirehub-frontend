@@ -6,6 +6,7 @@ import type { Resolver } from 'react-hook-form'
 import { CheckCircle } from 'lucide-react'
 import { Button, Input } from '../ui'
 import { createJob } from '../../api/jobs'
+import { ImportPromptButton } from './ImportPromptButton'
 
 const currencies = ['USD', 'EUR', 'GBP']
 const categories = ['Engineering', 'Design', 'Marketing', 'Sales', 'Operations', 'Product', 'Support']
@@ -288,6 +289,8 @@ export default function PostJobForm() {
         error={errors.applicationUrl?.message}
         {...register('applicationUrl')}
       />
+
+      <ImportPromptButton />
 
       <Button variant="primary" size="lg" className="w-full" type="submit" disabled={isSubmitting}>
         {isSubmitting ? 'Submitting...' : 'Submit job listing'}
