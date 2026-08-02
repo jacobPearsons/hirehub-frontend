@@ -33,12 +33,12 @@ describe('SkillInput', () => {
     const user = userEvent.setup()
     render(<Harness />)
 
-    await user.type(screen.getByLabelText('Skills'), 'Rust')
+    await user.type(screen.getByLabelText('Skills'), 'Report')
 
-    expect(screen.getByRole('button', { name: 'Rust' })).toBeInTheDocument()
-    await user.click(screen.getByRole('button', { name: 'Rust' }))
+    expect(screen.getByRole('button', { name: 'Report Writing' })).toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: 'Report Writing' }))
 
-    expect(screen.getByText('Rust')).toBeInTheDocument()
+    expect(screen.getByText('Report Writing')).toBeInTheDocument()
   })
 
   it('prevents adding more than max skills', async () => {
@@ -58,5 +58,25 @@ describe('SkillInput', () => {
   it('shows an error message when provided', () => {
     render(<SkillInput value={[]} onChange={() => {}} error="Add at least 3 skills" />)
     expect(screen.getByRole('alert')).toHaveTextContent('Add at least 3 skills')
+  })
+})
+
+describe('SkillInput niche suggestions', () => {
+  it('shows office suggestions when niche is office', async () => {
+    const user = userEvent.setup()
+    render(<SkillInput value={[]} onChange={() => {}} niche="office" />)
+
+    await user.type(screen.getByLabelText('Skills'), 'Zendesk')
+
+    expect(screen.getByText('Zendesk')).toBeInTheDocument()
+  })
+
+  it('shows general suggestions by default', async () => {
+    const user = userEvent.setup()
+    render(<SkillInput value={[]} onChange={() => {}} />)
+
+    await user.type(screen.getByLabelText('Skills'), 'Report')
+
+    expect(screen.getByText('Report Writing')).toBeInTheDocument()
   })
 })

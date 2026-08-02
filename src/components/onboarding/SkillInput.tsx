@@ -1,20 +1,16 @@
 import { useState, type KeyboardEvent } from 'react'
 import { X } from 'lucide-react'
-
-const SUGGESTIONS = [
-  'JavaScript', 'TypeScript', 'React', 'Node.js', 'Python', 'Java', 'Go', 'Rust',
-  'SQL', 'PostgreSQL', 'MongoDB', 'AWS', 'Docker', 'Kubernetes', 'CI/CD',
-  'GraphQL', 'REST APIs', 'Figma', 'Agile', 'Communication', 'UI/UX', 'Testing', 'Git',
-]
+import { SKILL_CATEGORIES, GENERAL_SUGGESTIONS, type SkillNiche } from '../../data/skills'
 
 interface SkillInputProps {
   value: string[]
   onChange: (skills: string[]) => void
   max?: number
   error?: string
+  niche?: SkillNiche
 }
 
-export function SkillInput({ value, onChange, max = 15, error }: SkillInputProps) {
+export function SkillInput({ value, onChange, max = 15, error, niche }: SkillInputProps) {
   const [text, setText] = useState('')
   const [open, setOpen] = useState(false)
 
@@ -34,7 +30,9 @@ export function SkillInput({ value, onChange, max = 15, error }: SkillInputProps
     }
   }
 
-  const matches = SUGGESTIONS.filter(
+  const suggestions =
+    niche && niche !== 'general' ? SKILL_CATEGORIES[niche] : GENERAL_SUGGESTIONS
+  const matches = suggestions.filter(
     (s) => s.toLowerCase().includes(text.toLowerCase()) && !value.includes(s),
   )
 
