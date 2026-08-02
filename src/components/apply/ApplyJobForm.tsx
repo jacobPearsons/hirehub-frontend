@@ -22,6 +22,8 @@ export function ApplyJobForm({ job, onSuccess }: ApplyJobFormProps) {
   const fileInputRef = useRef<HTMLInputElement>(null)
   const { user, addApplication } = useApp()
   const { showToast } = useToast()
+  const existingResumePath = user?.resumePath ?? null
+  const existingResumeFileName = user?.resumeFileName ?? null
 
   const { register, handleSubmit, control, formState: { errors, isSubmitting } } = useForm<ApplicationFormData>({
     resolver: zodResolver(applicationSchema),
@@ -70,11 +72,11 @@ export function ApplyJobForm({ job, onSuccess }: ApplyJobFormProps) {
         applicantName: data.fullName,
         applicantEmail: data.email,
         coverLetter: data.coverLetter,
-        resumePath,
-        resumeFileName: uploadedFileName,
+        resumePath: resumePath ?? existingResumePath ?? undefined,
+        resumeFileName: uploadedFileName ?? existingResumeFileName ?? undefined,
       })
       addApplication(res.data)
-      onSuccess(uploadedFileName || resumeFileName || undefined)
+      onSuccess(uploadedFileName || resumeFileName || existingResumeFileName || undefined)
     } catch (err) {
       showToast('error', err instanceof Error ? err.message : 'Application failed')
     }
@@ -91,23 +93,34 @@ export function ApplyJobForm({ job, onSuccess }: ApplyJobFormProps) {
         </p>
       </div>
       <div>
-        <label className="block text-sm font-medium text-ink mb-1">Resume (optional)</label>
-        {resumeFileName ? (
+        {existingResumePath ? (
           <div className="flex items-center gap-2 px-3 py-2.5 rounded-md border border-hairline bg-surface-1">
             <FileIcon className="w-4 h-4 text-ink-muted shrink-0" aria-hidden="true" />
-            <span className="text-sm text-ink truncate flex-1">{resumeFileName}</span>
-            <button type="button" onClick={handleClearFile} className="p-0.5 rounded text-ink-tertiary hover:text-error transition-colors" aria-label="Remove resume">
-              <X className="w-4 h-4" />
-            </button>
+            <span className="text-sm text-ink truncate flex-1">
+              Resume on file: {existingResumeFileName ?? 'your saved resume'}
+            </span>
           </div>
         ) : (
-          <label className="flex cursor-pointer items-center justify-center gap-2 px-4 py-6 rounded-md border-2 border-dashed border-hairline bg-surface-1 hover:border-ink/40 transition-colors">
-            <input ref={fileInputRef} type="file" accept=".pdf" onChange={handleFileChange} className="sr-only" aria-label="Upload resume (PDF)" />
-            <FileIcon className="w-5 h-5 text-ink-muted" aria-hidden="true" />
-            <span className="text-sm text-ink-muted">Click to upload PDF resume</span>
-          </label>
+          <>
+            <label className="block text-sm font-medium text-ink mb-1">Resume (optional)</label>
+            {resumeFileName ? (
+              <div className="flex items-center gap-2 px-3 py-2.5 rounded-md border border-hairline bg-surface-1">
+                <FileIcon className="w-4 h-4 text-ink-muted shrink-0" aria-hidden="true" />
+                <span className="text-sm text-ink truncate flex-1">{resumeFileName}</span>
+                <button type="button" onClick={handleClearFile} className="p-0.5 rounded text-ink-tertiary hover:text-error transition-colors" aria-label="Remove resume">
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+            ) : (
+              <label className="flex cursor-pointer items-center justify-center gap-2 px-4 py-6 rounded-md border-2 border-dashed border-hairline bg-surface-1 hover:border-ink/40 transition-colors">
+                <input ref={fileInputRef} type="file" accept=".pdf" onChange={handleFileChange} className="sr-only" aria-label="Upload resume (PDF)" />
+                <FileIcon className="w-5 h-5 text-ink-muted" aria-hidden="true" />
+                <span className="text-sm text-ink-muted">Click to upload PDF resume</span>
+              </label>
+            )}
+            <p className="mt-1 text-xs text-ink-tertiary">Accepted: PDF only, up to 10MB</p>
+          </>
         )}
-        <p className="mt-1 text-xs text-ink-tertiary">Accepted: PDF only, up to 10MB</p>
       </div>
       <Button variant="accent" size="lg" className="w-full" type="submit" disabled={isSubmitting}>
         {isSubmitting ? 'Submitting...' : 'Submit Application'}
