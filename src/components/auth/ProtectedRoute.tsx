@@ -7,6 +7,12 @@ interface ProtectedRouteProps {
   allowedRoles?: ('seeker' | 'employer' | 'admin')[]
 }
 
+const HOME_BY_ROLE: Record<string, string> = {
+  seeker: '/dashboard',
+  employer: '/employer/dashboard',
+  admin: '/admin',
+}
+
 export function ProtectedRoute({ children, allowedRoles }: ProtectedRouteProps) {
   const { user, loading } = useApp()
   const location = useLocation()
@@ -23,6 +29,10 @@ export function ProtectedRoute({ children, allowedRoles }: ProtectedRouteProps) 
 
   if (allowedRoles && !allowedRoles.includes(user.role)) {
     return <Navigate to="/" replace />
+  }
+
+  if (user && user.onboardingCompleted && location.pathname === '/onboarding') {
+    return <Navigate to={HOME_BY_ROLE[user.role] ?? '/dashboard'} replace />
   }
 
   if (user && user.role !== 'admin' && !user.onboardingCompleted && location.pathname !== '/onboarding') {

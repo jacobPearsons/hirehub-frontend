@@ -8,6 +8,7 @@ import { Input } from '../ui/Input'
 import { Button } from '../ui/Button'
 import { register } from '../../api/auth'
 import { setAccessToken } from '../../api/client'
+import { mapApiUser } from '../../context/AuthContext'
 import { useApp } from '../../context/AppContext'
 
 export default function SignupPage() {
@@ -35,14 +36,7 @@ export default function SignupPage() {
     try {
       const res = await register({ name: fullName, email, password, role })
       setAccessToken(res.data.accessToken)
-      setUser({
-        id: res.data.user.id,
-        name: res.data.user.name,
-        email: res.data.user.email,
-        role: res.data.user.role === 'EMPLOYER' ? 'employer' : 'seeker',
-        companyName: res.data.user.companyName,
-        onboardingCompleted: res.data.user.onboardingCompleted,
-      })
+      setUser(mapApiUser(res.data.user))
       navigate('/onboarding')
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Registration failed')

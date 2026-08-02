@@ -7,6 +7,7 @@ import { Input } from '../ui/Input'
 import { Button } from '../ui/Button'
 import { login } from '../../api/auth'
 import { setAccessToken } from '../../api/client'
+import { mapApiUser } from '../../context/AuthContext'
 import { useApp } from '../../context/AppContext'
 
 export default function LoginPage() {
@@ -26,13 +27,7 @@ export default function LoginPage() {
     try {
       const res = await login(email, password)
       setAccessToken(res.data.accessToken)
-      setUser({
-        id: res.data.user.id,
-        name: res.data.user.name,
-        email: res.data.user.email,
-        role: res.data.user.role === 'EMPLOYER' ? 'employer' : res.data.user.role === 'ADMIN' ? 'admin' : 'seeker',
-        companyName: res.data.user.companyName,
-      })
+      setUser(mapApiUser(res.data.user))
       navigate(
         res.data.user.role === 'EMPLOYER' ? '/employer/dashboard'
         : res.data.user.role === 'ADMIN' ? '/admin'

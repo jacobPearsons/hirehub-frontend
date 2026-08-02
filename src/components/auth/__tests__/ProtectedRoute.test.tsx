@@ -22,7 +22,14 @@ function renderAt(path: string) {
           }
         />
         <Route path="/login" element={<div>Login page</div>} />
-        <Route path="/onboarding" element={<div>Onboarding page</div>} />
+        <Route
+          path="/onboarding"
+          element={
+            <ProtectedRoute>
+              <div>Onboarding page</div>
+            </ProtectedRoute>
+          }
+        />
         <Route path="/" element={<div>Home page</div>} />
       </Routes>
     </MemoryRouter>
@@ -54,6 +61,16 @@ describe('ProtectedRoute', () => {
     renderAt('/dashboard')
     expect(screen.getByText('Onboarding page')).toBeInTheDocument()
     expect(screen.queryByText('Dashboard content')).not.toBeInTheDocument()
+  })
+
+  it('redirects away from /onboarding when onboarding is already completed', () => {
+    mockedUseApp.mockReturnValue({
+      user: { id: 'u1', name: 'Seeker', email: 's@test.com', role: 'seeker', onboardingCompleted: true },
+      loading: false,
+    })
+    renderAt('/onboarding')
+    expect(screen.getByText('Dashboard content')).toBeInTheDocument()
+    expect(screen.queryByText('Onboarding page')).not.toBeInTheDocument()
   })
 
   it('renders children when the user has completed onboarding', () => {

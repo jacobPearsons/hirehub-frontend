@@ -33,7 +33,8 @@ interface AuthContextValue {
 
 const AuthContext = createContext<AuthContextValue | null>(null)
 
-function mapApiUser(user: {
+// eslint-disable-next-line react-refresh/only-export-components
+export function mapApiUser(user: {
   id: string
   name: string
   email: string
