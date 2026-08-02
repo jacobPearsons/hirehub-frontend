@@ -14,6 +14,7 @@ interface SeekerResumeStepProps {
 export function SeekerResumeStep({ onSaved }: SeekerResumeStepProps) {
   const { user, setUser } = useApp()
   const [file, setFile] = useState<File | null>(null)
+  const [existingResume] = useState(() => user?.resumeFileName ?? null)
   const [error, setError] = useState('')
   const [saving, setSaving] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
@@ -95,6 +96,16 @@ export function SeekerResumeStep({ onSaved }: SeekerResumeStepProps) {
           >
             <X className="w-4 h-4" />
           </button>
+        </div>
+      ) : existingResume ? (
+        <div className="flex items-center justify-between gap-3 p-3 rounded-md border border-hairline bg-surface-1">
+          <div className="flex items-center gap-3 min-w-0">
+            <FileText className="w-5 h-5 text-accent shrink-0" />
+            <div className="min-w-0">
+              <p className="text-sm font-medium text-ink truncate">{existingResume}</p>
+              <p className="text-xs text-ink-muted">Resume already uploaded — choose a new file to replace it.</p>
+            </div>
+          </div>
         </div>
       ) : (
         <button
