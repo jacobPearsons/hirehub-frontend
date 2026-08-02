@@ -1,4 +1,6 @@
 import { motion } from 'framer-motion'
+import { ExternalLink } from 'lucide-react'
+import { Link } from 'react-router-dom'
 import { Card } from '../ui'
 import { InterviewDetails } from '../interview/InterviewDetails'
 import { OfferLetterView } from '../offer/OfferLetterView'
@@ -80,6 +82,16 @@ export function ApplicationCard({ application, onStatusUpdate }: ApplicationCard
               />
             </div>
           )}
+
+        <div className="mt-4 pt-4 border-t border-hairline flex items-center gap-2">
+          <Link
+            to={`/jobs/${application.jobId}`}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium text-accent hover:text-accent/80 hover:bg-accent/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/40 transition-colors"
+          >
+            <ExternalLink className="w-4 h-4" aria-hidden="true" />
+            View Job
+          </Link>
+        </div>
       </Card>
     </motion.div>
   )
