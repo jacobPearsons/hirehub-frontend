@@ -23,6 +23,7 @@ const ResetPasswordPage = lazy(() => import('./components/auth/ResetPasswordPage
 const OnboardingWizard = lazy(() => import('./components/onboarding/OnboardingWizard'))
 const AboutPage = lazy(() => import('./components/about/AboutPage'))
 const ContactPage = lazy(() => import('./components/contact/ContactPage'))
+const FAQPage = lazy(() => import('./components/faq/FAQPage'))
 const PostJobPage = lazy(() => import('./components/post-job/PostJobPage'))
 const DashboardPage = lazy(() => import('./components/dashboard/DashboardPage'))
 const EmployerDashboardPage = lazy(() => import('./components/employer-dashboard/EmployerDashboardPage'))
@@ -62,6 +63,7 @@ function App() {
               <Route path="/reset-password" element={<ErrorBoundary><ResetPasswordPage /></ErrorBoundary>} />
               <Route path="/about" element={<ErrorBoundary><AboutPage /></ErrorBoundary>} />
               <Route path="/contact" element={<ErrorBoundary><ContactPage /></ErrorBoundary>} />
+              <Route path="/faq" element={<ErrorBoundary><FAQPage /></ErrorBoundary>} />
               <Route path="/dashboard" element={
                 <ProtectedRoute allowedRoles={['seeker']}>
                   <DashboardShell>

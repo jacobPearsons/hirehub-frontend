@@ -14,6 +14,7 @@ const footerLinks = {
     { label: 'Career Advice', to: '/blog' },
     { label: 'Salary Guide', to: '/blog' },
     { label: 'Help Center', to: '#' },
+    { label: 'FAQ', to: '/faq' },
   ],
   company: [
     { label: 'About Us', to: '/about' },
