@@ -5,6 +5,7 @@ export function useBlogPost(slug: string) {
   return useQuery({
     queryKey: ['blogPost', slug],
     queryFn: () => getBlogPostBySlug(slug),
+    select: (data) => data.data,
     enabled: !!slug,
   })
 }

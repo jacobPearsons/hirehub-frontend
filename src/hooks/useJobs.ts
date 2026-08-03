@@ -6,5 +6,6 @@ export function useJobs(params: JobListParams = {}) {
   return useQuery({
     queryKey: ['jobs', params],
     queryFn: () => listJobs(params),
+    select: (data) => data.data,
   })
 }

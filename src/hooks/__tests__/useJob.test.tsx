@@ -46,7 +46,7 @@ describe('useJob', () => {
   })
 
   it('returns data after successful fetch', async () => {
-    vi.mocked(getJobById).mockResolvedValue(mockJob)
+    vi.mocked(getJobById).mockResolvedValue({ data: mockJob })
 
     const { result } = renderHook(() => useJob('1'), { wrapper: createWrapper() })
 
