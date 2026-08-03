@@ -1,4 +1,4 @@
-import { Menu, LogOut } from 'lucide-react'
+import { Menu, LogOut, ChevronsLeft, ChevronsRight } from 'lucide-react'
 import { useApp } from '../../context/AppContext'
 import { Avatar } from '../ui/Avatar'
 import { logout } from '../../api/auth'
@@ -9,9 +9,11 @@ import { useNavigate } from 'react-router-dom'
 
 interface InfobarProps {
   onMenuToggle: () => void
+  onCollapseToggle?: () => void
+  collapsed?: boolean
 }
 
-export function Infobar({ onMenuToggle }: InfobarProps) {
+export function Infobar({ onMenuToggle, onCollapseToggle, collapsed }: InfobarProps) {
   const { user, setUser } = useApp()
   const navigate = useNavigate()
 
@@ -32,6 +34,18 @@ export function Infobar({ onMenuToggle }: InfobarProps) {
       >
         <Menu size={22} />
       </button>
+
+      {onCollapseToggle && (
+        <button
+          type="button"
+          onClick={onCollapseToggle}
+          aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+          aria-expanded={!collapsed}
+          className="hidden md:inline-flex items-center justify-center p-2 rounded-md text-ink-muted hover:text-ink hover:bg-surface-2 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/30"
+        >
+          {collapsed ? <ChevronsRight className="w-5 h-5" /> : <ChevronsLeft className="w-5 h-5" />}
+        </button>
+      )}
 
       <div className="flex items-center gap-3 ml-auto">
         <NotificationBell />
