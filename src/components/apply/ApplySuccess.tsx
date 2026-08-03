@@ -13,7 +13,7 @@ export function ApplySuccess({ job, resumeFileName, onClose }: ApplySuccessProps
     <div className="relative">
       <div className="absolute inset-0 opacity-25" aria-hidden="true">
         <img
-          src="/apply-success-bg.png"
+          src="/apply-success-bloom.png"
           alt=""
           className="w-full h-full object-cover"
           loading="lazy"
