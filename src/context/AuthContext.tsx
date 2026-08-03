@@ -6,11 +6,22 @@ export interface AppUser {
   id: string
   name: string
   email: string
-  role: 'seeker' | 'employer'
+  role: 'seeker' | 'employer' | 'admin'
   companyName?: string
   phone?: string | null
   bio?: string | null
   avatarUrl?: string | null
+  headline?: string | null
+  location?: string | null
+  skills?: string[]
+  resumePath?: string | null
+  resumeFileName?: string | null
+  salaryMin?: number | null
+  salaryMax?: number | null
+  currency?: string | null
+  remoteOnly?: boolean | null
+  employmentType?: string | null
+  onboardingCompleted?: boolean
 }
 
 interface AuthContextValue {
@@ -22,16 +33,48 @@ interface AuthContextValue {
 
 const AuthContext = createContext<AuthContextValue | null>(null)
 
-function mapApiUser(user: { id: string; name: string; email: string; role: string; companyName?: string; phone?: string | null; bio?: string | null; avatarUrl?: string | null }): AppUser {
+// eslint-disable-next-line react-refresh/only-export-components
+export function mapApiUser(user: {
+  id: string
+  name: string
+  email: string
+  role: string
+  companyName?: string
+  phone?: string | null
+  bio?: string | null
+  avatarUrl?: string | null
+  headline?: string | null
+  location?: string | null
+  skills?: string[]
+  resumePath?: string | null
+  resumeFileName?: string | null
+  salaryMin?: number | null
+  salaryMax?: number | null
+  currency?: string | null
+  remoteOnly?: boolean | null
+  employmentType?: string | null
+  onboardingCompleted?: boolean
+}): AppUser {
   return {
     id: user.id,
     name: user.name,
     email: user.email,
-    role: user.role === 'EMPLOYER' ? 'employer' : 'seeker',
+    role: user.role === 'EMPLOYER' ? 'employer' : user.role === 'ADMIN' ? 'admin' : 'seeker',
     companyName: user.companyName,
     phone: user.phone,
     bio: user.bio,
     avatarUrl: user.avatarUrl,
+    headline: user.headline,
+    location: user.location,
+    skills: user.skills,
+    resumePath: user.resumePath,
+    resumeFileName: user.resumeFileName,
+    salaryMin: user.salaryMin,
+    salaryMax: user.salaryMax,
+    currency: user.currency,
+    remoteOnly: user.remoteOnly,
+    employmentType: user.employmentType,
+    onboardingCompleted: user.onboardingCompleted,
   }
 }
 

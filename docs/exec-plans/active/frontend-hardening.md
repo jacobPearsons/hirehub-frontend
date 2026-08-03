@@ -287,15 +287,15 @@ bun add @tanstack/react-query
 
 # Step 3: Add QueryClientProvider to App.tsx
 
-# Step 4: Convert API fetching to queries
-# Create src/hooks/useJobs.ts, useJob.ts, useBlogPosts.ts, useSavedJobs.ts, useApplications.ts
-# Refactor pages to use these hooks
+# Step 4: Convert API fetching to queries  [DONE — commits 400c987..b7f4b4b]
+# Created src/hooks/useJobs.ts, useJob.ts, useBlogPosts.ts, useSavedJobs.ts, useApplications.ts, useEmployerJobsQuery.ts, useCandidateProfileQuery.ts
+# Refactored pages to use these hooks. Deferred surfaces: MessagesTab, AdminPage, PricingSection, NotificationBell, layout components
 
 # Step 5: Add route preloading
 # Edit job cards and nav links
 
-# Step 6: Bundle analysis
-bun run build && npx vite-bundle-visualizer
+# Step 6: Bundle analysis  [DONE]
+# JobBoardPage chunk 10.09 kB / 3.22 kB gz (baseline ~10.68 kB / 3.41 kB gz); single shared useQuery chunk, no per-page Query duplication
 
 # Step 7: Design token cleanup
 # Edit src/index.css and tailwind.config.js

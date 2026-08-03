@@ -1,9 +1,13 @@
+import { useState } from 'react'
 import { motion } from 'framer-motion'
+import { ExternalLink, Workflow } from 'lucide-react'
+import { Link } from 'react-router-dom'
 import { Card } from '../ui'
 import { InterviewDetails } from '../interview/InterviewDetails'
 import { OfferLetterView } from '../offer/OfferLetterView'
 import { OrientationCard } from '../orientation/OrientationCard'
 import { PreBoardingChecklist } from '../preboarding/PreBoardingChecklist'
+import { HiringFlowModal } from './HiringFlowModal'
 import type { Application, ApplicationStatus } from '../../types/application'
 
 const statusConfig: Record<ApplicationStatus, { label: string; color: string }> = {
@@ -20,6 +24,7 @@ interface ApplicationCardProps {
 }
 
 export function ApplicationCard({ application, onStatusUpdate }: ApplicationCardProps) {
+  const [flowOpen, setFlowOpen] = useState(false)
   const status = statusConfig[application.status]
   const submittedDate = new Date(application.submittedAt).toLocaleDateString('en-US', {
     year: 'numeric',
@@ -80,7 +85,26 @@ export function ApplicationCard({ application, onStatusUpdate }: ApplicationCard
               />
             </div>
           )}
+
+        <div className="mt-4 pt-4 border-t border-hairline flex items-center gap-2">
+          <Link
+            to={`/jobs/${application.jobId}`}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium text-accent hover:text-accent/80 hover:bg-accent/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/40 transition-colors"
+          >
+            <ExternalLink className="w-4 h-4" aria-hidden="true" />
+            View Job
+          </Link>
+          <button
+            type="button"
+            onClick={() => setFlowOpen(true)}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium text-ink hover:text-ink-muted hover:bg-surface-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/40 transition-colors"
+          >
+            <Workflow className="w-4 h-4" aria-hidden="true" />
+            Hiring Flow
+          </button>
+        </div>
       </Card>
+      <HiringFlowModal application={application} open={flowOpen} onOpenChange={setFlowOpen} />
     </motion.div>
   )
 }

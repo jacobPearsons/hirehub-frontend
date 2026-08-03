@@ -41,6 +41,17 @@ export interface ProfileUpdate {
   phone?: string | null
   bio?: string | null
   companyName?: string | null
+  headline?: string | null
+  location?: string | null
+  skills?: string[]
+  resumePath?: string | null
+  resumeFileName?: string | null
+  salaryMin?: number | null
+  salaryMax?: number | null
+  currency?: string | null
+  remoteOnly?: boolean | null
+  employmentType?: string | null
+  onboardingCompleted?: boolean
 }
 
 export async function updateProfile(data: ProfileUpdate) {

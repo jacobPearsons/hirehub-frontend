@@ -7,6 +7,7 @@ import { Container } from '../ui/Container'
 import { useApp } from '../../context/AppContext'
 import { logout } from '../../api/auth'
 import { ThemeToggle } from '../ui/ThemeToggle'
+import { NotificationBell } from './NotificationBell'
 import { setAccessToken } from '../../api/client'
 
 const navLinks = [
@@ -70,9 +71,17 @@ export function Navbar() {
                 Dashboard
               </NavLink>
             )}
+            {user?.role === 'admin' && (
+              <NavLink to="/admin" className={({ isActive }) =>
+                `text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/40 rounded ${isActive ? 'text-accent' : 'text-ink-muted hover:text-accent'}`
+              }>
+                Admin
+              </NavLink>
+            )}
           </div>
 
           <div className="hidden md:flex items-center gap-3">
+            <NotificationBell />
             <ThemeToggle />
             {user ? (
               <>
@@ -92,15 +101,17 @@ export function Navbar() {
             )}
           </div>
 
-          <Dialog.Root open={mobileOpen} onOpenChange={setMobileOpen}>
-            <Dialog.Trigger asChild>
-              <button
-                className="md:hidden hover:text-accent text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/40 rounded-md"
-                aria-label="Open menu"
-              >
-                <Menu size={24} />
-              </button>
-            </Dialog.Trigger>
+          <div className="md:hidden flex items-center gap-1">
+            <ThemeToggle />
+            <Dialog.Root open={mobileOpen} onOpenChange={setMobileOpen}>
+              <Dialog.Trigger asChild>
+                <button
+                  className="hover:text-accent text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/40 rounded-md"
+                  aria-label="Open menu"
+                >
+                  <Menu size={24} />
+                </button>
+              </Dialog.Trigger>
             <Dialog.Portal>
               <Dialog.Overlay className="fixed inset-0 z-40 bg-black/40 md:hidden" />
               <Dialog.Content
@@ -126,6 +137,7 @@ export function Navbar() {
 
                 {user ? (
                   <>
+                    <NotificationBell />
                     {user.role === 'seeker' && (
                       <NavLink to="/dashboard" onClick={() => setMobileOpen(false)}
                         className={({ isActive }) =>
@@ -144,6 +156,15 @@ export function Navbar() {
                         Employer Dashboard
                       </NavLink>
                     )}
+                    {user.role === 'admin' && (
+                      <NavLink to="/admin" onClick={() => setMobileOpen(false)}
+                        className={({ isActive }) =>
+                          `text-lg font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/40 rounded ${isActive ? 'text-accent' : 'text-ink-muted hover:text-accent'}`
+                        }
+                      >
+                        Admin
+                      </NavLink>
+                    )}
                     <button onClick={() => { handleLogout(); setMobileOpen(false) }}
                       className="text-lg font-medium text-ink-muted hover:text-accent transition-colors"
                     >
@@ -159,7 +180,8 @@ export function Navbar() {
                 }
               </Dialog.Content>
             </Dialog.Portal>
-          </Dialog.Root>
+            </Dialog.Root>
+          </div>
         </div>
       </Container>
 

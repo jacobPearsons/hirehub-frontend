@@ -2,6 +2,7 @@ import { lazy, Suspense } from 'react'
 import { Routes, Route, useLocation } from 'react-router-dom'
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 import { ThemeProvider } from './context/ThemeContext'
+import { NotificationsProvider } from './context/NotificationsContext'
 import Layout from './components/layout/Layout'
 import { ToastProvider } from './components/ui/Toast'
 import { ErrorBoundary } from './components/ui/ErrorBoundary'
@@ -19,12 +20,15 @@ const LoginPage = lazy(() => import('./components/auth/LoginPage'))
 const SignupPage = lazy(() => import('./components/auth/SignupPage'))
 const ForgotPasswordPage = lazy(() => import('./components/auth/ForgotPasswordPage'))
 const ResetPasswordPage = lazy(() => import('./components/auth/ResetPasswordPage'))
+const OnboardingWizard = lazy(() => import('./components/onboarding/OnboardingWizard'))
 const AboutPage = lazy(() => import('./components/about/AboutPage'))
 const ContactPage = lazy(() => import('./components/contact/ContactPage'))
+const FAQPage = lazy(() => import('./components/faq/FAQPage'))
 const PostJobPage = lazy(() => import('./components/post-job/PostJobPage'))
 const DashboardPage = lazy(() => import('./components/dashboard/DashboardPage'))
 const EmployerDashboardPage = lazy(() => import('./components/employer-dashboard/EmployerDashboardPage'))
 const ProfilePage = lazy(() => import('./components/profile/ProfilePage'))
+const AdminPage = lazy(() => import('./components/admin/AdminPage').then((m) => ({ default: m.AdminPage })))
 
 function App() {
   const location = useLocation()
@@ -32,7 +36,9 @@ function App() {
 
   return (
     <ToastProvider>
-    <ThemeProvider><Layout>
+    <ThemeProvider>
+    <NotificationsProvider>
+    <Layout>
       <Suspense fallback={
         <main className="min-h-screen flex items-center justify-center bg-canvas">
           <div className="text-center text-ink-muted">Loading...</div>
@@ -57,6 +63,7 @@ function App() {
               <Route path="/reset-password" element={<ErrorBoundary><ResetPasswordPage /></ErrorBoundary>} />
               <Route path="/about" element={<ErrorBoundary><AboutPage /></ErrorBoundary>} />
               <Route path="/contact" element={<ErrorBoundary><ContactPage /></ErrorBoundary>} />
+              <Route path="/faq" element={<ErrorBoundary><FAQPage /></ErrorBoundary>} />
               <Route path="/dashboard" element={
                 <ProtectedRoute allowedRoles={['seeker']}>
                   <DashboardShell>
@@ -71,6 +78,13 @@ function App() {
                   </DashboardShell>
                 </ProtectedRoute>
               } />
+              <Route path="/admin" element={
+                <ProtectedRoute allowedRoles={['admin']}>
+                  <DashboardShell>
+                    <ErrorBoundary><AdminPage /></ErrorBoundary>
+                  </DashboardShell>
+                </ProtectedRoute>
+              } />
               <Route path="/dashboard/profile" element={
                 <ProtectedRoute allowedRoles={['seeker', 'employer']}>
                   <DashboardShell>
@@ -79,12 +93,19 @@ function App() {
                 </ProtectedRoute>
               } />
               <Route path="/post-job" element={<ProtectedRoute allowedRoles={['employer']}><ErrorBoundary><PostJobPage /></ErrorBoundary></ProtectedRoute>} />
+              <Route path="/onboarding" element={
+                <ProtectedRoute>
+                  <ErrorBoundary><OnboardingWizard /></ErrorBoundary>
+                </ProtectedRoute>
+              } />
               <Route path="*" element={<NotFoundPage />} />
             </Routes>
           </motion.div>
         </AnimatePresence>
       </Suspense>
-    </Layout></ThemeProvider>
+    </Layout>
+    </NotificationsProvider>
+    </ThemeProvider>
     </ToastProvider>
   )
 }

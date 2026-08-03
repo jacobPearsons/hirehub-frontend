@@ -1,4 +1,5 @@
 export { Button } from './Button'
+export { Avatar } from './Avatar'
 export { Tag } from './Tag'
 export { Card } from './Card'
 export { Section } from './Section'

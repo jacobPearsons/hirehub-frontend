@@ -1,5 +1,6 @@
 import { render, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import EmployerDashboardPage from '../EmployerDashboardPage'
 
 vi.mock('../../../context/AppContext', async (importOriginal) => {
@@ -19,6 +20,7 @@ vi.mock('../../../utils/usePageMeta', () => ({
 
 vi.mock('../../../api/jobs', () => ({
   listJobs: vi.fn(),
+  listEmployerJobs: vi.fn().mockResolvedValue({ data: [] }),
 }))
 
 vi.mock('../../../api/applications', () => ({
@@ -26,10 +28,13 @@ vi.mock('../../../api/applications', () => ({
 }))
 
 function renderEmployerDashboardPage() {
+  const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } })
   return render(
-    <MemoryRouter initialEntries={['/employer-dashboard']}>
-      <EmployerDashboardPage />
-    </MemoryRouter>
+    <QueryClientProvider client={queryClient}>
+      <MemoryRouter initialEntries={['/employer-dashboard']}>
+        <EmployerDashboardPage />
+      </MemoryRouter>
+    </QueryClientProvider>
   )
 }
 
@@ -43,6 +48,11 @@ describe('EmployerDashboardPage', () => {
     renderEmployerDashboardPage()
     expect(screen.getByRole('tab', { name: /job listings/i })).toBeInTheDocument()
     expect(screen.getByRole('tab', { name: /applicants/i })).toBeInTheDocument()
+  })
+
+  it('renders a Messages tab for chatting with the HireHub team', () => {
+    renderEmployerDashboardPage()
+    expect(screen.getByRole('tab', { name: /messages/i })).toBeInTheDocument()
   })
 
   it('defaults to Job Listings tab', () => {

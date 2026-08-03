@@ -49,7 +49,10 @@ describe('useJobs', () => {
   })
 
   it('returns data after successful fetch', async () => {
-    vi.mocked(listJobs).mockResolvedValue(mockJobs)
+    vi.mocked(listJobs).mockResolvedValue({
+      data: mockJobs,
+      pagination: { total: mockJobs.length, cursor: null },
+    })
 
     const { result } = renderHook(() => useJobs(), { wrapper: createWrapper() })
 

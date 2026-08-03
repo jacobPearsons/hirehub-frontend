@@ -4,6 +4,8 @@ import { MemoryRouter } from 'react-router-dom'
 import { ToastProvider } from '../../ui/Toast'
 import LoginPage from '../LoginPage'
 
+const { setUserMock } = vi.hoisted(() => ({ setUserMock: vi.fn() }))
+
 vi.mock('../../../api/auth', () => ({
   login: vi.fn(),
 }))
@@ -18,7 +20,7 @@ vi.mock('../../../context/AppContext', async (importOriginal) => {
     ...actual,
     useApp: vi.fn(() => ({
       user: null,
-      setUser: vi.fn(),
+      setUser: setUserMock,
     })),
   }
 })
@@ -73,5 +75,35 @@ describe('LoginPage', () => {
     await user.click(screen.getByRole('button', { name: /sign in/i }))
 
     expect(screen.getByRole('button', { name: /signing in/i })).toBeDisabled()
+  })
+
+  it('calls setUser with onboardingCompleted from the login response', async () => {
+    const { login } = await import('../../../api/auth')
+    ;(login as ReturnType<typeof vi.fn>).mockResolvedValue({
+      data: {
+        user: {
+          id: 'u1',
+          name: 'Jane Doe',
+          email: 'jane@test.com',
+          role: 'SEEKER',
+          onboardingCompleted: true,
+        },
+        accessToken: 'token',
+      },
+    })
+
+    const user = userEvent.setup()
+    renderLoginPage()
+
+    await user.type(screen.getByLabelText('Email'), 'jane@test.com')
+    await user.type(screen.getByLabelText('Password'), 'password123')
+    await user.click(screen.getByRole('button', { name: /sign in/i }))
+
+    expect(setUserMock).toHaveBeenCalledWith(
+      expect.objectContaining({ onboardingCompleted: true })
+    )
+    expect(setUserMock).toHaveBeenCalledWith(
+      expect.objectContaining({ name: 'Jane Doe' })
+    )
   })
 })

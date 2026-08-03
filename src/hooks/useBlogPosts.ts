@@ -6,5 +6,6 @@ export function useBlogPosts(params: BlogListParams = {}) {
   return useQuery({
     queryKey: ['blogPosts', params],
     queryFn: () => listBlogPosts(params),
+    select: (data) => data.data,
   })
 }

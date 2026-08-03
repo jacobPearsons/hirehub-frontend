@@ -509,8 +509,159 @@ Textures: None.
 Rendering style: Minimal linear gradient.
 Quality: Any.
 Aspect ratio: Any.
-Negative: No patterns, no shapes, no text, no photorealistic, no decorative
-          elements of any kind.
+Negative: No patterns, no shapes, no photorealistic, no text, no hard edges,
+          no high contrast, no cold colors.
+```
+
+**Shared:** Forgot-password and reset-password pages reuse this vignette — no separate asset needed.
+
+---
+
+## Section: Onboarding (Profile Setup)
+
+**Emotional objective:** Encouragement + Forward Momentum
+
+**Primary prompt (wizard background — warm dawn ambient):**
+```
+Subject: Abstract warm ambient field — a soft radial brightness centered behind
+       the form area, gently deepening from canvas #F5F0E8 at the core to
+       surface-2 #EBE7E1 at the edges. A faint accent #FF5600 glow at 4-6%
+       opacity rising from the top edge, like the first light of morning clearing
+       the horizon. No objects, no people, no hard-edged shapes.
+Environment: Abstract.
+Narrative: A new beginning — fresh-day warmth behind a profile being built. The
+          upward light direction echoes the progress bar, reinforcing momentum.
+Emotion: Calm anticipation — setup feels like the start of something, not a chore.
+Lighting: Soft radial glow, center-weighted, warm top highlight.
+Camera: N/A — abstract gradient.
+Lens: N/A.
+Composition: Brighter core in the central band where the max-w-3xl form sits,
+            vignette falloff at all edges, accent glow across the upper third at
+            low opacity. No focal point that competes with form controls.
+Color palette: Canvas #F5F0E8 core → Surface-2 #EBE7E1 edges, accent #FF5600 at
+              4-6% across the top, ink #111111 at 2% grain.
+Materials: N/A.
+Textures: 1.5% grain overlay, no banding.
+Rendering style: Minimal ambient gradient, smooth, subtle depth.
+Quality: 1920x1080, non-tileable.
+Aspect ratio: 16:9
+Negative: No objects, no people, no shapes, no patterns, no text, no logos,
+          no hard edges, no banding, no high contrast, no cold blue tones,
+          no sunset/sky gradient clichés, no stock-photo imagery.
+```
+
+**Alt variant (completion step — success glow):**
+```
+Subject: The same ambient field with a soft reward glow blooming from the center
+       behind the summary card — a warm white core with a faint success-green
+       #0BDF50 undertone at 4% opacity dissolving outward into warm neutrals.
+       The accent top-light remains.
+Environment: Abstract.
+Narrative: Task complete — a gentle glow of confirmation behind the final summary.
+Emotion: Quiet accomplishment and relief.
+Lighting: Soft, slightly brighter than the primary variant.
+Camera: N/A.
+Lens: N/A.
+Composition: Center-weighted bloom behind the summary card, warm falloff.
+Color palette: Warm white core → Canvas #F5F0E8 → Surface-2 #EBE7E1 edges,
+              success #0BDF50 at 4% core, accent #FF5600 top-light retained.
+Materials: N/A.
+Textures: 1.5% grain, no banding.
+Rendering style: Minimal ambient gradient, smooth.
+Quality: 1920x1080, non-tileable.
+Aspect ratio: 16:9
+Negative: Same as primary, plus no confetti and no celebration graphics.
+```
+
+---
+
+## Section: NotFound (404)
+
+**Emotional objective:** Warm Recovery + Reassurance
+
+**Primary prompt (404 background — lamplight ambient):**
+```
+Subject: A very soft, downward-settling ambient field — a gentle warm glow
+       concentrated slightly above center, like lamplight in a quiet room,
+       falling off evenly to canvas #F5F0E8 at the edges. A single faint accent
+       #FF5600 hint at 3% opacity near the center, barely perceptible.
+Environment: Abstract.
+Narrative: A calm, contained space — you wandered off course but nothing is wrong;
+          the warm lamplight keeps you grounded while you find your way back.
+Emotion: Safe, unhurried, gently guided.
+Lighting: Soft, even ambient.
+Camera: N/A.
+Lens: N/A.
+Composition: Centered glow behind the message block, even falloff, no directional
+            light, no focal shapes.
+Color palette: Canvas #F5F0E8 edges, accent #FF5600 at 3% center hint.
+Materials: N/A.
+Textures: 2% grain.
+Rendering style: Minimal ambient gradient.
+Quality: 1920x1080, non-tileable.
+Aspect ratio: 16:9
+Negative: No shapes, no arrows, no compass motifs, no text, no photorealism,
+          no cold tones, no high contrast.
+```
+
+---
+
+## Section: Dashboard Shell
+
+**Emotional objective:** Quiet Focus + Competence
+
+**Primary prompt (header band — barely-there wash):**
+```
+Subject: An almost imperceptible top-weighted wash — canvas #F5F0E8 at content
+       level deepening very slightly to surface-2 #EBE7E1 in the top band under
+       the nav, with a faint accent #FF5600 glimmer at 2% opacity in the
+       upper-right corner. Data surfaces stay visually untouched.
+Environment: Abstract.
+Narrative: A well-run workspace where data does the talking — atmosphere is
+          present but never competes with content.
+Emotion: Trust and focus.
+Lighting: Soft top-weighted ambient.
+Camera: N/A.
+Lens: N/A.
+Composition: Designed as a top band (works cropped to ~3:1), no focal point.
+Color palette: Canvas #F5F0E8 → Surface-2 #EBE7E1 top band, accent #FF5600 at 2%.
+Materials: N/A.
+Textures: 1% grain.
+Rendering style: Minimal ambient gradient.
+Quality: 1920x1080, designed for a ~1920x640 crop.
+Aspect ratio: 16:9
+Negative: No shapes, no patterns, no grid motifs, no text, no photorealism,
+          no grain above 1%.
+```
+
+---
+
+## Section: Apply Success
+
+**Emotional objective:** Relief + Confirmation
+
+**Primary prompt (success backdrop — reward bloom):**
+```
+Subject: A soft radial bloom — warm canvas #F5F0E8 core brightening to a gentle
+       white center behind the success message, with a very faint success-green
+       #0BDF50 undertone at 4% at the core and the standard accent #FF5600 glow
+       in the upper-right. No shapes, no confetti.
+Environment: Abstract.
+Narrative: The application landed — a quiet glow of confirmation after the effort
+          of applying.
+Emotion: Relief, slight elation, trust.
+Lighting: Soft radial, center-weighted.
+Camera: N/A.
+Lens: N/A.
+Composition: Center-weighted glow behind the success card, warm falloff.
+Color palette: Warm white core → Canvas #F5F0E8 → Surface-2 #EBE7E1 edges,
+              success #0BDF50 at 4% core, accent #FF5600 upper-right.
+Materials: N/A.
+Textures: 2% grain.
+Rendering style: Minimal ambient gradient.
+Quality: 1600x1200, non-tileable.
+Aspect ratio: 4:3
+Negative: Same as Onboarding primary, plus no confetti and no celebration graphics.
 ```
 
 ---
@@ -530,6 +681,11 @@ Negative: No patterns, no shapes, no text, no photorealistic, no decorative
 10. Contact ambient background                      → contact page atmosphere
 11. Auth card background                            → authentication atmosphere
 12. Post-job form background                        → job posting UX
+13. Onboarding wizard background                    → activation momentum
+14. Onboarding completion glow                      → success reward
+15. Apply success backdrop                          → confirmation glow
+16. Dashboard shell header band                     → quiet competence
+17. NotFound ambient                                → warm recovery
 ```
 
 ---
@@ -552,3 +708,8 @@ Negative: No patterns, no shapes, no text, no photorealistic, no decorative
 | Contact ambient | 1920x1080 | WebP | No | lossy 80% | @2x |
 | Auth background | 800x600 | WebP | No | lossless | @2x |
 | Post-job background | 1920x1080 | WebP | No | lossless | @2x |
+| Onboarding background | 1920x1080 | WebP | No | lossless | @2x |
+| Onboarding completion | 1920x1080 | WebP | No | lossless | @2x |
+| Apply success backdrop | 1600x1200 | WebP | No | lossless | @2x |
+| Dashboard header wash | 1920x640 | WebP | No | lossless | @2x |
+| NotFound ambient | 1920x1080 | WebP | No | lossless | @2x |

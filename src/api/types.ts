@@ -10,22 +10,44 @@ export interface ApiUser {
   id: string
   name: string
   email: string
-  role: 'SEEKER' | 'EMPLOYER'
+  role: 'SEEKER' | 'EMPLOYER' | 'ADMIN'
   companyName?: string
   phone?: string | null
   bio?: string | null
   avatarUrl?: string | null
+  headline?: string | null
+  location?: string | null
+  skills?: string[]
+  resumePath?: string | null
+  resumeFileName?: string | null
+  salaryMin?: number | null
+  salaryMax?: number | null
+  currency?: string | null
+  remoteOnly?: boolean | null
+  employmentType?: string | null
+  onboardingCompleted?: boolean
 }
 
 export interface AuthUser {
   id: string
   name: string
   email: string
-  role: 'seeker' | 'employer'
+  role: 'seeker' | 'employer' | 'admin'
   companyName?: string
   phone?: string | null
   bio?: string | null
   avatarUrl?: string | null
+  headline?: string | null
+  location?: string | null
+  skills?: string[]
+  resumePath?: string | null
+  resumeFileName?: string | null
+  salaryMin?: number | null
+  salaryMax?: number | null
+  currency?: string | null
+  remoteOnly?: boolean | null
+  employmentType?: string | null
+  onboardingCompleted?: boolean
 }
 
 export interface LoginResponse {

@@ -15,6 +15,7 @@ export interface Job {
   requirements: string[];
   responsibilities: string[];
   postedDate: string;
+  expiresAt?: string;
   featured: boolean;
 }
 

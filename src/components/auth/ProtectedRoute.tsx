@@ -1,14 +1,21 @@
-import { Navigate } from 'react-router-dom'
+import { Navigate, useLocation } from 'react-router-dom'
 import { Loader2 } from 'lucide-react'
 import { useApp } from '../../context/AppContext'
 
 interface ProtectedRouteProps {
   children: React.ReactNode
-  allowedRoles?: ('seeker' | 'employer')[]
+  allowedRoles?: ('seeker' | 'employer' | 'admin')[]
+}
+
+const HOME_BY_ROLE: Record<string, string> = {
+  seeker: '/dashboard',
+  employer: '/employer/dashboard',
+  admin: '/admin',
 }
 
 export function ProtectedRoute({ children, allowedRoles }: ProtectedRouteProps) {
   const { user, loading } = useApp()
+  const location = useLocation()
 
   if (loading) {
     return (
@@ -22,6 +29,14 @@ export function ProtectedRoute({ children, allowedRoles }: ProtectedRouteProps) 
 
   if (allowedRoles && !allowedRoles.includes(user.role)) {
     return <Navigate to="/" replace />
+  }
+
+  if (user && user.onboardingCompleted && location.pathname === '/onboarding') {
+    return <Navigate to={HOME_BY_ROLE[user.role] ?? '/dashboard'} replace />
+  }
+
+  if (user && user.role !== 'admin' && !user.onboardingCompleted && location.pathname !== '/onboarding') {
+    return <Navigate to="/onboarding" replace />
   }
 
   return <>{children}</>

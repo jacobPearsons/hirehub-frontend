@@ -2,7 +2,6 @@ import { useState } from 'react'
 import { Heart } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { useApp } from '../../context/AppContext'
-import { saveJob, removeSavedJob } from '../../api/savedJobs'
 
 interface SaveButtonProps {
   jobId: string
@@ -17,15 +16,8 @@ export function SaveButton({ jobId, className = '' }: SaveButtonProps) {
   async function handleToggle() {
     if (pending) return
     setPending(true)
-    toggleSaveJob(jobId)
     try {
-      if (saved) {
-        await removeSavedJob(jobId)
-      } else {
-        await saveJob(jobId)
-      }
-    } catch {
-      toggleSaveJob(jobId)
+      await toggleSaveJob(jobId)
     } finally {
       setPending(false)
     }

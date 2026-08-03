@@ -1,4 +1,3 @@
-import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { Briefcase, Eye, Users } from 'lucide-react'
 import { Link, useNavigate } from 'react-router-dom'
@@ -6,9 +5,8 @@ import { Card, Tag } from '../ui'
 import { SkeletonGrid } from '../ui/SkeletonGrid'
 import { EmptyState } from '../ui/EmptyState'
 import { ErrorState } from '../ui/ErrorState'
-import { listEmployerJobs } from '../../api/jobs'
+import { useEmployerJobsQuery } from '../../hooks/useEmployerJobsQuery'
 import { useApp } from '../../context/AppContext'
-import type { Job } from '../../data/jobs'
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -18,31 +16,16 @@ const containerVariants = {
 export function JobListingsTab() {
   const { applications } = useApp()
   const navigate = useNavigate()
-  const [allJobs, setAllJobs] = useState<Job[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const { data, isLoading, isError, refetch } = useEmployerJobsQuery()
+
+  const jobs = data?.data ?? []
+  const error = isError ? 'Failed to load job listings.' : null
 
   function handleRetry() {
-    setLoading(true)
-    setError(null)
-    listEmployerJobs()
-      .then(res => setAllJobs(res.data))
-      .catch(() => setError('Failed to load job listings.'))
-      .finally(() => setLoading(false))
+    refetch()
   }
 
-  useEffect(() => {
-    let cancelled = false
-    listEmployerJobs()
-      .then(res => { if (!cancelled) setAllJobs(res.data) })
-      .catch(() => { if (!cancelled) setError('Failed to load job listings.') })
-      .finally(() => { if (!cancelled) setLoading(false) })
-    return () => { cancelled = true }
-  }, [])
-
-  const jobs = allJobs
-
-  if (loading) {
+  if (isLoading) {
     return <SkeletonGrid count={4} columns={2} />
   }
 

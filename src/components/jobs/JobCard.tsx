@@ -17,6 +17,7 @@ interface JobCardProps {
 export function JobCard({ job }: JobCardProps) {
   const queryClient = useQueryClient()
   const [logoError, setLogoError] = useState(false)
+  const salary = formatSalary(job.salaryMin, job.salaryMax, job.currency)
 
   const prefetchJob = () => {
     queryClient.prefetchQuery({
@@ -63,9 +64,9 @@ export function JobCard({ job }: JobCardProps) {
         <span className="text-sm text-ink-muted">{job.location}</span>
       </div>
 
-      <p className="text-sm font-medium text-ink mt-1">
-        {formatSalary(job.salaryMin, job.salaryMax, job.currency)}
-      </p>
+      {salary && (
+        <p className="text-sm font-medium text-ink mt-1">{salary}</p>
+      )}
 
       <div className="flex flex-wrap gap-2 mt-3">
         {job.tags.map((tag) => (

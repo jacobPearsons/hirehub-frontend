@@ -5,6 +5,7 @@ export function useJob(id: string) {
   return useQuery({
     queryKey: ['job', id],
     queryFn: () => getJobById(id),
+    select: (data) => data.data,
     enabled: !!id,
   })
 }

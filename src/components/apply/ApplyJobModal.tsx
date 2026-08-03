@@ -3,7 +3,8 @@ import * as Dialog from '@radix-ui/react-dialog'
 import { AnimatePresence, motion } from 'framer-motion'
 import { X } from 'lucide-react'
 import { ApplyJobForm } from './ApplyJobForm'
-import { ApplySuccess } from './ApplySuccess'
+import { ApplyLanding } from './ApplyLanding'
+import { useApp } from '../../context/AppContext'
 import type { Job } from '../../data/jobs'
 
 interface ApplyJobModalProps {
@@ -13,6 +14,7 @@ interface ApplyJobModalProps {
 }
 
 export function ApplyJobModal({ job, open, onOpenChange }: ApplyJobModalProps) {
+  const { user } = useApp()
   const [success, setSuccess] = useState(false)
   const [resumeFileName, setResumeFileName] = useState<string | undefined>()
 
@@ -28,7 +30,7 @@ export function ApplyJobModal({ job, open, onOpenChange }: ApplyJobModalProps) {
   }
 
   return (
-    <Dialog.Root open={open} onOpenChange={onOpenChange}>
+    <Dialog.Root open={open} onOpenChange={handleClose}>
       <AnimatePresence>
         {open && (
           <Dialog.Portal forceMount>
@@ -71,7 +73,7 @@ export function ApplyJobModal({ job, open, onOpenChange }: ApplyJobModalProps) {
                   </div>
 
                   {success ? (
-                    <ApplySuccess job={job} resumeFileName={resumeFileName} onClose={handleClose} />
+                    <ApplyLanding job={job} user={user} resumeFileName={resumeFileName} />
                   ) : (
                     <ApplyJobForm job={job} onSuccess={handleSuccess} />
                   )}

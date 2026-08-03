@@ -3,18 +3,20 @@ import { HeroContent } from '../ui/HeroContent'
 import { usePageMeta } from '../../utils/usePageMeta'
 import { JobListingsTab } from './JobListingsTab'
 import { ApplicantsTab } from './ApplicantsTab'
+import { MessagesTab } from '../dashboard/MessagesTab'
 
 const tabs = [
   { id: 'listings', label: 'Job Listings' },
   { id: 'applicants', label: 'Applicants' },
+  { id: 'messages', label: 'Messages' },
 ] as const
 
 export default function EmployerDashboardPage() {
   const [searchParams, setSearchParams] = useSearchParams()
-  const activeTab = (searchParams.get('tab') as 'listings' | 'applicants') ?? 'listings'
+  const activeTab = (searchParams.get('tab') as 'listings' | 'applicants' | 'messages') ?? 'listings'
   const meta = usePageMeta({ title: 'Employer Dashboard | HireHub Community', description: 'Manage your job listings and review applicants' })
 
-  function setActiveTab(tab: 'listings' | 'applicants') {
+  function setActiveTab(tab: 'listings' | 'applicants' | 'messages') {
     setSearchParams(tab === 'listings' ? {} : { tab })
   }
 
@@ -51,6 +53,7 @@ export default function EmployerDashboardPage() {
 
       {activeTab === 'listings' && <JobListingsTab />}
       {activeTab === 'applicants' && <ApplicantsTab />}
+      {activeTab === 'messages' && <MessagesTab />}
     </>
   )
 }

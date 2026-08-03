@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useCallback, useRef } from 'react'
+import { useState, useMemo } from 'react'
 import { HeroContent } from '../ui/HeroContent'
 import { Section, Container, Reveal } from '../ui'
 import { usePageMeta } from '../../utils/usePageMeta'
@@ -8,73 +8,30 @@ import { FilterDrawer } from './FilterDrawer'
 import { ActiveFilterChips } from './ActiveFilterChips'
 import { JobCardGrid } from './JobCardGrid'
 import { Button } from '../ui/Button'
-import { listJobs } from '../../api/jobs'
-import type { Job } from '../../data/jobs'
-
-const PAGE_SIZE = 12
+import { useInfiniteJobs } from '../../hooks/useJobs'
 
 export default function JobBoardPage() {
   const meta = usePageMeta({ title: 'Jobs | HireHub Community', description: 'Browse thousands of curated job listings from top companies.' })
 
-  const [allJobs, setAllJobs] = useState<Job[]>([])
-  const [loading, setLoading] = useState(true)
-  const [loadingMore, setLoadingMore] = useState(false)
-  const [error, setError] = useState('')
-  const [cursor, setCursor] = useState<string | null>(null)
-  const [total, setTotal] = useState(0)
   const [search, setSearch] = useState('')
   const [filters, setFilters] = useState({ category: '', seniority: '', remote: '' })
   const [filterDrawerOpen, setFilterDrawerOpen] = useState(false)
 
+  const {
+    data,
+    isLoading,
+    isError,
+    error,
+    hasNextPage,
+    isFetchingNextPage,
+    fetchNextPage,
+    refetch,
+  } = useInfiniteJobs({ search, category: filters.category, seniority: filters.seniority })
+
+  const allJobs = data?.jobs ?? []
+  const total = data?.total ?? 0
+
   const activeFilterCount = [filters.category, filters.seniority, filters.remote].filter(Boolean).length
-
-  const searchRef = useRef(search)
-  const filtersRef = useRef(filters)
-  const cursorRef = useRef(cursor)
-
-  useEffect(() => { searchRef.current = search }, [search])
-  useEffect(() => { filtersRef.current = filters }, [filters])
-  useEffect(() => { cursorRef.current = cursor }, [cursor])
-
-  const loadJobs = useCallback(async (reset = false) => {
-    if (reset) {
-      setLoading(true)
-      setError('')
-    } else {
-      setLoadingMore(true)
-    }
-
-    try {
-      const params: Record<string, string | number> = { take: PAGE_SIZE }
-      if (!reset && cursorRef.current) params.cursor = cursorRef.current
-      if (searchRef.current) params.search = searchRef.current
-      if (filtersRef.current.category) params.category = filtersRef.current.category
-      if (filtersRef.current.seniority) params.seniority = filtersRef.current.seniority
-
-      const res = await listJobs(params as Record<string, string | number>)
-      setAllJobs(prev => reset ? res.data : [...prev, ...res.data])
-      setCursor(res.pagination?.cursor ?? null)
-      setTotal(res.pagination?.total ?? 0)
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load jobs')
-    } finally {
-      setLoading(false)
-      setLoadingMore(false)
-    }
-  }, [])
-
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    loadJobs(true)
-  }, [search, filters, loadJobs])
-
-  const handleFilterChange = (key: string, value: string) => {
-    setFilters((prev) => ({ ...prev, [key]: value }))
-  }
-
-  const handleSearchChange = (value: string) => {
-    setSearch(value)
-  }
 
   const filteredJobs = useMemo(() => {
     if (!filters.remote) return allJobs
@@ -86,7 +43,15 @@ export default function JobBoardPage() {
     })
   }, [filters.remote, allJobs])
 
-  const hasMore = cursor !== null && allJobs.length < total
+  const hasMore = !!hasNextPage && allJobs.length < total
+
+  const handleFilterChange = (key: string, value: string) => {
+    setFilters((prev) => ({ ...prev, [key]: value }))
+  }
+
+  const handleSearchChange = (value: string) => {
+    setSearch(value)
+  }
 
   return (
     <>
@@ -135,14 +100,14 @@ export default function JobBoardPage() {
             activeCount={activeFilterCount}
           />
 
-          {loading ? (
+          {isLoading ? (
             <div className="text-center py-16">
               <p className="text-ink-muted">Loading jobs...</p>
             </div>
-          ) : error ? (
+          ) : isError ? (
             <div className="text-center py-16">
-              <p className="text-error mb-4">{error}</p>
-              <Button variant="primary" size="sm" onClick={() => loadJobs(true)}>Try again</Button>
+              <p className="text-error mb-4">{error instanceof Error ? error.message : 'Failed to load jobs'}</p>
+              <Button variant="primary" size="sm" onClick={() => refetch()}>Try again</Button>
             </div>
           ) : (
             <>
@@ -152,8 +117,8 @@ export default function JobBoardPage() {
                   <JobCardGrid jobs={filteredJobs} />
                   {hasMore && (
                     <div className="mt-8 text-center">
-                      <Button variant="ghost" size="md" onClick={() => loadJobs(false)} disabled={loadingMore}>
-                        {loadingMore ? 'Loading more...' : `Load more (${filteredJobs.length} of ${total})`}
+                      <Button variant="ghost" size="md" onClick={() => fetchNextPage()} disabled={isFetchingNextPage}>
+                        {isFetchingNextPage ? 'Loading more...' : `Load more (${filteredJobs.length} of ${total})`}
                       </Button>
                     </div>
                   )}
@@ -165,8 +130,8 @@ export default function JobBoardPage() {
                 <JobCardGrid jobs={filteredJobs} />
                 {hasMore && (
                   <div className="mt-8 text-center">
-                    <Button variant="ghost" size="md" onClick={() => loadJobs(false)} disabled={loadingMore}>
-                      {loadingMore ? 'Loading more...' : `Load more (${filteredJobs.length} of ${total})`}
+                    <Button variant="ghost" size="md" onClick={() => fetchNextPage()} disabled={isFetchingNextPage}>
+                      {isFetchingNextPage ? 'Loading more...' : `Load more (${filteredJobs.length} of ${total})`}
                     </Button>
                   </div>
                 )}

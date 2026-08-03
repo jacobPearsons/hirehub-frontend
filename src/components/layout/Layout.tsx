@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import { useLocation } from 'react-router-dom'
 import { Navbar } from './Navbar'
 import { Footer } from './Footer'
 import ScrollToTop from './ScrollToTop'
@@ -8,7 +9,22 @@ interface LayoutProps {
   children: ReactNode
 }
 
+const isDashboardPath = (pathname: string) =>
+  pathname === '/dashboard' ||
+  pathname.startsWith('/dashboard/') ||
+  pathname === '/employer/dashboard' ||
+  pathname.startsWith('/employer/dashboard/') ||
+  pathname === '/admin' ||
+  pathname === '/login' ||
+  pathname === '/signup' ||
+  pathname === '/forgot-password' ||
+  pathname === '/reset-password' ||
+  pathname === '/onboarding'
+
 export default function Layout({ children }: LayoutProps) {
+  const { pathname } = useLocation()
+  const inDashboard = isDashboardPath(pathname)
+
   return (
     <>
       <Preloader />
@@ -19,9 +35,9 @@ export default function Layout({ children }: LayoutProps) {
       >
         Skip to content
       </a>
-      <Navbar />
+      {!inDashboard && <Navbar />}
       <main id="main-content" className="min-h-screen">{children}</main>
-      <Footer />
+      {!inDashboard && <Footer />}
     </>
   )
 }

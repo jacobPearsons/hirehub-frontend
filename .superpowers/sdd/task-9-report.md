@@ -1,90 +1,80 @@
-# Task 9: Final Wiring and Build Verification — Report
+# Task 9 Report — Routing + gating wiring
 
-## Verification Results
+## Status: DONE
 
-### 1. TypeScript Compilation (`npx tsc --noEmit`)
-**Status:** PASS
-Zero errors.
+## What was implemented
 
-### 2. Build (`npm run build`)
-**Status:** PASS
-Clean build with no errors. All chunks generated successfully.
+TDD wiring of the `/onboarding` route and the onboarding-completion gate on
+the `feat/onboarding-wizard` branch.
 
-### 3. Lint (`npm run lint`)
-**Status:** PASS (with warnings)
-- 24 errors (all pre-existing: `react-hooks/set-state-in-effect`, `no-empty`, `react-refresh/only-export-components`, `no-unused-vars`, `no-explicit-any`, `no-useless-assignment`)
-- 3 warnings (pre-existing: `react-hooks/incompatible-library` on RHF `watch()`)
-- No new errors introduced by this task.
+### `src/components/auth/ProtectedRoute.tsx`
+Added `useLocation()` and, after the role check:
+```tsx
+if (user && !user.onboardingCompleted && location.pathname !== '/onboarding') {
+  return <Navigate to="/onboarding" replace />
+}
+```
+- The `location.pathname !== '/onboarding'` guard prevents a redirect loop
+  when the user is already viewing the wizard (per plan).
+- Ordering note: the role check runs before the onboarding gate, so an
+  employer with `allowedRoles={['employer']}` still hits the role redirect
+  first — matches plan intent.
 
-### 4. Component Integration Check
-**Status:** PASS
+### `src/App.tsx`
+Added lazy import `const OnboardingWizard = lazy(() => import('./components/onboarding/OnboardingWizard'))`
+and route:
+```tsx
+<Route path="/onboarding" element={
+  <ProtectedRoute><ErrorBoundary><OnboardingWizard /></ErrorBoundary></ProtectedRoute>
+} />
+```
 
-| File | Expected Exports | Found |
-|------|-----------------|-------|
-| `src/components/interview/index.ts` | `InterviewScheduleModal`, `InterviewDetails` | ✅ |
-| `src/components/offer/index.ts` | `OfferLetterModal`, `OfferLetterView` | ✅ |
-| `src/components/preboarding/index.ts` | `PreBoardingChecklist` | ✅ |
-| `src/components/orientation/index.ts` | `OrientationCard` | ✅ |
+### `src/components/auth/SignupPage.tsx`
+- `setUser` now includes `onboardingCompleted: res.data.user.onboardingCompleted`.
+- Final navigation changed to `navigate('/onboarding')` for both roles (was
+  role-based dashboard redirect). Existing `SignupPage.test.tsx` does not
+  assert navigation, so it stays green.
 
-### 5. Dashboard Wiring Check
-**Status:** PASS
+### `__tests__/ProtectedRoute.test.tsx` (new, RED→GREEN)
+5 tests per plan spec: loading spinner (`Loader2`), no user → `/login`,
+`onboardingCompleted: false` on `/dashboard` → `/onboarding`, completed →
+renders children, disallowed role → `/`. Mocked `useApp` via
+`vi.mock('../../../context/AppContext')`, wrapped in `MemoryRouter` + `Routes`.
 
-**`ApplicantsTab.tsx`:**
-- Imports and renders `InterviewScheduleModal` ✅
-- Imports and renders `OfferLetterModal` ✅
-- "Schedule Interview" button wired to open modal ✅
-- "Make offer" button wired to open modal ✅
-- "Mark reviewing" and "Reject" buttons functional ✅
+## TDD evidence
 
-**`ApplicationCard.tsx`:**
-- Shows `InterviewDetails` when status is `interviewing` ✅
-- Shows `OfferLetterView` when status is `offer` ✅
-- Shows `PreBoardingChecklist` when offer is accepted ✅
-- Shows `OrientationCard` when orientation details exist ✅
+- RED: 1 failed / 5 (onboarding-gate test only — gate absent).
+- GREEN: 5/5 after implementation.
+- Full suite: `npm run test:run` → 91 passed / 0 failed.
+- Build: `npm run build` (`tsc -b && vite build`) → passes.
+- Lint: `npm run lint` → 0 errors. Fixed 2 errors I had introduced (unused
+  `_props` params in `SeekerCompleteStep`/`EmployerCompleteStep` — removed the
+  parameter and the now-unused prop interfaces). Remaining 3 warnings are
+  pre-existing RHF `watch` "incompatible library" notes in
+  ApplyJobForm.tsx / InterviewScheduleModal.tsx / ProfilePage.tsx — untouched.
 
-### 6. Email Integration Check
-**Status:** PASS
+## Files changed
 
-`src/api/emails.ts` exports:
-- `sendInterviewInvitation` ✅
-- `sendPostInterviewFollowUp` ✅ (note: named `sendPostInterviewFollowUp` per brief's `sendInterviewFollowUp`)
-- `sendOfferLetter` ✅
-- `sendPreBoardingChecklist` ✅
-- `sendOrientationDetails` ✅ (note: named `sendOrientationDetails` per brief's `sendOrientation`)
-
-### 7. Type Check
-**Status:** PASS
-
-`src/types/hiring-flow.ts` has:
-- `InterviewDetails` interface ✅
-- `OfferDetails` interface ✅
-- `OnboardingChecklistItem` interface ✅
-- `OrientationDetails` interface ✅
-
-`src/types/application.ts` has:
-- `interviewDetails?: InterviewDetails` ✅
-- `offerDetails?: OfferDetails` ✅
-- `preBoardingChecklist?: OnboardingChecklistItem[]` ✅
-- `orientationDetails?: OrientationDetails` ✅
-
-## Issues Found and Fixed
-
-| # | File | Issue | Fix |
-|---|------|-------|-----|
-| 1 | `ApplicantsTab.tsx:90-195` | JSX return had two sibling root elements (TS2657) | Wrapped in `<>...</>` fragment |
-| 2 | `InterviewScheduleModal.tsx:74` | Unused `interviewDetails` variable + unused `InterviewDetails` import | Removed both |
-| 3 | `OfferLetterModal.tsx:77` | Unused `offerDetails` variable + unused `OfferDetails` import | Removed both |
-| 4 | `OfferLetterModal.tsx:53` | Zod `.default('USD')` caused resolver type mismatch | Removed `.default()` (value already in `defaultValues`) |
-| 5 | `PostJobForm.tsx:46` | `z.preprocess` + `.transform()` caused resolver type mismatch with Zod 4 | Replaced with `z.coerce.number()` and added `Resolver<JobFormData>` cast |
-| 6 | `SearchBar.tsx:11` | `useRef()` called without initial value (TS2554) | Added explicit `undefined` initial value |
-| 7 | `AppContext.tsx:5` | Unused `Application` import | Removed |
-| 8 | `AuthContext.tsx:1` | Unused `useCallback` import | Removed |
-| 9 | `tsconfig.app.json` | Test files (`__tests__/`) included in build compilation | Added `"exclude": ["src/**/__tests__/**"]` |
+- `src/components/auth/ProtectedRoute.tsx`
+- `src/components/auth/SignupPage.tsx`
+- `src/App.tsx`
+- `src/components/auth/__tests__/ProtectedRoute.test.tsx` (new)
+- `src/components/onboarding/SeekerCompleteStep.tsx` (lint fix)
+- `src/components/onboarding/EmployerCompleteStep.tsx` (lint fix)
 
 ## Commit
 
-- `31722fe` — fix: resolve build errors and wire hiring pipeline components
+- `b28fbe5 feat(auth): gate incomplete users to onboarding`
 
-## Final Status
+## Self-review
 
-All 7 verification checks pass. The hiring pipeline is fully wired and the build is clean.
+- Incomplete users are redirected from every protected route to `/onboarding`
+  (including `/dashboard/profile` and `/post-job`); the wizard's own landing
+  and the completion redirects (`/jobs`, `/post-job`) are unaffected because
+  `onboardingCompleted` is set before navigating.
+- Both roles land on `/onboarding` after signup.
+- Lint/build/tests all green.
+
+## Concerns
+
+- None. Task 10 (final whole-branch gate) is next.

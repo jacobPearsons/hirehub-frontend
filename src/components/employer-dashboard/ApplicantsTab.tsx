@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { FileText, Users } from 'lucide-react'
 import { Card } from '../ui'
@@ -7,7 +7,8 @@ import { EmptyState } from '../ui/EmptyState'
 import { ErrorState } from '../ui/ErrorState'
 import { InterviewScheduleModal } from '../interview'
 import { OfferLetterModal } from '../offer'
-import { listEmployerJobs } from '../../api/jobs'
+import { CandidateDetailDrawer } from '../candidate'
+import { useEmployerJobsQuery } from '../../hooks/useEmployerJobsQuery'
 import { useApplications } from '../../context/ApplicationsContext'
 import type { Application, ApplicationStatus } from '../../types/application'
 
@@ -26,23 +27,12 @@ const containerVariants = {
 
 export function ApplicantsTab() {
   const { applications: allApps, updateApplicationStatus: updateContextStatus } = useApplications()
-  const [employerJobIds, setEmployerJobIds] = useState<string[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const { data, isLoading, isError, refetch } = useEmployerJobsQuery()
   const [interviewModalApp, setInterviewModalApp] = useState<Application | null>(null)
   const [offerModalApp, setOfferModalApp] = useState<Application | null>(null)
+  const [viewApp, setViewApp] = useState<Application | null>(null)
 
-  useEffect(() => {
-    let cancelled = false
-    listEmployerJobs()
-      .then(res => {
-        const jobIds = res.data.map(job => job.id)
-        if (!cancelled) setEmployerJobIds(jobIds)
-      })
-      .catch(() => { if (!cancelled) setError('Failed to load jobs.') })
-      .finally(() => { if (!cancelled) setLoading(false) })
-    return () => { cancelled = true }
-  }, [])
+  const employerJobIds = data?.data.map((job) => job.id) ?? []
 
   const apps = allApps.filter(app => employerJobIds.includes(app.jobId))
 
@@ -50,14 +40,14 @@ export function ApplicantsTab() {
     updateContextStatus(id, status)
   }
 
-  if (loading) {
+  if (isLoading) {
     return (
       <SkeletonGrid count={4} columns={2} />
     )
   }
 
-  if (error) {
-    return <ErrorState message={error} onRetry={() => window.location.reload()} />
+  if (isError) {
+    return <ErrorState message="Failed to load jobs." onRetry={() => refetch()} />
   }
 
   if (apps.length === 0) {
@@ -108,6 +98,12 @@ export function ApplicantsTab() {
                     </div>
                     <p className="text-sm text-ink-muted mt-3 line-clamp-2">{app.coverLetter}</p>
                     <div className="flex flex-wrap items-center gap-2 mt-3">
+                      <button
+                        onClick={() => setViewApp(app)}
+                        className="text-xs font-medium text-accent hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/40 rounded"
+                      >
+                        View profile
+                      </button>
                       {app.status !== 'reviewing' && (
                         <button
                           onClick={() => handleStatusChange(app.id, 'reviewing')}
@@ -172,6 +168,14 @@ export function ApplicantsTab() {
           open={!!offerModalApp}
           onOpenChange={(open) => { if (!open) setOfferModalApp(null) }}
           onSuccess={() => setOfferModalApp(null)}
+        />
+      )}
+      {viewApp && (
+        <CandidateDetailDrawer
+          application={viewApp}
+          open={!!viewApp}
+          onOpenChange={(open) => { if (!open) setViewApp(null) }}
+          onActionComplete={() => setViewApp(null)}
         />
       )}
     </>

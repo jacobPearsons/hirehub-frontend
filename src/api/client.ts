@@ -1,4 +1,4 @@
-const API_BASE = (import.meta.env.VITE_API_URL as string) || 'http://localhost:4000/api'
+export const API_BASE = (import.meta.env.VITE_API_URL as string) || 'http://localhost:4000/api'
 
 let accessToken: string | null = null
 
@@ -104,6 +104,13 @@ export function apiPost<T>(endpoint: string, body?: unknown) {
 export function apiPatch<T>(endpoint: string, body?: unknown) {
   return apiFetch<T>(endpoint, {
     method: 'PATCH',
+    body: body ? JSON.stringify(body) : undefined,
+  })
+}
+
+export function apiPut<T>(endpoint: string, body?: unknown) {
+  return apiFetch<T>(endpoint, {
+    method: 'PUT',
     body: body ? JSON.stringify(body) : undefined,
   })
 }

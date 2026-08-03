@@ -1,20 +1,33 @@
-import { useSearchParams } from 'react-router-dom'
+import { useSearchParams, Link } from 'react-router-dom'
 import { HeroContent } from '../ui/HeroContent'
 import { usePageMeta } from '../../utils/usePageMeta'
+import { useApp } from '../../context/AppContext'
+import { Button } from '../ui/Button'
 import { OverviewTab } from './OverviewTab'
 import { SavedJobsTab } from './SavedJobsTab'
 import { ApplicationsTab } from './ApplicationsTab'
+import { MessagesTab } from './MessagesTab'
 
 const tabs = [
   { id: 'overview', label: 'Overview' },
   { id: 'saved', label: 'Saved Jobs' },
   { id: 'applications', label: 'My Applications' },
+  { id: 'messages', label: 'Messages' },
 ] as const
 
+const tabMeta = {
+  overview: { title: 'Overview', subtitle: 'Your activity at a glance' },
+  saved: { title: 'Saved Jobs', subtitle: 'Jobs you’ve bookmarked' },
+  applications: { title: 'My Applications', subtitle: 'Track every application and hiring stage' },
+  messages: { title: 'Messages', subtitle: 'Chat with employers and the HireHub team' },
+} as const
+
 export default function DashboardPage() {
+  const { user } = useApp()
   const [searchParams, setSearchParams] = useSearchParams()
-  const activeTab = (searchParams.get('tab') as 'overview' | 'saved' | 'applications') ?? 'overview'
-  const meta = usePageMeta({ title: 'Dashboard | HireHub Community', description: 'Manage your saved jobs and applications' })
+  const tabParam = searchParams.get('tab')
+  const activeTab = tabs.some((t) => t.id === tabParam) ? (tabParam as (typeof tabs)[number]['id']) : 'overview'
+  const meta = usePageMeta({ title: tabMeta[activeTab].title, description: tabMeta[activeTab].subtitle })
 
   function setActiveTab(tab: string) {
     setSearchParams(tab === 'overview' ? {} : { tab })
@@ -26,11 +39,25 @@ export default function DashboardPage() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <HeroContent variant="accent">
           <div>
-            <h1 className="text-3xl md:text-[40px] leading-[1.15] tracking-[-0.8px] font-medium">Dashboard</h1>
-            <p className="text-ink-muted mt-1">Manage your saved jobs and applications</p>
+            <h1 className="text-3xl md:text-[40px] leading-[1.15] tracking-[-0.8px] font-medium">
+              {tabMeta[activeTab].title}
+            </h1>
+            <p className="text-ink-muted mt-1">{tabMeta[activeTab].subtitle}</p>
           </div>
         </HeroContent>
       </div>
+
+      {user && !user.onboardingCompleted && (
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 p-4 rounded-lg border border-accent/30 bg-accent/5">
+          <div>
+            <p className="text-sm font-medium text-ink">Complete your onboarding</p>
+            <p className="text-sm text-ink-muted">Finish setting up your profile so employers can find you.</p>
+          </div>
+          <Link to="/onboarding" className="sm:flex-shrink-0">
+            <Button variant="primary" size="sm">Continue</Button>
+          </Link>
+        </div>
+      )}
 
       <div role="tablist" aria-label="Dashboard tabs" className="flex overflow-x-auto gap-1 border-b border-hairline mb-6">
         {tabs.map((tab) => (
@@ -54,6 +81,7 @@ export default function DashboardPage() {
       {activeTab === 'overview' && <OverviewTab />}
       {activeTab === 'saved' && <SavedJobsTab />}
       {activeTab === 'applications' && <ApplicationsTab />}
+      {activeTab === 'messages' && <MessagesTab />}
     </>
   )
 }

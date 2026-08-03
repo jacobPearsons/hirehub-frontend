@@ -1,180 +1,72 @@
-### Task 2: Sidebar Component
+## Task 2 — Fix remaining 10 pre-existing test failures
 
-**Files:**
-- Create: `src/components/layout/Sidebar.tsx`
-- Create: `src/components/layout/sidebar-constants.ts`
+Post-polyfill reality: **12 failed / 59 passed** in 5 files. All 10 remaining
+failures are real test bugs (missing providers/mocks, outdated expectations,
+responsive double-render) — NOT framework gaps. Component behavior is
+intentional; tests are corrected to match it.
 
-**Interfaces:**
-- Consumes: `NavLink`, `useLocation` from react-router-dom; `useApp` from AppContext; Lucide icons
-- Produces: `Sidebar` component with `mobile`, `isOpen`, `onClose` props
+TDD: run each file, fix its tests, re-run until green. Exact fixes:
 
-- [ ] **Step 1: Create sidebar navigation constants**
+### 2a. `src/components/jobs/__tests__/JobBoardPage.test.tsx` (4 failures)
+
+`JobCard` calls `useQueryClient` → wrap the render helper in
+`QueryClientProvider`:
 
 ```ts
-// src/components/layout/sidebar-constants.ts
-import { LayoutDashboard, Bookmark, Briefcase, Search, FileText, Users, Plus } from 'lucide-react'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 
-interface SidebarItem {
-  label: string
-  to: string
-  icon: React.ComponentType<{ className?: string }>
-}
-
-export const seekerNavItems: SidebarItem[] = [
-  { label: 'Dashboard', to: '/dashboard', icon: LayoutDashboard },
-  { label: 'Saved Jobs', to: '/dashboard', icon: Bookmark },
-  { label: 'Browse Jobs', to: '/jobs', icon: Search },
-]
-
-export const employerNavItems: SidebarItem[] = [
-  { label: 'Dashboard', to: '/employer/dashboard', icon: LayoutDashboard },
-  { label: 'Job Listings', to: '/employer/dashboard', icon: Briefcase },
-  { label: 'Applicants', to: '/employer/dashboard', icon: Users },
-  { label: 'Post Job', to: '/post-job', icon: Plus },
-]
-```
-
-- [ ] **Step 2: Create the Sidebar component**
-
-```tsx
-// src/components/layout/Sidebar.tsx
-import { NavLink, Link, useNavigate } from 'react-router-dom'
-import { X, LogOut } from 'lucide-react'
-import { useApp } from '../../context/AppContext'
-import { logout } from '../../api/auth'
-import { setAccessToken } from '../../api/client'
-import { seekerNavItems, employerNavItems } from './sidebar-constants'
-import type { ReactNode } from 'react'
-
-interface SidebarProps {
-  mobile?: boolean
-  isOpen?: boolean
-  onClose?: () => void
-}
-
-function NavItem({ item, onClick }: { item: { label: string; to: string; icon: React.ComponentType<{ className?: string }> }; onClick?: () => void }) {
-  const Icon = item.icon
-  return (
-    <NavLink
-      to={item.to}
-      onClick={onClick}
-      className={({ isActive }) =>
-        `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/30 ${
-          isActive
-            ? 'bg-accent/10 text-accent'
-            : 'text-ink-muted hover:text-ink hover:bg-surface-2'
-        }`
-      }
-    >
-      <Icon className="h-5 w-5 shrink-0" />
-      <span>{item.label}</span>
-    </NavLink>
-  )
-}
-
-function SidebarContent({ onNavClick }: { onNavClick?: () => void }) {
-  const { user, setUser } = useApp()
-  const navigate = useNavigate()
-
-  const navItems = user?.role === 'employer' ? employerNavItems : seekerNavItems
-
-  const handleLogout = async () => {
-    try { await logout() } catch {}
-    setAccessToken(null)
-    setUser(null)
-    navigate('/')
-    onNavClick?.()
-  }
-
-  return (
-    <nav className="flex flex-col h-full bg-canvas">
-      {/* Logo */}
-      <div className="flex items-center gap-3 px-4 h-14 border-b border-hairline shrink-0">
-        <Link to="/" onClick={onNavClick} className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/30 rounded">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 52" fill="none" className="h-7" aria-hidden="true">
-            <rect x="4" y="6" width="40" height="40" rx="8" fill="#ff5600"/>
-            <path d="M16 16v20M16 26h16M32 16v20" stroke="white" strokeWidth="3.5" strokeLinecap="round"/>
-            <text x="54" y="32" fontFamily="Inter, system-ui, sans-serif" fontSize="22" fontWeight="500" fill="currentColor" letterSpacing="-0.3">HireHub</text>
-            <text x="54" y="45" fontFamily="Inter, system-ui, sans-serif" fontSize="11" fontWeight="400" fill="currentColor" opacity="0.6">Community</text>
-          </svg>
-        </Link>
-      </div>
-
-      {/* Navigation */}
-      <div className="flex-1 overflow-y-auto py-4 px-3 space-y-1">
-        {navItems.map((item) => (
-          <NavItem key={item.label} item={item} onClick={onNavClick} />
-        ))}
-      </div>
-
-      {/* Footer */}
-      <div className="border-t border-hairline p-3 shrink-0">
-        {user && (
-          <div className="flex items-center gap-3 px-3 py-2.5">
-            <span className="text-sm text-ink-muted truncate">{user.name}</span>
-            <button
-              onClick={handleLogout}
-              className="ml-auto text-ink-muted hover:text-ink transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/30 rounded"
-              aria-label="Log out"
-            >
-              <LogOut size={18} />
-            </button>
-          </div>
-        )}
-      </div>
-    </nav>
-  )
-}
-
-export function Sidebar({ mobile, isOpen, onClose }: SidebarProps) {
-  if (mobile) {
-    return (
-      <>
-        {isOpen && (
-          <div className="fixed inset-0 z-50 md:hidden">
-            <div className="fixed inset-0 bg-black/40" onClick={onClose} />
-            <div className="fixed left-0 top-0 bottom-0 w-[280px] max-w-[85vw] bg-canvas border-r border-hairline shadow-2xl flex flex-col">
-              <div className="flex items-center justify-between px-4 h-14 border-b border-hairline shrink-0">
-                <span className="font-medium text-ink text-sm">Menu</span>
-                <button
-                  onClick={onClose}
-                  className="p-2 text-ink-muted hover:text-ink rounded-lg hover:bg-surface-2 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/30"
-                  aria-label="Close menu"
-                >
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
-              <div className="flex-1 overflow-y-auto">
-                <SidebarContent onNavClick={onClose} />
-              </div>
-            </div>
-          </div>
-        )}
-      </>
-    )
-  }
-
-  return (
-    <div className="hidden md:flex w-56 shrink-0 border-r border-hairline">
-      <SidebarContent />
-    </div>
+function renderJobBoardPage() {
+  const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } })
+  render(
+    <QueryClientProvider client={queryClient}>
+      <MemoryRouter>{/* ...existing wrapper... */}</MemoryRouter>
+    </QueryClientProvider>
   )
 }
 ```
 
-Note: Replace `__import_useNavigate` with actual `useNavigate` import from react-router-dom. The component uses string concatenation with ternaries per HireHub convention, no `cn()` or `clsx()`.
+`JobBoardPage` renders both a mobile and a desktop layout in one DOM tree
+(intentional responsive markup), so every one-off text/placeholder query
+matches twice. Fix each assertion:
 
-- [ ] **Step 3: Run build to verify**
+- "renders a search bar": `getByPlaceholderText('Search jobs...')` →
+  `getAllByPlaceholderText('Search jobs...')`, expect `.length` to be ≥ 1.
+- "renders filter options ...": the grid is only rendered after `loading`
+  clears, so the synchronous `getByText('Category')` races the promise →
+  use `await screen.findByText('Category')` (also `findByText` for
+  'Seniority' and 'Location').
+- "renders empty state when no jobs are returned":
+  `await screen.findAllByText(/no jobs match/i)`, expect `.length` ≥ 1.
+- "renders job cards when jobs are returned":
+  `await screen.findAllByText('Frontend Engineer')`, expect `.length` ≥ 1
+  (unblocks once `QueryClientProvider` is present).
 
-Run: `npx tsc --noEmit`
-Expected: No errors
+### 2b. `src/components/dashboard/__tests__/DashboardPage.test.tsx` (3 failures)
 
-- [ ] **Step 4: Commit**
+`DashboardPage` renders `OverviewTab` by default, which calls `useApplications()`
+(needs `ApplicationsProvider`) and destructures `savedJobIds` from `useApp`
+(the mock only returns `user`/`setUser` → `savedJobIds.length` throws). Fix:
 
-```bash
-git add src/components/layout/Sidebar.tsx src/components/layout/sidebar-constants.ts
-git commit -m "feat: add responsive Sidebar component with role-based navigation"
-```
+- Wrap the render helper in `<ApplicationsProvider>` (safe in tests: no access
+  token → it never calls the API) alongside the existing `MemoryRouter` +
+  `ToastProvider`.
+- Extend the `useApp` mock to return `{ user: null, setUser: vi.fn(), savedJobIds: [] }`.
+- "defaults to Saved Jobs tab" is WRONG — the component defaults to `overview`
+  (`DashboardPage.tsx:20` `useSearchParams().get('tab') ?? 'overview'`). Rename
+  to "defaults to Overview tab" and assert the Overview tab has
+  `aria-selected="true"`.
 
----
+### 2c. `src/components/employer-dashboard/__tests__/EmployerDashboardPage.test.tsx` (3 failures)
+
+The page's `JobListingsTab` (rendered by default) calls `listEmployerJobs()`
+from `api/jobs`, but the test mock only exports `listJobs`. Fix:
+
+- Add `listEmployerJobs: vi.fn().mockResolvedValue({ data: [] })` to the
+  `vi.mock('../../../api/jobs')` factory (JobListingsTab reads `res.data`).
+- "defaults to Job Listings tab" is correct (default is `listings`,
+  `EmployerDashboardPage.tsx:14`) — it passes once the mock exists.
+
+Verify: `npm run test:run` → **71 passed / 0 failed**. Also `npm run build`.
+
+Commit: `fix(test): repair JobBoard/Dashboard/EmployerDashboard suites`.
 
