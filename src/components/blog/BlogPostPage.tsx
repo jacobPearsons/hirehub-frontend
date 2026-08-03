@@ -1,4 +1,3 @@
-import { useState, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { Section, Container, Reveal } from '../ui'
 import { HeroContent } from '../ui/HeroContent'
@@ -6,21 +5,11 @@ import { SkeletonCard } from '../ui/SkeletonCard'
 import { usePageMeta } from '../../utils/usePageMeta'
 import { Tag } from '../ui/Tag'
 import { formatDate } from '../../utils/date'
-import { getBlogPostBySlug } from '../../api/blog'
-import type { BlogPost } from '../../data/blog'
+import { useBlogPost } from '../../hooks/useBlogPost'
 
 export default function BlogPostPage() {
   const { slug } = useParams<{ slug: string }>()
-  const [post, setPost] = useState<BlogPost | null>(null)
-  const [loading, setLoading] = useState(true)
-
-  useEffect(() => {
-    if (!slug) return
-    getBlogPostBySlug(slug)
-      .then(res => setPost(res.data))
-      .catch(() => {})
-      .finally(() => setLoading(false))
-  }, [slug])
+  const { data: post, isLoading, isError } = useBlogPost(slug ?? '')
 
   const meta = usePageMeta({
     title: post ? `${post.title} | HireHub Community` : 'Post | HireHub Community',
@@ -29,7 +18,7 @@ export default function BlogPostPage() {
     url: post ? `/blog/${post.slug}` : undefined,
   })
 
-  if (loading) {
+  if (isLoading) {
     return (
       <>
         {meta}
@@ -40,7 +29,7 @@ export default function BlogPostPage() {
     )
   }
 
-  if (!post) {
+  if (!post || isError) {
     return (
       <>
         {meta}
