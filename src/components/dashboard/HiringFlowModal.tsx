@@ -59,8 +59,12 @@ export function HiringFlowModal({ application, open, onOpenChange }: HiringFlowM
                     <Dialog.Title className="text-lg font-semibold text-ink">
                       Hiring Flow — {application.jobTitle}
                     </Dialog.Title>
+                    <Dialog.Description className="sr-only">
+                      Your application status at each stage of the hiring process.
+                    </Dialog.Description>
                     <Dialog.Close asChild>
                       <button
+                        type="button"
                         className="p-1 rounded-md text-ink-tertiary hover:text-ink hover:bg-surface-2 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/40"
                         aria-label="Close"
                       >

@@ -106,12 +106,19 @@ export function SeekerResumeStep({ onSaved }: SeekerResumeStepProps) {
               <p className="text-xs text-ink-muted">Resume already uploaded — choose a new file to replace it.</p>
             </div>
           </div>
+          <button
+            type="button"
+            onClick={() => inputRef.current?.click()}
+            className="text-sm font-medium text-accent hover:text-[#e04d00] p-1 rounded transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/30"
+          >
+            Replace
+          </button>
         </div>
       ) : (
         <button
           type="button"
           onClick={() => inputRef.current?.click()}
-          className="w-full p-6 rounded-md border-2 border-dashed border-hairline text-center hover:border-ink/40 transition-colors"
+          className="w-full p-6 rounded-md border-2 border-dashed border-hairline text-center hover:border-ink/40 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/30"
         >
           <FileText className="w-6 h-6 text-ink-muted mx-auto mb-2" />
           <p className="text-sm font-medium text-ink">Choose a resume (PDF, up to 10 MB)</p>

@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { Send, MessageSquare } from 'lucide-react'
 import { useApp } from '../../context/AppContext'
@@ -24,6 +25,7 @@ function formatTime(iso: string) {
 
 export function MessagesTab() {
   const { user } = useApp()
+  const [searchParams] = useSearchParams()
   const [conversations, setConversations] = useState<Conversation[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -33,20 +35,34 @@ export function MessagesTab() {
   const [draft, setDraft] = useState('')
   const [sending, setSending] = useState(false)
   const tempIdRef = useRef(0)
+  const requestedConvIdRef = useRef(searchParams.get('conv'))
 
   function loadConversations() {
     setLoading(true)
     setError(null)
+    const requestedConvId = requestedConvIdRef.current
     listConversations()
-      .then((res) => setConversations(res.data))
+      .then((res) => {
+        setConversations(res.data)
+        if (requestedConvId && res.data.some((c) => c.id === requestedConvId)) {
+          setActiveId(requestedConvId)
+        }
+      })
       .catch(() => setError('Failed to load conversations.'))
       .finally(() => setLoading(false))
   }
 
   useEffect(() => {
     let cancelled = false
+    const requestedConvId = requestedConvIdRef.current
     listConversations()
-      .then((res) => { if (!cancelled) setConversations(res.data) })
+      .then((res) => {
+        if (cancelled) return
+        setConversations(res.data)
+        if (requestedConvId && res.data.some((c) => c.id === requestedConvId)) {
+          setActiveId(requestedConvId)
+        }
+      })
       .catch(() => { if (!cancelled) setError('Failed to load conversations.') })
       .finally(() => { if (!cancelled) setLoading(false) })
     return () => { cancelled = true }

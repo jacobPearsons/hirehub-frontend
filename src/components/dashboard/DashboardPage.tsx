@@ -25,7 +25,8 @@ const tabMeta = {
 export default function DashboardPage() {
   const { user } = useApp()
   const [searchParams, setSearchParams] = useSearchParams()
-  const activeTab = (searchParams.get('tab') as 'overview' | 'saved' | 'applications' | 'messages') ?? 'overview'
+  const tabParam = searchParams.get('tab')
+  const activeTab = tabs.some((t) => t.id === tabParam) ? (tabParam as (typeof tabs)[number]['id']) : 'overview'
   const meta = usePageMeta({ title: tabMeta[activeTab].title, description: tabMeta[activeTab].subtitle })
 
   function setActiveTab(tab: string) {

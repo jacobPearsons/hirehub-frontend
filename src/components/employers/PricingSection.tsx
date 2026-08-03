@@ -8,14 +8,21 @@ import { Card } from '../ui/Card'
 import { Button } from '../ui/Button'
 import { SkeletonGrid } from '../ui/SkeletonGrid'
 import { listPricingTiers } from '../../api/pricing'
+import { useApp } from '../../context/AppContext'
 import { PaymentModal } from './PaymentModal'
 import type { PricingTier } from '../../data/pricing'
 
 export function PricingSection() {
+  const { user } = useApp()
   const [tiers, setTiers] = useState<PricingTier[]>([])
   const [loading, setLoading] = useState(true)
   const [selectedTier, setSelectedTier] = useState<PricingTier | null>(null)
   const navigate = useNavigate()
+
+  const handlePaid = (conversationId: string) => {
+    const base = user?.role === 'employer' ? '/employer/dashboard' : '/dashboard'
+    navigate(`${base}?tab=messages&conv=${conversationId}`)
+  }
 
   useEffect(() => {
     listPricingTiers().then(res => setTiers(res.data)).catch(() => {})
@@ -69,7 +76,7 @@ export function PricingSection() {
         tier={selectedTier!}
         open={!!selectedTier}
         onOpenChange={(o) => !o && setSelectedTier(null)}
-        onPaid={() => navigate('/dashboard')}
+        onPaid={handlePaid}
       />
     </Section>
   )

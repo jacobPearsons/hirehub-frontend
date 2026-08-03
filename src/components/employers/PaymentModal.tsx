@@ -88,9 +88,15 @@ export function PaymentModal({ tier, open, onOpenChange, onPaid }: PaymentModalP
                     <Dialog.Title className="text-lg font-semibold text-ink">
                       {success ? 'Payment received' : `Subscribe to ${tier.tier}`}
                     </Dialog.Title>
+                    <Dialog.Description className="sr-only">
+                      {success
+                        ? 'Your payment was successful. Start chatting with the HireHub team.'
+                        : `Complete checkout for the ${tier.tier} plan.`}
+                    </Dialog.Description>
                     <Dialog.Close asChild>
                       <button
-                        className="p-1 rounded-md text-ink-tertiary hover:text-ink hover:bg-surface-2 transition-colors"
+                        type="button"
+                        className="p-1 rounded-md text-ink-tertiary hover:text-ink hover:bg-surface-2 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/30"
                         aria-label="Close"
                       >
                         <X className="w-5 h-5" />

@@ -114,7 +114,7 @@ export function ApplyJobForm({ job, onSuccess }: ApplyJobFormProps) {
                 <div className="flex items-center gap-2 px-3 py-2.5 rounded-md border border-hairline bg-surface-1">
                   <FileIcon className="w-4 h-4 text-ink-muted shrink-0" aria-hidden="true" />
                   <span className="text-sm text-ink truncate flex-1">{resumeFileName}</span>
-                  <button type="button" onClick={handleClearFile} className="p-0.5 rounded text-ink-tertiary hover:text-error transition-colors" aria-label="Remove resume">
+                  <button type="button" onClick={handleClearFile} className="p-0.5 rounded text-ink-tertiary hover:text-error transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/30" aria-label="Remove resume">
                     <X className="w-4 h-4" />
                   </button>
                 </div>

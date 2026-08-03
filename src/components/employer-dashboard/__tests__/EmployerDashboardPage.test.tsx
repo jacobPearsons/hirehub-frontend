@@ -46,6 +46,11 @@ describe('EmployerDashboardPage', () => {
     expect(screen.getByRole('tab', { name: /applicants/i })).toBeInTheDocument()
   })
 
+  it('renders a Messages tab for chatting with the HireHub team', () => {
+    renderEmployerDashboardPage()
+    expect(screen.getByRole('tab', { name: /messages/i })).toBeInTheDocument()
+  })
+
   it('defaults to Job Listings tab', () => {
     renderEmployerDashboardPage()
     expect(screen.getByRole('tab', { name: /job listings/i })).toHaveAttribute('aria-selected', 'true')

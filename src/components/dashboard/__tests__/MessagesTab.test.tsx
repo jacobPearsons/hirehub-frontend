@@ -1,5 +1,6 @@
 import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { MemoryRouter } from 'react-router-dom'
 import { MessagesTab } from '../MessagesTab'
 import { listConversations, getMessages } from '../../../api/messages'
 
@@ -40,10 +41,24 @@ beforeEach(() => {
 
 describe('MessagesTab', () => {
   it('renders conversations and opens a thread on click', async () => {
-    render(<MessagesTab />)
+    render(
+      <MemoryRouter>
+        <MessagesTab />
+      </MemoryRouter>
+    )
     expect(await screen.findByText('HireHub Team')).toBeInTheDocument()
     await userEvent.setup().click(screen.getByText('HireHub Team'))
     const thread = await screen.findByTestId('thread-messages')
     expect(within(thread).getByText(/welcome to hirehub/i)).toBeInTheDocument()
+  })
+
+  it('auto-opens the conversation selected via ?conv= param', async () => {
+    render(
+      <MemoryRouter initialEntries={['/dashboard?tab=messages&conv=c1']}>
+        <MessagesTab />
+      </MemoryRouter>
+    )
+    const thread = await screen.findByTestId('thread-messages')
+    expect(await within(thread).findByText(/welcome to hirehub/i)).toBeInTheDocument()
   })
 })
