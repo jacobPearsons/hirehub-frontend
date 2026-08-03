@@ -1,5 +1,6 @@
 import { render, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
+import { AppProvider } from '../../../context/AppContext'
 import { ToastProvider } from '../../ui/Toast'
 import JobDetailPage from '../JobDetailPage'
 
@@ -60,11 +61,13 @@ const mockJob = {
 
 function renderJobDetailPage() {
   return render(
-    <MemoryRouter initialEntries={['/jobs/test-id']}>
-      <ToastProvider>
-        <JobDetailPage />
-      </ToastProvider>
-    </MemoryRouter>
+    <AppProvider>
+      <MemoryRouter initialEntries={['/jobs/test-id']}>
+        <ToastProvider>
+          <JobDetailPage />
+        </ToastProvider>
+      </MemoryRouter>
+    </AppProvider>
   )
 }
 
