@@ -1,5 +1,6 @@
 import { render, screen, waitFor } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import BlogPage from '../BlogPage'
 
 vi.mock('../../../api/blog', () => ({
@@ -11,10 +12,13 @@ vi.mock('../../../utils/usePageMeta', () => ({
 }))
 
 function renderBlogPage() {
+  const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } })
   return render(
-    <MemoryRouter initialEntries={['/blog']}>
-      <BlogPage />
-    </MemoryRouter>
+    <QueryClientProvider client={queryClient}>
+      <MemoryRouter initialEntries={['/blog']}>
+        <BlogPage />
+      </MemoryRouter>
+    </QueryClientProvider>
   )
 }
 

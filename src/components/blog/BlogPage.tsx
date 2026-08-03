@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { HeroContent } from '../ui/HeroContent'
 import { Section, Container, Reveal } from '../ui'
 import { SkeletonGrid } from '../ui/SkeletonGrid'
@@ -6,24 +6,15 @@ import { usePageMeta } from '../../utils/usePageMeta'
 import { FeaturedPost } from './FeaturedPost'
 import { CategoryFilter } from './CategoryFilter'
 import { BlogGrid } from './BlogGrid'
-import { listBlogPosts } from '../../api/blog'
-import type { BlogPost } from '../../data/blog'
+import { useBlogPosts } from '../../hooks/useBlogPosts'
 
 const categories = ['All', 'Hiring Tips', 'Company Culture', 'Career Advice', 'Industry News']
 
 export default function BlogPage() {
   const meta = usePageMeta({ title: 'Blog | HireHub Community', description: 'Insights and advice for your career journey.' })
 
-  const [posts, setPosts] = useState<BlogPost[]>([])
-  const [loading, setLoading] = useState(true)
   const [activeCategory, setActiveCategory] = useState('')
-
-  useEffect(() => {
-    listBlogPosts({ take: 20 })
-      .then(res => setPosts(res.data))
-      .catch(() => {})
-      .finally(() => setLoading(false))
-  }, [])
+  const { data: posts = [], isLoading } = useBlogPosts({ take: 20 })
 
   const featured = posts.find((p) => p.featured)
 
@@ -32,7 +23,7 @@ export default function BlogPage() {
       ? posts
       : posts.filter((p) => p.category === activeCategory)
 
-  if (loading) {
+  if (isLoading) {
     return (
       <>
         {meta}
