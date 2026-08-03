@@ -10,6 +10,7 @@ interface SidebarProps {
   mobile?: boolean
   isOpen?: boolean
   onClose?: () => void
+  collapsed?: boolean
 }
 
 function isNavActive(pathname: string, search: string, to: string): boolean {
@@ -23,7 +24,7 @@ function isNavActive(pathname: string, search: string, to: string): boolean {
   return toPath === '/jobs' && pathname.startsWith('/jobs/')
 }
 
-function NavItem({ item, onClick }: { item: SidebarItem; onClick?: () => void }) {
+function NavItem({ item, onClick, collapsed }: { item: SidebarItem; onClick?: () => void; collapsed?: boolean }) {
   const Icon = item.icon
   const { pathname, search } = useLocation()
   const active = isNavActive(pathname, search, item.to)
@@ -31,20 +32,22 @@ function NavItem({ item, onClick }: { item: SidebarItem; onClick?: () => void })
     <Link
       to={item.to}
       onClick={onClick}
+      title={item.label}
+      aria-label={item.label}
       aria-current={active ? 'page' : undefined}
       className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/30 ${
         active
           ? 'bg-accent/10 text-accent'
           : 'text-ink-muted hover:text-ink hover:bg-surface-2'
-      }`}
+      } ${collapsed ? 'justify-center px-0' : ''}`}
     >
       <Icon className="h-5 w-5 shrink-0" />
-      <span>{item.label}</span>
+      {!collapsed && <span>{item.label}</span>}
     </Link>
   )
 }
 
-function SidebarContent({ onNavClick }: { onNavClick?: () => void }) {
+function SidebarContent({ onNavClick, collapsed }: { onNavClick?: () => void; collapsed?: boolean }) {
   const { user, setUser } = useApp()
   const navigate = useNavigate()
 
@@ -76,32 +79,34 @@ function SidebarContent({ onNavClick }: { onNavClick?: () => void }) {
       {/* Navigation */}
       <div className="flex-1 overflow-y-auto py-4 px-3 space-y-1">
         {navItems.map((item) => (
-          <NavItem key={item.label} item={item} onClick={onNavClick} />
+          <NavItem key={item.label} item={item} onClick={onNavClick} collapsed={collapsed} />
         ))}
       </div>
 
       {/* Footer */}
-      <div className="border-t border-hairline p-3 shrink-0">
-        {user && (
-          <div className="flex items-center gap-3 px-3 py-2.5">
-            <Avatar name={user.name} src={user.avatarUrl} size="sm" />
-            <span className="text-sm text-ink font-medium truncate">{user.name}</span>
-            <button
-              type="button"
-              onClick={handleLogout}
-              className="ml-auto text-ink-muted hover:text-ink transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/30 rounded"
-              aria-label="Log out"
-            >
-              <LogOut size={18} />
-            </button>
-          </div>
-        )}
-      </div>
+      {!collapsed && (
+        <div className="border-t border-hairline p-3 shrink-0">
+          {user && (
+            <div className="flex items-center gap-3 px-3 py-2.5">
+              <Avatar name={user.name} src={user.avatarUrl} size="sm" />
+              <span className="text-sm text-ink font-medium truncate">{user.name}</span>
+              <button
+                type="button"
+                onClick={handleLogout}
+                className="ml-auto text-ink-muted hover:text-ink transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/30 rounded"
+                aria-label="Log out"
+              >
+                <LogOut size={18} />
+              </button>
+            </div>
+          )}
+        </div>
+      )}
     </nav>
   )
 }
 
-export function Sidebar({ mobile, isOpen, onClose }: SidebarProps) {
+export function Sidebar({ mobile, isOpen, onClose, collapsed }: SidebarProps) {
   if (mobile) {
     return (
       <>
@@ -131,8 +136,8 @@ export function Sidebar({ mobile, isOpen, onClose }: SidebarProps) {
   }
 
   return (
-    <div className="hidden md:flex w-56 shrink-0 border-r border-hairline">
-      <SidebarContent />
+    <div className={`hidden md:flex ${collapsed ? 'w-14' : 'w-56'} shrink-0 border-r border-hairline transition-all duration-200`}>
+      <SidebarContent collapsed={collapsed} />
     </div>
   )
 }
