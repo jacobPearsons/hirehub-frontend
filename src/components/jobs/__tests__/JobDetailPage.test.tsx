@@ -1,5 +1,6 @@
 import { render, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { AppProvider } from '../../../context/AppContext'
 import { ToastProvider } from '../../ui/Toast'
 import JobDetailPage from '../JobDetailPage'
@@ -60,14 +61,17 @@ const mockJob = {
 }
 
 function renderJobDetailPage() {
+  const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } })
   return render(
-    <AppProvider>
-      <MemoryRouter initialEntries={['/jobs/test-id']}>
-        <ToastProvider>
-          <JobDetailPage />
-        </ToastProvider>
-      </MemoryRouter>
-    </AppProvider>
+    <QueryClientProvider client={queryClient}>
+      <AppProvider>
+        <MemoryRouter initialEntries={['/jobs/test-id']}>
+          <ToastProvider>
+            <JobDetailPage />
+          </ToastProvider>
+        </MemoryRouter>
+      </AppProvider>
+    </QueryClientProvider>
   )
 }
 
@@ -83,7 +87,7 @@ describe('JobDetailPage', () => {
     )
 
     renderJobDetailPage()
-    expect(screen.getByText('Loading...')).toBeInTheDocument()
+    expect(screen.getByRole('status', { name: /loading job/i })).toBeInTheDocument()
   })
 
   it('renders job details when loaded', async () => {

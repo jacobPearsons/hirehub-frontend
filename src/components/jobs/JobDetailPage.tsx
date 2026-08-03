@@ -1,29 +1,19 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { Section, Container } from '../ui'
 import { HeroContent } from '../ui/HeroContent'
+import { SkeletonCard } from '../ui/SkeletonCard'
 import { usePageMeta } from '../../utils/usePageMeta'
-import { getJobById } from '../../api/jobs'
+import { useJob } from '../../hooks/useJob'
 import { JobHeader } from './JobHeader'
 import { JobBody } from './JobBody'
 import { CompanySidebar } from './CompanySidebar'
 import { SaveButton } from './SaveButton'
-import type { Job } from '../../data/jobs'
 
 export default function JobDetailPage() {
   const { id } = useParams<{ id: string }>()
-  const [job, setJob] = useState<Job | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState('')
+  const { data: job, isLoading, isError } = useJob(id ?? '')
   const [now] = useState(() => Date.now())
-
-  useEffect(() => {
-    if (!id) return
-    getJobById(id)
-      .then(res => setJob(res.data))
-      .catch(err => setError(err.message))
-      .finally(() => setLoading(false))
-  }, [id])
 
   const meta = usePageMeta({
     title: job ? `${job.title} | HireHub Community` : 'Job | HireHub Community',
@@ -32,18 +22,22 @@ export default function JobDetailPage() {
     url: job ? `/jobs/${job.id}` : undefined,
   })
 
-  if (loading) {
+  if (isLoading) {
     return (
       <>
         {meta}
         <Section>
-          <Container><div className="text-center py-24"><p className="text-ink-muted">Loading...</p></div></Container>
+          <Container>
+            <div role="status" aria-label="Loading job..." className="max-w-3xl mx-auto">
+              <SkeletonCard />
+            </div>
+          </Container>
         </Section>
       </>
     )
   }
 
-  if (!job || error) {
+  if (!job || isError) {
     return (
       <>
         {meta}
