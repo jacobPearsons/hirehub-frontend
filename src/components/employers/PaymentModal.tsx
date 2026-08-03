@@ -1,7 +1,7 @@
 import { useState, type FormEvent } from 'react'
 import * as Dialog from '@radix-ui/react-dialog'
 import { AnimatePresence, motion } from 'framer-motion'
-import { X, CheckCircle } from 'lucide-react'
+import { X } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { Button } from '../ui/Button'
 import { Input } from '../ui/Input'
@@ -76,6 +76,13 @@ export function PaymentModal({ tier, open, onOpenChange, onPaid }: PaymentModalP
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
               >
+                <img
+                  src="/payment-modal-bg.png"
+                  alt=""
+                  aria-hidden="true"
+                  loading="lazy"
+                  className="pointer-events-none absolute inset-0 h-full w-full object-cover opacity-[0.15]"
+                />
                 <motion.div
                   className="bg-surface-1 rounded-xl p-6 w-full max-w-lg shadow-xl border border-hairline"
                   initial={{ opacity: 0, y: 16, scale: 0.96 }}
@@ -118,7 +125,13 @@ export function PaymentModal({ tier, open, onOpenChange, onPaid }: PaymentModalP
                     </div>
                   ) : success ? (
                     <div className="flex flex-col items-center text-center py-8">
-                      <CheckCircle className="w-16 h-16 text-success mb-4" aria-hidden="true" />
+                      <img
+                        src="/payment-success-check.png"
+                        alt=""
+                        aria-hidden="true"
+                        loading="lazy"
+                        className="w-24 h-24 mb-4"
+                      />
                       <h2 className="text-xl font-semibold text-ink mb-2">
                         Thank you for choosing {tier.tier}!
                       </h2>
