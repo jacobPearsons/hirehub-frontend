@@ -1,11 +1,11 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { MapPin } from 'lucide-react'
 import { Section } from '../ui/Section'
 import { Container } from '../ui/Container'
 import { Card } from '../ui/Card'
 import { SkeletonGrid } from '../ui/SkeletonGrid'
-import { listJobs } from '../../api/jobs'
+import { useJobs } from '../../hooks/useJobs'
 import { formatSalary } from '../../utils/format'
 import type { Job } from '../../data/jobs'
 
@@ -29,16 +29,9 @@ function CompanyLogo({ job, className }: { job: Job; className?: string }) {
 }
 
 export function FeaturedJobs() {
-  const [featured, setFeatured] = useState<Job[]>([])
-  const [loading, setLoading] = useState(true)
+  const { data: jobs = [], isLoading } = useJobs({ take: 20 })
+  const featured = jobs.filter((job: Job) => job.featured).slice(0, 3)
   const salary = (job: Job) => formatSalary(job.salaryMin, job.salaryMax, job.currency)
-
-  useEffect(() => {
-    listJobs({ take: 20 }).then(res => {
-      setFeatured(res.data.filter((j: Job) => j.featured).slice(0, 3))
-    }).catch(() => {})
-      .finally(() => setLoading(false))
-  }, [])
 
   return (
     <Section className="relative overflow-hidden">
@@ -49,7 +42,7 @@ export function FeaturedJobs() {
         <h2 className="text-[40px] leading-[1.15] tracking-[-0.8px] font-medium mb-8">
           Featured openings
         </h2>
-        {loading ? (
+        {isLoading ? (
           <SkeletonGrid count={3} columns={3} />
         ) : featured.length === 0 ? (
           <p className="text-ink-muted">No featured jobs right now. Check back soon.</p>
