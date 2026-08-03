@@ -1,14 +1,14 @@
-import { useState, useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { Bookmark } from 'lucide-react'
+import { useQueryClient } from '@tanstack/react-query'
 import { useApp } from '../../context/AppContext'
-import { listSavedJobs } from '../../api/savedJobs'
+import { useSavedJobsQuery } from '../../hooks/useSavedJobsQuery'
 import { JobCard } from '../jobs/JobCard'
 import { SkeletonGrid } from '../ui/SkeletonGrid'
 import { EmptyState } from '../ui/EmptyState'
 import { ErrorState } from '../ui/ErrorState'
-import type { Job } from '../../data/jobs'
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -18,32 +18,26 @@ const containerVariants = {
 export function SavedJobsTab() {
   const { savedJobIds } = useApp()
   const navigate = useNavigate()
-  const [savedJobs, setSavedJobs] = useState<Job[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-
-  function handleRetry() {
-    setLoading(true)
-    setError(null)
-    listSavedJobs()
-      .then(res => setSavedJobs(res.data))
-      .catch(() => setError('Failed to load saved jobs.'))
-      .finally(() => setLoading(false))
-  }
+  const queryClient = useQueryClient()
+  const skipFirstInvalidate = useRef(true)
+  const { data, isLoading, isError, refetch } = useSavedJobsQuery()
 
   useEffect(() => {
-    let cancelled = false
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setLoading(true)
-    setError(null)
-    listSavedJobs()
-      .then(res => { if (!cancelled) setSavedJobs(res.data) })
-      .catch(() => { if (!cancelled) setError('Failed to load saved jobs.') })
-      .finally(() => { if (!cancelled) setLoading(false) })
-    return () => { cancelled = true }
-  }, [savedJobIds])
+    if (skipFirstInvalidate.current) {
+      skipFirstInvalidate.current = false
+      return
+    }
+    queryClient.invalidateQueries({ queryKey: ['savedJobs'] })
+  }, [savedJobIds, queryClient])
 
-  if (loading) {
+  const savedJobs = data?.data ?? []
+  const error = isError ? 'Failed to load saved jobs.' : null
+
+  function handleRetry() {
+    refetch()
+  }
+
+  if (isLoading) {
     return <SkeletonGrid count={6} columns={3} />
   }
 
