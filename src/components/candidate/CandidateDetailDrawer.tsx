@@ -1,10 +1,11 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import * as Dialog from '@radix-ui/react-dialog'
 import { AnimatePresence, motion } from 'framer-motion'
 import { X, FileText, Mail, Phone, Globe, MapPin, Calendar } from 'lucide-react'
 import { Avatar, Button } from '../ui'
 import { useToast } from '../ui/Toast'
-import { getCandidateProfile, resumeFileUrl, type CandidateProfile } from '../../api/applications'
+import { resumeFileUrl } from '../../api/applications'
+import { useCandidateProfileQuery } from '../../hooks/useCandidateProfileQuery'
 import { useApplications } from '../../context/ApplicationsContext'
 import { InterviewScheduleModal, InterviewDetails } from '../interview'
 import { OfferLetterModal } from '../offer'
@@ -44,32 +45,14 @@ export function CandidateDetailDrawer({
   onOpenChange,
   onActionComplete,
 }: CandidateDetailDrawerProps) {
-  const [candidate, setCandidate] = useState<CandidateProfile | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const { data, isLoading, isError, refetch } = useCandidateProfileQuery(application.id, open)
   const [interviewOpen, setInterviewOpen] = useState(false)
   const [offerOpen, setOfferOpen] = useState(false)
   const { showToast } = useToast()
   const { updateApplicationStatus } = useApplications()
 
-  useEffect(() => {
-    if (!open) return
-    let cancelled = false
-    getCandidateProfile(application.id)
-      .then((res) => {
-        if (!cancelled) {
-          setCandidate(res.data.candidate)
-          setLoading(false)
-        }
-      })
-      .catch(() => {
-        if (!cancelled) {
-          setError('Failed to load candidate profile.')
-          setLoading(false)
-        }
-      })
-    return () => { cancelled = true }
-  }, [open, application.id])
+  const candidate = data?.data.candidate ?? null
+  const error = isError ? 'Failed to load candidate profile.' : null
 
   async function handleStatusChange(status: Application['status'], message: string) {
     try {
@@ -119,7 +102,7 @@ export function CandidateDetailDrawer({
                 </div>
 
                 <div className="p-6 space-y-6">
-                  {loading && (
+                  {isLoading && (
                     <div className="flex items-center justify-center py-16 text-ink-muted text-sm">
                       Loading candidate profile…
                     </div>
@@ -128,13 +111,13 @@ export function CandidateDetailDrawer({
                   {error && (
                     <div className="py-16 text-center">
                       <p className="text-error text-sm">{error}</p>
-                      <Button variant="accent" size="sm" className="mt-4" onClick={() => window.location.reload()}>
+                      <Button variant="accent" size="sm" className="mt-4" onClick={() => refetch()}>
                         Retry
                       </Button>
                     </div>
                   )}
 
-                  {candidate && !loading && (
+                  {candidate && !isLoading && (
                     <>
                       <div className="flex items-center gap-4">
                         <Avatar name={candidate.name} src={candidate.avatarUrl} size="lg" />
