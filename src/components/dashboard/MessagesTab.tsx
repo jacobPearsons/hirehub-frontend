@@ -203,6 +203,13 @@ export function MessagesTab() {
           </>
         ) : (
           <div className="flex flex-col items-center justify-center py-16 text-center px-6">
+            <img
+              src="/conversation-thread.png"
+              alt=""
+              aria-hidden="true"
+              loading="lazy"
+              className="mb-4 w-full max-w-sm rounded-lg"
+            />
             <MessageSquare className="w-12 h-12 mb-4 text-ink-tertiary" />
             <h3 className="text-lg font-medium text-ink mb-1">Select a conversation</h3>
             <p className="text-sm text-ink-muted max-w-sm">Pick a conversation from the list to view the thread.</p>
