@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { Check } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { Section } from '../ui/Section'
@@ -7,11 +8,14 @@ import { Card } from '../ui/Card'
 import { Button } from '../ui/Button'
 import { SkeletonGrid } from '../ui/SkeletonGrid'
 import { listPricingTiers } from '../../api/pricing'
+import { PaymentModal } from './PaymentModal'
 import type { PricingTier } from '../../data/pricing'
 
 export function PricingSection() {
   const [tiers, setTiers] = useState<PricingTier[]>([])
   const [loading, setLoading] = useState(true)
+  const [selectedTier, setSelectedTier] = useState<PricingTier | null>(null)
+  const navigate = useNavigate()
 
   useEffect(() => {
     listPricingTiers().then(res => setTiers(res.data)).catch(() => {})
@@ -54,13 +58,19 @@ export function PricingSection() {
                     </li>
                   ))}
                 </ul>
-                <Button variant={tier.featured ? 'accent' : 'primary'} size="lg" className="w-full" type="button">{tier.ctaText}</Button>
+                <Button variant={tier.featured ? 'accent' : 'primary'} size="lg" className="w-full" type="button" onClick={() => setSelectedTier(tier)}>{tier.ctaText}</Button>
               </Card>
             </motion.div>
           ))}
         </div>
         )}
       </Container>
+      <PaymentModal
+        tier={selectedTier!}
+        open={!!selectedTier}
+        onOpenChange={(o) => !o && setSelectedTier(null)}
+        onPaid={() => navigate('/dashboard')}
+      />
     </Section>
   )
 }
