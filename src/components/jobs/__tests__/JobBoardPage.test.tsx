@@ -1,4 +1,5 @@
 import { render, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { ToastProvider } from '../../ui/Toast'
@@ -126,5 +127,40 @@ describe('JobBoardPage', () => {
 
     renderJobBoardPage()
     expect((await screen.findAllByText('Frontend Engineer')).length).toBeGreaterThanOrEqual(1)
+  })
+
+  it('loads more jobs when clicking load more', async () => {
+    const { listJobs } = await import('../../../api/jobs')
+    const pageOneJob = {
+      id: '1',
+      title: 'Engineer One',
+      company: 'Acme',
+      companyLogo: '',
+      location: 'Remote',
+      remote: true,
+      salaryMin: 100000,
+      salaryMax: 150000,
+      currency: 'USD',
+      tags: ['React'],
+      category: 'Engineering',
+      seniority: 'senior',
+      description: 'Build things',
+      requirements: [],
+      responsibilities: [],
+      postedDate: '2026-01-01',
+      featured: false,
+    }
+    const pageTwoJob = { ...pageOneJob, id: '2', title: 'Engineer Two' }
+    ;(listJobs as ReturnType<typeof vi.fn>).mockImplementation((params?: { cursor?: string }) =>
+      params?.cursor
+        ? Promise.resolve({ data: [pageTwoJob], pagination: { total: 2, cursor: null } })
+        : Promise.resolve({ data: [pageOneJob], pagination: { total: 2, cursor: 'page-2' } })
+    )
+
+    renderJobBoardPage()
+    const [loadMore] = await screen.findAllByRole('button', { name: /load more/i })
+    await userEvent.click(loadMore)
+
+    expect((await screen.findAllByText('Engineer Two')).length).toBeGreaterThanOrEqual(1)
   })
 })
