@@ -56,7 +56,7 @@ export default function BlogPostPage() {
     )
   }
 
-  const paragraphs = post.content ? post.content.split('\n\n') : []
+  const blocks = post.content ? post.content.split('\n\n') : []
 
   return (
     <>
@@ -87,9 +87,23 @@ export default function BlogPostPage() {
               </div>
             </div>
             <div>
-              {paragraphs.map((para, i) => (
-                <p key={i} className="text-base leading-[1.8] text-ink-muted mb-4">{para}</p>
-              ))}
+              {blocks.map((block, i) => {
+                const match = block.trim().match(/^!\[(.*?)\]\((.*?)\)$/)
+                if (match) {
+                  return (
+                    <img
+                      key={i}
+                      src={match[2]}
+                      alt={match[1]}
+                      loading="lazy"
+                      className="w-full rounded-xl my-2"
+                    />
+                  )
+                }
+                return (
+                  <p key={i} className="text-base leading-[1.8] text-ink-muted mb-4">{block}</p>
+                )
+              })}
             </div>
           </article></Reveal>
           <div className="mt-12 text-center">

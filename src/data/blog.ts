@@ -31,6 +31,24 @@ export const blogPosts: BlogPost[] = [
     featured: false,
   },
   {
+    slug: "how-hiring-works-on-hirehub",
+    title: "How Hiring Works on HireHub: From Application to Offer",
+    excerpt:
+      "A look inside the HireHub experience — from your first application to a signed offer, and everything in between.",
+    content:
+      "HireHub was built to make hiring transparent for everyone — job seekers and employers alike. This post walks you through the full experience, from the moment you hit apply to the day you sign an offer, so you know exactly what to expect at every step.\n\nThe journey starts the moment your application leaves your hands. It moves through a clear hiring flow — from submitted, to review, to interview, and finally to offer or close. You can follow your application's progress in real time from the My Applications dashboard. The moment a status changes, your dashboard updates — no refreshing, no guessing, no waiting on a reply that never comes.\n\n![The hiring flow at a glance](/hiring-flow-timeline.png)\n\nWhen a company wants to move forward, they'll reach out to schedule an interview. Treat it as a two-way conversation: prepare examples that show your skills in action, research the company beforehand, and use the chance to ask questions of your own. If things go well, you'll receive an offer — review every detail carefully, and don't be afraid to ask clarifying questions before you sign.\n\nOn the employer side, the same transparency applies in reverse. Publishing a role takes just a few minutes, and if you're hiring in bulk, the import prompt makes it even faster — copy the prompt, paste in your job descriptions, and your listings are live.\n\n![Copy the import prompt to publish roles faster](/clipboard-paste.png)\n\nWhether you're a first-time applicant or a seasoned hiring manager, the goal is the same: a hiring process where everyone knows where they stand. From the first application to the signed offer, that's the HireHub promise.",
+    image: "/clipboard-paste.png",
+    category: "Company News",
+    author: {
+      name: "Sarah Chen",
+      avatar: "https://i.pravatar.cc/150?u=sarah-chen",
+      role: "Head of Talent",
+    },
+    date: "2026-08-03",
+    readTime: 5,
+    featured: false,
+  },
+  {
     slug: "remote-hiring-best-practices",
     title: "Remote Hiring Best Practices for 2026",
     excerpt:
