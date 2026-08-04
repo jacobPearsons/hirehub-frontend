@@ -399,3 +399,192 @@ Negative: Same as primary, plus no pure-black backgrounds and no saturated blues
 - Resume row: `text-sm text-ink-muted` with the file name in `text-ink font-medium`.
 
 ---
+
+## Section: Blog Covers — August 2026 Digest
+
+**Emotional objective:** Curiosity → Trust
+
+> One photoshoot, five scenes. The August 2026 digest covers share a single warm
+> color grade, soft directional window light from camera-left, 3% film grain, and
+> 8K editorial still-life realism — no people in any frame. Distinct subjects,
+> one light signature.
+
+**Primary prompt (`blog-cover-us-labor-2026.png` — job market / economic outlook):**
+```
+Subject: A plain whiteboard on a wooden easel, angled slightly, with a hand-drawn
+       market chart in dry-erase marker — an ink-black line climbing steadily,
+       then flattening into a gentle plateau, with small accent-orange
+       annotations at the elbow of the curve. A marker and a stone-gray eraser
+       rest on the tray. On the warm oak table beside it, a folded morning
+       newspaper and a ceramic mug of coffee.
+Environment: A quiet, sunlit meeting corner — a warm cream wall, a frosted-glass
+           window casting soft directional light, the whiteboard dominating the
+           frame. No people, no other desks.
+Narrative: The economy cooling from rapid growth into a steady, cautious plateau
+          — "low-hire, low-fire." The flattened curve reads as stability, not
+          stagnation; the morning paper suggests informed, deliberate optimism.
+Emotion: Calm, measured confidence — a steady outlook delivered without hype.
+Lighting: Soft morning window light from camera-left, diffused and warm, with a
+         gentle shadow falloff across the whiteboard's matte surface.
+Camera: Three-quarter front view, eye level on the chart, slight downward tilt.
+Lens: 50mm f/2.8.
+Composition: The whiteboard anchors the left two-thirds; the coffee and newspaper
+            balance the lower-right on the table. 25% negative space upper-right
+            for headline. Chart line readable at a glance.
+Color palette: Whiteboard white #FFFFFF, canvas #F5F1EC walls, surface-2 #EBE7E1
+              in the table shadow, ink #111111 chart line and annotations,
+              accent #FF5600 annotation arrows, warm oak wood tones.
+Materials: Whiteboard enamel, dry-erase marker ink, wood (easel and table),
+          ceramic (mug), newsprint (paper).
+Textures: 3% film grain, a faint dry-erase smudge on the board, soft paper tooth
+         on the newspaper.
+Rendering style: Editorial still-life photography, warm neutral color grade,
+                consistent with the rest of the digest shoot.
+Quality: 8K, marker-line detail sharp, no retouching beyond color.
+Aspect ratio: 16:9
+Negative: No people, no faces, no staged-office props, no red-tape clichés, no
+         screen captures, no cold blue cast, no stock financial imagery.
+```
+
+**Primary prompt (`blog-cover-job-search-2026.png` — job-search strategy):**
+```
+Subject: A top-down desk scene of a deliberate job search — a printed resume on
+       warm white paper with a soft highlighter sweep across the headline, a
+       black gel pen, a paper shortlist checklist with a few boxes ticked in
+       ink, and a smartphone propped at the edge showing a clean job-listing
+       page. A small coffee cup anchors the corner of the desk.
+Environment: A tidy home desk with a warm oak surface in soft daylight. No people,
+           no laptop open — the phone is the only screen.
+Narrative: A search run with intention — resume, shortlist, checklist, and one
+          listing on screen. The scene says "organized, one step at a time."
+Emotion: Calm control and quiet optimism — preparation as a form of confidence.
+Lighting: Soft diffused window light from camera-left, even top-down illumination,
+         gentle warm shadows under each object.
+Camera: Directly overhead (top-down), flat and true.
+Lens: 40mm f/5.6, deep focus across the desk.
+Composition: The resume dominates the lower-left with the highlighter and pen at
+            its edge; the checklist and phone form a diagonal in the upper-right.
+            20% negative space upper-left for headline.
+Color palette: Warm white paper #FFFFFF, canvas #F5F1EC wood tones, surface-2
+              #EBE7E1 in the checklist paper and the phone-case shadow, ink
+              #111111 text and tick marks, accent #FF5600 highlighter sweep and
+              listing highlights.
+Materials: Paper (resume, checklist), plastic (highlighter, pen barrel), glass
+          (phone screen), ceramic (mug), warm oak (desk).
+Textures: 3% film grain, subtle paper grain on the resume, faint highlighter
+         bleed along the sweep.
+Rendering style: Editorial top-down still-life photography, warm neutral grade,
+                matching the digest shoot.
+Quality: 8K, crisp printed type and highlighter detail.
+Aspect ratio: 16:9
+Negative: No people, no hands, no faces, no staged-office desk clichés, no cold
+         blue screen glow dominating, no visible monitor.
+```
+
+**Primary prompt (`blog-cover-culture-2026.png` — workplace culture trends):**
+```
+Subject: Two empty wooden chairs pulled close to one side of a small round table,
+       angled toward each other as if two people were mid-conversation. Between
+       them, a shared open notebook with handwritten notes and a ceramic coffee
+       cup. Morning light falls through window blinds, drawing soft stripes of
+       warmth over the table and the notebook.
+Environment: A warm collaborative corner — cream walls, a window with light
+           wooden blinds, a small sideboard with a plant. No people.
+Narrative: Belonging and human connection — the two chairs turned toward each
+          other say "we talk here." The shared notebook is the work of a
+          partnership, not a row of solo desks.
+Emotion: Warm belonging, quiet companionship, psychological safety.
+Lighting: Soft morning sunlight through the blinds from camera-right, casting
+         gentle striped shadows, with warm fill from the room.
+Camera: Slightly low three-quarter angle at table height, the chairs in the
+        foreground.
+Lens: 35mm f/2.8.
+Composition: The two chairs form a V opening toward the camera, the notebook and
+            coffee at the pivot point between them. 25% negative space upper-left
+            for headline.
+Color palette: Warm cream walls and canvas #F5F1EC, surface-2 #EBE7E1 in the
+              notebook paper and chair shadows, ink #111111 handwritten notes,
+              accent #FF5600 on the coffee cup and one notebook tab, warm wood
+              tones.
+Materials: Wood (chairs, table), linen (chair seats), paper (notebook), ceramic
+          (cup), glass (window).
+Textures: 3% film grain, subtle linen weave on the seats, soft wood grain.
+Rendering style: Editorial still-life photography, warm natural grade, the same
+                light signature as the rest of the digest shoot.
+Quality: 8K, window-light stripes crisp, fabric weave visible.
+Aspect ratio: 16:9
+Negative: No people, no faces, no handshakes, no staged-office clichés, no
+         empty-cubicle tropes, no cold blue cast.
+```
+
+**Primary prompt (`blog-cover-remote-2026.png` — remote work landscape):**
+```
+Subject: A sunlit home-office corner — a closed laptop angled on a warm wooden
+       desk, a cushioned over-ear headset beside it, and a window behind the
+       desk with a green plant on the sill. A small canvas travel bag rests
+       against the desk leg, hinting at work-from-anywhere.
+Environment: A bright home office by a large window with sheer curtains and
+           morning sun. A soft rug, a mug, and a stack of notebooks keep it
+           human. No people.
+Narrative: Flexibility and balance — the work lives in this room, the bag says
+          it can also live anywhere. The closed laptop says the day belongs to
+          its owner.
+Emotion: Easy, calm flexibility — freedom without chaos.
+Lighting: Bright warm morning window light from behind the laptop, a gentle flare
+         on the sheer curtain, warm ambient fill in the room.
+Camera: Three-quarter eye-level view, slightly above the desk line.
+Lens: 35mm f/2.0.
+Composition: Laptop center with the headset to its left, window and plant in the
+            upper-right, the travel bag anchoring the lower-left. 20% negative
+            space upper-left for headline.
+Color palette: Canvas #F5F1EC walls and sheers, surface-2 #EBE7E1 in the rug and
+              bag, ink #111111 laptop and headset, accent #FF5600 on a notebook
+              edge and the plant-pot detail, warm wood desk tones.
+Materials: Anodized aluminum (laptop), leather and foam (headset), linen and
+          canvas (bag, curtain), terracotta (pot), wood (desk).
+Textures: 3% film grain, soft linen weave on the curtain, subtle leather grain.
+Rendering style: Editorial still-life photography, warm sunlit grade matching the
+                digest shoot.
+Quality: 8K, fabric and plant detail sharp.
+Aspect ratio: 16:9
+Negative: No people, no faces, no staged videoconference clichés, no open laptop
+         with a webcam, no cold blue screen glow, no sterile setups.
+```
+
+**Primary prompt (`blog-cover-ai-2026.png` — AI at work):**
+```
+Subject: A laptop on a warm wooden desk showing a clean, minimal interface — a
+       soft pale dashboard with simple card shapes and a single accent-orange
+       highlight — with a thin human notebook beside it filled with handwritten
+       notes and a small coffee cup. A very subtle warm glow emanates from the
+       screen.
+Environment: A quiet home study in warm daylight, a plant at the edge of the
+           frame, cream walls, the desk surface catching soft window light.
+           No people.
+Narrative: Augmentation, not replacement — the machine renders the clean
+          interface while the handwritten notebook beside it holds the human
+          decisions. They work together on the same desk.
+Emotion: Steady reassurance — technology as a calm tool, not a threat.
+Lighting: Soft window light from camera-left with a gentle warm bloom from the
+         screen toward the notebook.
+Camera: Slightly elevated three-quarter view, desk-level intimacy.
+Lens: 50mm f/2.8.
+Composition: Laptop on the left with the notebook overlapping its right edge,
+            coffee in the lower-right corner, the screen glow bridging the two.
+            20% negative space upper-right for headline.
+Color palette: Warm white interface cards #FFFFFF on a canvas #F5F1EC screen
+              background, surface-2 #EBE7E1 in the keyboard and notebook cover,
+              ink #111111 interface text and handwriting, accent #FF5600 on the
+              interface highlight and the mug.
+Materials: Anodized aluminum (laptop), paper (notebook), ink, ceramic (mug),
+          wood (desk), glass (screen).
+Textures: 3% film grain, paper grain on the notebook, subtle screen-glass sheen.
+Rendering style: Editorial still-life photography, warm grade, identical light
+                signature to the other digest covers.
+Quality: 8K, screen pixels and handwriting legible.
+Aspect ratio: 16:9
+Negative: No people, no faces, no robotic or sci-fi imagery, no staged-office
+         clichés, no cold blue interface glow, no dystopian tones.
+```
+
+---
