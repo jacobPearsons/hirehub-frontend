@@ -16,17 +16,35 @@ interface ApplyJobModalProps {
 export function ApplyJobModal({ job, open, onOpenChange }: ApplyJobModalProps) {
   const { user } = useApp()
   const [success, setSuccess] = useState(false)
-  const [resumeFileName, setResumeFileName] = useState<string | undefined>()
+  const [submittedFileName, setSubmittedFileName] = useState<string | undefined>()
+  const [resumeFile, setResumeFile] = useState<File | null>(null)
+  const [resumeFileName, setResumeFileName] = useState<string | null>(null)
+  const [prevOpen, setPrevOpen] = useState(open)
+
+  if (open !== prevOpen) {
+    setPrevOpen(open)
+    if (!open) {
+      setSuccess(false)
+      setSubmittedFileName(undefined)
+    }
+  }
 
   function handleSuccess(filename?: string) {
-    setResumeFileName(filename)
+    setSubmittedFileName(filename)
+    setResumeFile(null)
+    setResumeFileName(null)
     setSuccess(true)
   }
 
   function handleClose() {
     setSuccess(false)
-    setResumeFileName(undefined)
+    setSubmittedFileName(undefined)
     onOpenChange(false)
+  }
+
+  function handleResumeChange(file: File | null, name: string | null) {
+    setResumeFile(file)
+    setResumeFileName(name)
   }
 
   return (
@@ -73,9 +91,15 @@ export function ApplyJobModal({ job, open, onOpenChange }: ApplyJobModalProps) {
                   </div>
 
                   {success ? (
-                    <ApplyLanding job={job} user={user} resumeFileName={resumeFileName} />
+                    <ApplyLanding job={job} user={user} resumeFileName={submittedFileName} />
                   ) : (
-                    <ApplyJobForm job={job} onSuccess={handleSuccess} />
+                    <ApplyJobForm
+                      job={job}
+                      onSuccess={handleSuccess}
+                      resumeFile={resumeFile}
+                      resumeFileName={resumeFileName}
+                      onResumeChange={handleResumeChange}
+                    />
                   )}
                 </motion.div>
               </motion.div>

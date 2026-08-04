@@ -1,4 +1,4 @@
-import { useState, useRef, type ChangeEvent } from 'react'
+import { useRef, type ChangeEvent } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { X, File as FileIcon } from 'lucide-react'
@@ -14,11 +14,12 @@ const MAX_FILE_SIZE = 10 * 1024 * 1024
 interface ApplyJobFormProps {
   job: Job
   onSuccess: (resumeFileName?: string) => void
+  resumeFile: File | null
+  resumeFileName: string | null
+  onResumeChange: (file: File | null, name: string | null) => void
 }
 
-export function ApplyJobForm({ job, onSuccess }: ApplyJobFormProps) {
-  const [resumeFileName, setResumeFileName] = useState<string | null>(null)
-  const [resumeFile, setResumeFile] = useState<File | null>(null)
+export function ApplyJobForm({ job, onSuccess, resumeFile, resumeFileName, onResumeChange }: ApplyJobFormProps) {
   const fileInputRef = useRef<HTMLInputElement>(null)
   const { user, addApplication } = useApp()
   const { showToast } = useToast()
@@ -47,13 +48,11 @@ export function ApplyJobForm({ job, onSuccess }: ApplyJobFormProps) {
       if (fileInputRef.current) fileInputRef.current.value = ''
       return
     }
-    setResumeFileName(file.name)
-    setResumeFile(file)
+    onResumeChange(file, file.name)
   }
 
   function handleClearFile() {
-    setResumeFileName(null)
-    setResumeFile(null)
+    onResumeChange(null, null)
     if (fileInputRef.current) fileInputRef.current.value = ''
   }
 
