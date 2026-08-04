@@ -294,3 +294,108 @@ When generating imagery for these surfaces:
 - [ ] Modals stay flat white panels over the warm canvas wash — no glass, no gradients
 - [ ] No cold blue tones, no stock tropes, no busy backgrounds
 - [ ] Correct aspect ratio for placement (1:1 icons, 16:9 backdrops)
+
+## Section: Dashboard Mobile (9:16)
+
+**Emotional objective:** Quiet Focus + Competence
+
+**Primary prompt (mobile dashboard overview — 9:16):**
+```
+Subject: A single hand holding a smartphone in a portrait orientation, thumb
+       resting at the side, the HireHub dashboard overview legible on screen:
+       a profile summary card at the top (avatar, name, headline, location),
+       three tinted stat cards in a row (Applications, Saved Jobs, Interviews),
+       a 4-column detail strip (email, salary expectation, employment type,
+       work mode), and a wrap of small muted skill chips. The faint
+       overview-grid background pattern sits behind the stat cards.
+Environment: A softly lit desk or café corner behind the hand and phone, falling
+           into a warm neutral blur that matches the brand canvas.
+Narrative: Opportunity status at a glance — the quick check-in between tasks,
+          thumb away from tapping.
+Emotion: Quiet focus and competence; the data reads instantly.
+Lighting: Soft natural light from camera-left, gentle warm falloff.
+Camera: Straight-on to the screen at a slight downward angle, intimate distance.
+Lens: 50mm f/2.8.
+Composition: Phone occupies the center two-thirds of frame, screen bright and
+            legible, ~30% warm negative space around it for editorial feel.
+Color palette: Canvas #F5F1EC, Surface-1 #FFFFFF cards, Surface-2 #EBE7E1
+              stat-card icon tints, Ink #111111 text, Ink-muted #626260 labels,
+              Accent #FF5600 on the interview icon and Edit-profile link,
+              Hairline #D3CEC6 borders.
+Rendering style: Editorial photography of a real UI screen, crisp type, warm
+                neutral color grade, 2-3% film grain.
+Aspect ratio: 9:16
+Negative: No cold blue tones, no stock hand-and-phone tropes, no visible
+          background UI, no oversaturation, no heavy drop shadows.
+```
+
+**Component rules (from DashboardShell.tsx / OverviewTab.tsx):**
+- Screen canvas: `bg-canvas` warm neutral; the profile summary and stat cards are `bg-surface-1` with `border-hairline`.
+- Stat cards: `w-12 h-12 rounded-full` icon chips tinted `bg-blue-100 text-blue-600`, `bg-purple-100 text-purple-600`, `bg-green-100 text-green-600` — the only color beyond ink and accent; numbers `text-2xl font-semibold text-ink`.
+- Accent `#ff5600` appears only as the Edit-profile link and the hover arrow — keep it sparse in the hero image.
+- The grid behind the stat cards is `/overview-grid-bg.svg`, `text-ink` at low opacity — the "city of opportunities" pattern.
+- Typography: Inter — name `text-lg font-semibold text-ink`, labels `text-sm text-ink-muted`, detail labels `text-xs text-ink-tertiary`.
+
+---
+
+## Section: Dashboard Profile Card (Light / Dark)
+
+**Emotional objective:** Approachable + Credible
+
+**Primary prompt (profile card avatar — neutral subject, light mode):**
+```
+Subject: One neutral professional subject (early 30s, warm medium-brown skin,
+       short dark hair, soft amber sweater) photographed from the chest up at a
+       slight angle, looking just off-camera with a calm, genuine smile. Framed
+       as the avatar space of a profile card — small in frame, centered in the
+       upper third.
+Environment: A softly blurred warm interior — cream wall and warm lamplight —
+           reading as the card background, not a studio backdrop.
+Narrative: A real person, present and approachable — a face a candidate would
+          scroll past and remember.
+Emotion: Warm credibility — professional without being posed.
+Lighting: Soft window light from camera-right, gentle warmth on skin.
+Camera: Eye level, chest-up crop, intimate but not close.
+Lens: 85mm f/2.0.
+Composition: Subject centered in the upper third, ~50% negative space below and
+            around for the card's name, headline, location, detail grid, skill
+            chips, and resume row.
+Color palette: Canvas #F5F1EC, Surface-1 #FFFFFF, Ink #111111, Ink-muted
+              #626260, Ink-tertiary #9C9FA5, Accent #FF5600 (small detail),
+              Hairline #D3CEC6.
+Rendering style: Editorial portrait photography, warm neutral grade, 3% grain.
+Aspect ratio: 4:3
+Negative: No corporate blue suits, no forced smiles, no studio strobes, no cold
+          tones, no stock-photo posing, no text overlays.
+```
+
+**Alt variant (same subject and scene, dark mode):**
+```
+Subject: The same subject, same pose, same expression, same crop — nothing
+       changes except the surface tones around them.
+Environment: The same interior rendered with the theme inverted — the warm canvas
+           darkens to a deep warm charcoal, card surfaces to a dark warm gray,
+           ink flips to warm white, hairlines become low-opacity warm outlines.
+Narrative: The same person in the same room at a different hour — identity is
+          unchanged by theme.
+Emotion: Warm credibility in low light — same warmth, darker surfaces.
+Lighting: Same window light, slightly dimmed to match the darker surfaces.
+Camera: Same framing and distance as the light variant.
+Composition: Identical placement — the light/dark pair must read as one card in
+            two themes, so negative space and crop are pixel-consistent.
+Color palette: Dark canvas ≈ #1F1C19, dark card surface ≈ #2A2622, ink →
+              warm white #F5F1EC, accent #FF5600 retained, hairlines ≈ #3A3530
+              at low opacity.
+Rendering style: Same as primary, matching dark color grade.
+Aspect ratio: 4:3
+Negative: Same as primary, plus no pure-black backgrounds and no saturated blues.
+```
+
+**Component rules (from OverviewTab.tsx):**
+- Card: `Card variant="default" className="p-5"` — `bg-surface-1` in light, its dark-theme equivalent in dark; hairline border.
+- Avatar: `Avatar size="lg"` with initials fallback; name `text-lg font-semibold text-ink truncate`, headline `text-sm text-ink-muted truncate`, location a `MapPin` icon + `text-sm text-ink-muted`.
+- Detail grid: `grid grid-cols-2 sm:grid-cols-4 gap-3` — each cell a `text-xs text-ink-tertiary` label over a `text-ink font-medium truncate` value.
+- Skill chips: `bg-surface-2 text-ink-muted rounded-pill` — muted by design; accent is reserved for the Edit-profile link.
+- Resume row: `text-sm text-ink-muted` with the file name in `text-ink font-medium`.
+
+---
