@@ -186,3 +186,113 @@ export const SKILL_NICHES = [
 ] as const
 
 export const ALL_SKILLS = Object.values(SKILL_CATEGORIES).flat()
+
+export const NICHE_ALIASES: Record<string, SkillNiche> = {
+  'customer service': 'office',
+  'customer support': 'office',
+  csr: 'office',
+  support: 'office',
+  'office admin': 'office',
+  administrative: 'office',
+  frontend: 'tech',
+  'front end': 'tech',
+  backend: 'tech',
+  'back end': 'tech',
+  'full stack': 'tech',
+  software: 'tech',
+  developer: 'tech',
+  programming: 'tech',
+  programmer: 'tech',
+  engineer: 'tech',
+  engineering: 'tech',
+  react: 'tech',
+  nodejs: 'tech',
+  'node.js': 'tech',
+  typescript: 'tech',
+  javascript: 'tech',
+  html: 'tech',
+  css: 'tech',
+  python: 'tech',
+  sql: 'tech',
+  aws: 'tech',
+  cloud: 'tech',
+  devops: 'tech',
+  php: 'tech',
+  'data science': 'tech',
+  'data analysis': 'tech',
+  design: 'design',
+  'graphic design': 'design',
+  'product design': 'design',
+  'ux research': 'design',
+  'video editing': 'design',
+  accounting: 'business',
+  finance: 'business',
+  financial: 'business',
+  bookkeeping: 'business',
+  marketing: 'marketing',
+  sales: 'marketing',
+  seo: 'marketing',
+  recruiting: 'hr',
+  recruiter: 'hr',
+  'talent acquisition': 'hr',
+  hr: 'hr',
+  'human resources': 'hr',
+  nurse: 'healthcare',
+  nursing: 'healthcare',
+  medical: 'healthcare',
+  healthcare: 'healthcare',
+  welding: 'trades',
+  welder: 'trades',
+  electrician: 'trades',
+  plumbing: 'trades',
+  plumber: 'trades',
+  construction: 'trades',
+  hvac: 'trades',
+  legal: 'legal',
+  law: 'legal',
+  lawyer: 'legal',
+  paralegal: 'legal',
+  teaching: 'education',
+  teacher: 'education',
+  education: 'education',
+  esl: 'education',
+  spanish: 'languages',
+  bilingual: 'languages',
+  translation: 'languages',
+  communication: 'soft-skills',
+  leadership: 'soft-skills',
+  teamwork: 'soft-skills',
+}
+
+export interface NicheDetection {
+  niche: SkillNiche
+  matches: string[]
+}
+
+export function detectNiche(text: string, selected: string[] = []): NicheDetection {
+  const lower = text.toLowerCase()
+  const scores: Partial<Record<SkillNiche, number>> = {}
+
+  for (const [phrase, niche] of Object.entries(NICHE_ALIASES)) {
+    if (lower.includes(phrase)) scores[niche] = (scores[niche] ?? 0) + 3
+  }
+
+  for (const [niche, skills] of Object.entries(categoryData) as [Exclude<SkillNiche, 'general'>, string[]][]) {
+    let score = 0
+    for (const skill of skills) {
+      const needle = skill.toLowerCase()
+      if (needle.length >= 4 && lower.includes(needle)) score += 1
+    }
+    if (score > 0) scores[niche] = (scores[niche] ?? 0) + score
+  }
+
+  const ranked = (Object.entries(scores) as [SkillNiche, number][]).sort((a, b) => b[1] - a[1])
+  if (ranked.length === 0) return { niche: 'general', matches: [] }
+
+  const niche = ranked[0][0]
+  const matches = ((categoryData as Record<SkillNiche, string[]>)[niche] ?? [])
+    .filter((skill) => lower.includes(skill.toLowerCase()) && !selected.includes(skill))
+    .slice(0, 8)
+
+  return { niche, matches }
+}
