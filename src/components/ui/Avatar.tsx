@@ -3,6 +3,7 @@ import { useState } from 'react'
 interface AvatarProps {
   name: string
   src?: string | null
+  fallbackSrc?: string | null
   size?: 'sm' | 'md' | 'lg'
   className?: string
 }
@@ -22,8 +23,9 @@ function getInitials(name: string) {
     .join('')
 }
 
-export function Avatar({ name, src, size = 'md', className = '' }: AvatarProps) {
+export function Avatar({ name, src, fallbackSrc, size = 'md', className = '' }: AvatarProps) {
   const [error, setError] = useState(false)
+  const [fallbackError, setFallbackError] = useState(false)
   const initials = getInitials(name)
 
   if (src && !error) {
@@ -33,6 +35,17 @@ export function Avatar({ name, src, size = 'md', className = '' }: AvatarProps) 
         alt=""
         className={`rounded-full object-cover shrink-0 ${sizeClasses[size]} ${className}`}
         onError={() => setError(true)}
+      />
+    )
+  }
+
+  if (fallbackSrc && !fallbackError) {
+    return (
+      <img
+        src={fallbackSrc}
+        alt=""
+        className={`rounded-full object-cover shrink-0 ${sizeClasses[size]} ${className}`}
+        onError={() => setFallbackError(true)}
       />
     )
   }

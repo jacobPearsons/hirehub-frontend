@@ -2,9 +2,13 @@ import { FileText, Bookmark, Calendar, MapPin, ArrowRight, Pencil } from 'lucide
 import { Link } from 'react-router-dom'
 import { useApplications } from '../../context/ApplicationsContext'
 import { useApp } from '../../context/AppContext'
+import { useTheme } from '../../context/ThemeContext'
 import { Card } from '../ui/Card'
 import { Avatar } from '../ui/Avatar'
 import { formatSalary } from '../../utils/format'
+
+const DARK_AVATAR = '/new/same%20subject%20and%20scene%2C%20dark%20mode%29.png'
+const LIGHT_AVATAR = '/new/%28profile%20card%20avatar%20%E2%80%94%20neutral%20subject%2C%20light%20mode%29.png'
 
 const statCards = [
   {
@@ -33,6 +37,7 @@ const statCards = [
 export function OverviewTab() {
   const { applications } = useApplications()
   const { user, savedJobIds } = useApp()
+  const { dark } = useTheme()
 
   const applicationsList = Array.isArray(applications) ? applications : []
 
@@ -53,7 +58,7 @@ export function OverviewTab() {
         <Card variant="default" className="p-5">
           <div className="flex flex-col sm:flex-row sm:items-center gap-4">
             <div className="flex items-center gap-4 min-w-0">
-              <Avatar name={user.name} src={user.avatarUrl} size="lg" />
+              <Avatar name={user.name} src={user.avatarUrl} fallbackSrc={dark ? DARK_AVATAR : LIGHT_AVATAR} size="lg" />
               <div className="min-w-0">
                 <p className="text-lg font-semibold text-ink truncate">{user.name}</p>
                 {user.headline && <p className="text-sm text-ink-muted truncate">{user.headline}</p>}
