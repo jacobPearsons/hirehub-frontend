@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react'
+import { render, screen, fireEvent, act } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { SKILL_NICHES } from '../../../data/skills'
 import { SeekerSkillsStep } from '../SeekerSkillsStep'
@@ -45,5 +45,20 @@ describe('SeekerSkillsStep', () => {
     expect(screen.getByRole('button', { name: 'General Office & Administrative' })).toHaveAttribute('aria-pressed', 'true')
     expect(screen.getByRole('button', { name: 'General' })).toHaveAttribute('aria-pressed', 'false')
     expect(screen.getByTestId('skill-input')).toHaveAttribute('data-niche', 'office')
+  })
+
+  it('detects a niche from pasted text and suggests skills', () => {
+    vi.useFakeTimers()
+    try {
+      render(<SeekerSkillsStep onSaved={vi.fn()} />)
+      fireEvent.change(screen.getByLabelText(/aiming for/i), {
+        target: { value: 'customer service representative using Zendesk and phone etiquette' },
+      })
+      act(() => { vi.advanceTimersByTime(300) })
+      expect(screen.getByRole('button', { name: 'General Office & Administrative' })).toHaveAttribute('aria-pressed', 'true')
+      expect(screen.getByText(/suggested from your description/i)).toBeInTheDocument()
+    } finally {
+      vi.useRealTimers()
+    }
   })
 })
