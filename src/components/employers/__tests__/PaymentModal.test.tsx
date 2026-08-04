@@ -4,13 +4,18 @@ import { MemoryRouter } from 'react-router-dom'
 import { PaymentModal } from '../PaymentModal'
 import type { PricingTier } from '../../../data/pricing'
 
-const { mockOpenSupportConversation, mockUseApp } = vi.hoisted(() => ({
+const { mockOpenSupportConversation, mockUseApp, mockListPricingTiers } = vi.hoisted(() => ({
   mockOpenSupportConversation: vi.fn(),
   mockUseApp: vi.fn(),
+  mockListPricingTiers: vi.fn(),
 }))
 
 vi.mock('../../../api/messages', () => ({
   openSupportConversation: () => mockOpenSupportConversation(),
+}))
+
+vi.mock('../../../api/pricing', () => ({
+  listPricingTiers: () => mockListPricingTiers(),
 }))
 
 vi.mock('../../../context/AppContext', () => ({
@@ -18,6 +23,7 @@ vi.mock('../../../context/AppContext', () => ({
 }))
 
 const tier: PricingTier = { tier: 'Pro', price: 299, period: 'month', description: 'x', features: ['a'], ctaText: 'Start Free Trial', featured: true }
+const starter: PricingTier = { tier: 'Starter', price: 99, period: 'month', description: 'x', features: ['a'], ctaText: 'Get Started', featured: false }
 
 const conversation = {
   id: 'conv-1',
@@ -29,16 +35,27 @@ const conversation = {
   updatedAt: '2026-08-01T00:00:00.000Z',
 }
 
+function loggedInUser() {
+  mockUseApp.mockReturnValue({ user: { id: 'u1', name: 'Acme', email: 'acme@x.com', role: 'employer' } })
+}
+
+async function fillValidCard(user: ReturnType<typeof userEvent.setup>) {
+  await user.type(screen.getByLabelText(/card number/i), '4242 4242 4242 4242')
+  await user.type(screen.getByLabelText(/expiry/i), '09/27')
+  await user.type(screen.getByLabelText(/cvc/i), '123')
+}
+
 describe('PaymentModal', () => {
   beforeEach(() => {
     mockOpenSupportConversation.mockReset()
     mockUseApp.mockReset()
+    mockListPricingTiers.mockReset().mockResolvedValue({ data: [starter, tier] })
   })
 
   it('submits a mock payment, shows a thank-you state, and starts chatting via onPaid', async () => {
     const user = userEvent.setup()
     const onPaid = vi.fn()
-    mockUseApp.mockReturnValue({ user: { id: 'u1', name: 'Acme', email: 'acme@x.com', role: 'employer' } })
+    loggedInUser()
     mockOpenSupportConversation.mockResolvedValue({ success: true, data: conversation })
 
     render(
@@ -47,7 +64,7 @@ describe('PaymentModal', () => {
       </MemoryRouter>
     )
 
-    await user.type(screen.getByLabelText(/card number/i), '4242 4242 4242 4242')
+    await fillValidCard(user)
     await user.click(screen.getByRole('button', { name: /pay/i }))
 
     expect(await screen.findByText(/thank you/i)).toBeInTheDocument()
@@ -73,7 +90,7 @@ describe('PaymentModal', () => {
   it('auto-navigates to chat about 1.2s after a successful payment', async () => {
     const user = userEvent.setup()
     const onPaid = vi.fn()
-    mockUseApp.mockReturnValue({ user: { id: 'u1', name: 'Acme', email: 'acme@x.com', role: 'employer' } })
+    loggedInUser()
     mockOpenSupportConversation.mockResolvedValue({ success: true, data: conversation })
 
     render(
@@ -82,12 +99,48 @@ describe('PaymentModal', () => {
       </MemoryRouter>
     )
 
-    await user.type(screen.getByLabelText(/card number/i), '4242 4242 4242 4242')
+    await fillValidCard(user)
     await user.click(screen.getByRole('button', { name: /pay/i }))
 
     await screen.findByText(/thank you/i)
     expect(onPaid).not.toHaveBeenCalled()
 
     await waitFor(() => expect(onPaid).toHaveBeenCalledWith('conv-1'), { timeout: 2000 })
+  })
+
+  it('blocks submission and shows errors for an invalid card', async () => {
+    const user = userEvent.setup()
+    loggedInUser()
+
+    render(
+      <MemoryRouter>
+        <PaymentModal tier={tier} open onOpenChange={() => {}} onPaid={vi.fn()} />
+      </MemoryRouter>
+    )
+
+    await user.type(screen.getByLabelText(/card number/i), '1234 5678 9012 3456')
+    await user.click(screen.getByRole('button', { name: /pay/i }))
+
+    expect(await screen.findByText(/card number looks invalid/i)).toBeInTheDocument()
+    expect(screen.getByText(/use mm\/yy/i)).toBeInTheDocument()
+    expect(screen.getByText(/cvc is required/i)).toBeInTheDocument()
+    expect(mockOpenSupportConversation).not.toHaveBeenCalled()
+  })
+
+  it('lets the user switch plans inside the modal', async () => {
+    const user = userEvent.setup()
+    loggedInUser()
+
+    render(
+      <MemoryRouter>
+        <PaymentModal tier={tier} open onOpenChange={() => {}} onPaid={vi.fn()} />
+      </MemoryRouter>
+    )
+
+    expect(await screen.findByRole('radio', { name: /starter/i })).toBeInTheDocument()
+    await user.click(screen.getByRole('radio', { name: /starter/i }))
+
+    expect(screen.getByText('Starter plan')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /pay \$99/i })).toBeInTheDocument()
   })
 })
