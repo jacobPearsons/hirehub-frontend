@@ -3,6 +3,7 @@ import { usePageMeta } from '../../utils/usePageMeta'
 import { HeroSection } from './HeroSection'
 import { TrustBar } from './TrustBar'
 import { ValueProps } from './ValueProps'
+import { DashboardShowcase } from './DashboardShowcase'
 import { FeaturedJobs } from './FeaturedJobs'
 import { TestimonialStrip } from './TestimonialStrip'
 import { WhyUs } from './WhyUs'
@@ -19,6 +20,7 @@ export default function HomePage() {
       <Reveal><TrustBar /></Reveal>
       <Reveal delay={0.1}><FeaturedJobs /></Reveal>
       <Reveal delay={0.05}><ValueProps /></Reveal>
+      <Reveal delay={0.1}><DashboardShowcase /></Reveal>
       <Reveal delay={0.05}><TestimonialStrip /></Reveal>
       <Reveal delay={0.1}><WhyUs /></Reveal>
       <Reveal delay={0.05}><FAQSection /></Reveal>
