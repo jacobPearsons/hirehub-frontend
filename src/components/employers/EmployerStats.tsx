@@ -1,12 +1,6 @@
 import { Section } from '../ui/Section'
 import { Container } from '../ui/Container'
 
-const stats = [
-  { number: '10,000+', label: 'Active Job Seekers' },
-  { number: '500+', label: 'Companies Hiring' },
-  { number: '94%', label: 'Satisfaction Rate' },
-] as const
-
 export function EmployerStats() {
   return (
     <Section className="relative overflow-hidden">
@@ -19,16 +13,17 @@ export function EmployerStats() {
         />
       </div>
       <Container className="relative">
-        <h2 className="sr-only">HireHub by the numbers</h2>
-        <div className="flex flex-col md:flex-row items-center justify-center gap-8 md:gap-16">
-          {stats.map((stat) => (
-            <div key={stat.label} className="flex flex-col items-center">
-              <span className="text-[40px] font-medium text-ink">
-                {stat.number}
-              </span>
-              <span className="text-sm text-ink-muted">{stat.label}</span>
-            </div>
-          ))}
+        <div className="max-w-3xl mx-auto text-center">
+          <h2 className="text-[32px] md:text-[40px] leading-[1.15] tracking-[-0.8px] font-medium mb-6">
+            The people you want are already here
+          </h2>
+          <p className="text-lg text-ink-muted leading-[1.7]">
+            More than <span className="text-ink font-medium">ten thousand active job seekers</span>{' '}
+            open HireHub every day looking for their next role, and right now{' '}
+            <span className="text-ink font-medium">over five hundred companies are hiring</span>{' '}
+            through the platform. Ninety-four percent of the teams that have run a hiring cycle
+            with us say they’d come back. That’s the pool you’re posting into.
+          </p>
         </div>
       </Container>
     </Section>
