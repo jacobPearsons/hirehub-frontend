@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useEffect, useMemo, useCallback, type ReactNode } from 'react'
-import { listApplications, updateHiringData, updateApplicationStatus as apiUpdateStatus } from '../api/applications'
+import { listApplications, listEmployerApplications, updateHiringData, updateApplicationStatus as apiUpdateStatus } from '../api/applications'
 import { getAccessToken } from '../api/client'
+import { useAuth } from './AuthContext'
 import type { Application } from '../types/application'
 import type { InterviewDetails, OfferDetails, OnboardingChecklistItem, OrientationDetails } from '../types/hiring-flow'
 
@@ -18,15 +19,20 @@ interface ApplicationsContextValue {
 const ApplicationsContext = createContext<ApplicationsContextValue | null>(null)
 
 export function ApplicationsProvider({ children }: { children: ReactNode }) {
+  const { user, loading: authLoading } = useAuth()
   const [applications, setApplications] = useState<Application[]>([])
 
   useEffect(() => {
     const controller = new AbortController()
 
     async function init() {
-      if (!getAccessToken()) return
+      if (authLoading) return
+      if (!getAccessToken() || !user) return
       try {
-        const res = await listApplications()
+        const res =
+          user.role === 'employer'
+            ? await listEmployerApplications()
+            : await listApplications()
         if (!controller.signal.aborted) {
           setApplications(res.data)
         }
@@ -35,7 +41,7 @@ export function ApplicationsProvider({ children }: { children: ReactNode }) {
 
     init()
     return () => controller.abort()
-  }, [])
+  }, [authLoading, user?.id])
 
   const addApplication = useCallback((app: Application) => {
     setApplications(prev => [app, ...prev])
