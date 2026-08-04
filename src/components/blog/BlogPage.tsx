@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { HeroContent } from '../ui/HeroContent'
 import { Section, Container, Reveal } from '../ui'
-import { SkeletonGrid } from '../ui/SkeletonGrid'
+import { BlogSkeletonGrid } from './BlogSkeleton'
 import { usePageMeta } from '../../utils/usePageMeta'
 import { FeaturedPost } from './FeaturedPost'
 import { CategoryFilter } from './CategoryFilter'
@@ -28,7 +28,7 @@ export default function BlogPage() {
       <>
         {meta}
         <Section>
-          <Container><SkeletonGrid count={6} columns={3} /></Container>
+          <Container><BlogSkeletonGrid /></Container>
         </Section>
       </>
     )

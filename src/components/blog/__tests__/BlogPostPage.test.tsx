@@ -53,6 +53,7 @@ describe('BlogPostPage', () => {
     ;(getBlogPostBySlug as ReturnType<typeof vi.fn>).mockReturnValue(new Promise(() => {}))
 
     renderBlogPostPage()
+    expect(screen.getByRole('status', { name: /loading blog post/i })).toBeInTheDocument()
     expect(screen.queryByRole('heading', { name: 'Hello World' })).not.toBeInTheDocument()
   })
 

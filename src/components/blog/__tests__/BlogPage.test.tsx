@@ -28,6 +28,7 @@ describe('BlogPage', () => {
     ;(listBlogPosts as ReturnType<typeof vi.fn>).mockReturnValue(new Promise(() => {}))
 
     renderBlogPage()
+    expect(screen.getByRole('status', { name: /loading blog posts/i })).toBeInTheDocument()
     expect(screen.queryByRole('heading', { name: /blog$/i })).not.toBeInTheDocument()
   })
 

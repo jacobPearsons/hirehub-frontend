@@ -1,7 +1,7 @@
 import { useParams, Link } from 'react-router-dom'
 import { Section, Container, Reveal } from '../ui'
 import { HeroContent } from '../ui/HeroContent'
-import { SkeletonCard } from '../ui/SkeletonCard'
+import { BlogPostSkeleton } from './BlogSkeleton'
 import { usePageMeta } from '../../utils/usePageMeta'
 import { Tag } from '../ui/Tag'
 import { formatDate } from '../../utils/date'
@@ -23,7 +23,7 @@ export default function BlogPostPage() {
       <>
         {meta}
         <Section>
-          <Container><div className="max-w-3xl mx-auto"><SkeletonCard /></div></Container>
+          <Container><BlogPostSkeleton /></Container>
         </Section>
       </>
     )
