@@ -28,7 +28,7 @@ export default function JobBoardPage() {
     refetch,
   } = useInfiniteJobs({ search, category: filters.category, seniority: filters.seniority })
 
-  const allJobs = data?.jobs ?? []
+  const allJobs = useMemo(() => data?.jobs ?? [], [data])
   const total = data?.total ?? 0
 
   const activeFilterCount = [filters.category, filters.seniority, filters.remote].filter(Boolean).length
