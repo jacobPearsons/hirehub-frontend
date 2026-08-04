@@ -11,6 +11,7 @@ export interface ApiUser {
   name: string
   email: string
   role: 'SEEKER' | 'EMPLOYER' | 'ADMIN'
+  permissions?: string[]
   companyName?: string
   phone?: string | null
   bio?: string | null
@@ -33,6 +34,7 @@ export interface AuthUser {
   name: string
   email: string
   role: 'seeker' | 'employer' | 'admin'
+  permissions?: string[]
   companyName?: string
   phone?: string | null
   bio?: string | null

@@ -7,6 +7,7 @@ export interface AppUser {
   name: string
   email: string
   role: 'seeker' | 'employer' | 'admin'
+  permissions?: string[]
   companyName?: string
   phone?: string | null
   bio?: string | null
@@ -39,6 +40,7 @@ export function mapApiUser(user: {
   name: string
   email: string
   role: string
+  permissions?: string[]
   companyName?: string
   phone?: string | null
   bio?: string | null
@@ -60,6 +62,7 @@ export function mapApiUser(user: {
     name: user.name,
     email: user.email,
     role: user.role === 'EMPLOYER' ? 'employer' : user.role === 'ADMIN' ? 'admin' : 'seeker',
+    permissions: user.permissions,
     companyName: user.companyName,
     phone: user.phone,
     bio: user.bio,
