@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react'
+import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router-dom'
 import { PaymentModal } from '../PaymentModal'
@@ -68,5 +68,26 @@ describe('PaymentModal', () => {
 
     expect(screen.getByText(/sign in required/i)).toBeInTheDocument()
     expect(screen.getByRole('link', { name: /sign in/i })).toHaveAttribute('href', '/login')
+  })
+
+  it('auto-navigates to chat about 1.2s after a successful payment', async () => {
+    const user = userEvent.setup()
+    const onPaid = vi.fn()
+    mockUseApp.mockReturnValue({ user: { id: 'u1', name: 'Acme', email: 'acme@x.com', role: 'employer' } })
+    mockOpenSupportConversation.mockResolvedValue({ success: true, data: conversation })
+
+    render(
+      <MemoryRouter>
+        <PaymentModal tier={tier} open onOpenChange={() => {}} onPaid={onPaid} />
+      </MemoryRouter>
+    )
+
+    await user.type(screen.getByLabelText(/card number/i), '4242 4242 4242 4242')
+    await user.click(screen.getByRole('button', { name: /pay/i }))
+
+    await screen.findByText(/thank you/i)
+    expect(onPaid).not.toHaveBeenCalled()
+
+    await waitFor(() => expect(onPaid).toHaveBeenCalledWith('conv-1'), { timeout: 2000 })
   })
 })

@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from 'react'
+import { useEffect, useRef, useState, type FormEvent } from 'react'
 import * as Dialog from '@radix-ui/react-dialog'
 import { AnimatePresence, motion } from 'framer-motion'
 import { X } from 'lucide-react'
@@ -23,17 +23,32 @@ export function PaymentModal({ tier, open, onOpenChange, onPaid }: PaymentModalP
   const [cvc, setCvc] = useState('')
   const [paying, setPaying] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [conversationId, setConversationId] = useState<string | null>(null)
   const [success, setSuccess] = useState(false)
+  const [navigating, setNavigating] = useState(false)
+  const conversationIdRef = useRef<string | null>(null)
+  const navigatingRef = useRef(false)
+  const navigateTimerRef = useRef<number | undefined>(undefined)
+
+  useEffect(() => () => window.clearTimeout(navigateTimerRef.current), [])
 
   function handleClose() {
+    window.clearTimeout(navigateTimerRef.current)
+    navigatingRef.current = false
+    setNavigating(false)
     setCardNumber('')
     setExpiry('')
     setCvc('')
     setError(null)
-    setConversationId(null)
     setSuccess(false)
     onOpenChange(false)
+  }
+
+  function handleStartChatting() {
+    const id = conversationIdRef.current
+    if (!id || navigatingRef.current) return
+    navigatingRef.current = true
+    setNavigating(true)
+    onPaid(id)
   }
 
   async function handleSubmit(e: FormEvent) {
@@ -42,17 +57,14 @@ export function PaymentModal({ tier, open, onOpenChange, onPaid }: PaymentModalP
     setError(null)
     try {
       const res = await openSupportConversation()
-      setConversationId(res.data.id)
+      conversationIdRef.current = res.data.id
       setSuccess(true)
+      navigateTimerRef.current = window.setTimeout(handleStartChatting, 1200)
     } catch {
       setError('Something went wrong with your payment. Please try again.')
     } finally {
       setPaying(false)
     }
-  }
-
-  function handleStartChatting() {
-    if (conversationId) onPaid(conversationId)
   }
 
   return (
@@ -138,8 +150,8 @@ export function PaymentModal({ tier, open, onOpenChange, onPaid }: PaymentModalP
                       <p className="text-sm text-ink-muted mb-8">
                         Your payment was successful. Our team is ready to help you get started.
                       </p>
-                      <Button variant="accent" size="lg" className="w-full" onClick={handleStartChatting}>
-                        Start chatting with the HireHub team
+                      <Button variant="accent" size="lg" className="w-full" onClick={handleStartChatting} disabled={navigating}>
+                        {navigating ? 'Starting chat…' : 'Start chatting with the HireHub team'}
                       </Button>
                     </div>
                   ) : (
