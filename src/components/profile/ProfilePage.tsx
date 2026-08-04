@@ -130,7 +130,7 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="max-w-2xl space-y-8">
+    <div className="max-w-2xl mx-auto w-full space-y-8">
       <h1 className="text-2xl font-semibold text-ink">Profile</h1>
 
       {/* Personal Information */}

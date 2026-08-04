@@ -65,14 +65,27 @@ function SidebarContent({ onNavClick, collapsed }: { onNavClick?: () => void; co
   return (
     <nav className="flex flex-col h-full bg-canvas">
       {/* Logo */}
-      <div className="flex items-center gap-3 px-4 h-14 border-b border-hairline shrink-0">
-        <Link to="/" onClick={onNavClick} className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/30 rounded">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 52" fill="none" className="h-7" aria-hidden="true">
-            <rect x="4" y="6" width="40" height="40" rx="8" fill="#ff5600"/>
-            <path d="M16 16v20M16 26h16M32 16v20" stroke="white" strokeWidth="3.5" strokeLinecap="round"/>
-            <text x="54" y="32" fontFamily="Inter, system-ui, sans-serif" fontSize="22" fontWeight="500" fill="currentColor" letterSpacing="-0.3">HireHub</text>
-            <text x="54" y="45" fontFamily="Inter, system-ui, sans-serif" fontSize="11" fontWeight="400" fill="currentColor" opacity="0.6">Community</text>
-          </svg>
+      <div className={`h-14 border-b border-hairline shrink-0 ${collapsed ? 'flex justify-center' : 'flex items-center gap-3 px-4'}`}>
+        <Link
+          to="/"
+          onClick={onNavClick}
+          aria-label="HireHub"
+          title="HireHub"
+          className="flex items-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/30 rounded"
+        >
+          {collapsed ? (
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" fill="none" className="h-8 w-8" aria-hidden="true">
+              <rect x="4" y="4" width="40" height="40" rx="8" fill="#ff5600"/>
+              <path d="M16 16v20M16 26h16M32 16v20" stroke="white" strokeWidth="3.5" strokeLinecap="round"/>
+            </svg>
+          ) : (
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 52" fill="none" className="h-7" aria-hidden="true">
+              <rect x="4" y="6" width="40" height="40" rx="8" fill="#ff5600"/>
+              <path d="M16 16v20M16 26h16M32 16v20" stroke="white" strokeWidth="3.5" strokeLinecap="round"/>
+              <text x="54" y="32" fontFamily="Inter, system-ui, sans-serif" fontSize="22" fontWeight="500" fill="currentColor" letterSpacing="-0.3">HireHub</text>
+              <text x="54" y="45" fontFamily="Inter, system-ui, sans-serif" fontSize="11" fontWeight="400" fill="currentColor" opacity="0.6">Community</text>
+            </svg>
+          )}
         </Link>
       </div>
 

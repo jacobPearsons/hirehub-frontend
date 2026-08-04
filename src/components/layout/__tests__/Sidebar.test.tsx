@@ -28,4 +28,20 @@ describe('Sidebar', () => {
     // label still accessible via title
     expect(screen.getByTitle('Overview')).toBeInTheDocument()
   })
+
+  it('collapses the wordmark to the logo mark only', () => {
+    const { rerender } = render(
+      <MemoryRouter>
+        <Sidebar />
+      </MemoryRouter>,
+    )
+    expect(screen.getByText('Community')).toBeInTheDocument()
+    rerender(
+      <MemoryRouter>
+        <Sidebar collapsed />
+      </MemoryRouter>,
+    )
+    expect(screen.queryByText('Community')).not.toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'HireHub' })).toBeInTheDocument()
+  })
 })
