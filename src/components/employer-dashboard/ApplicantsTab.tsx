@@ -10,6 +10,8 @@ import { OfferLetterModal } from '../offer'
 import { CandidateDetailDrawer } from '../candidate'
 import { useEmployerJobsQuery } from '../../hooks/useEmployerJobsQuery'
 import { useApplications } from '../../context/ApplicationsContext'
+import { useAuth } from '../../context/AuthContext'
+import { canManageApplications } from '../../utils/permissions'
 import type { Application, ApplicationStatus } from '../../types/application'
 
 const statusConfig: Record<ApplicationStatus, { label: string; color: string }> = {
@@ -27,6 +29,8 @@ const containerVariants = {
 
 export function ApplicantsTab() {
   const { applications: allApps, updateApplicationStatus: updateContextStatus } = useApplications()
+  const { user } = useAuth()
+  const canManage = canManageApplications(user)
   const { data, isLoading, isError, refetch } = useEmployerJobsQuery()
   const [interviewModalApp, setInterviewModalApp] = useState<Application | null>(null)
   const [offerModalApp, setOfferModalApp] = useState<Application | null>(null)
@@ -104,7 +108,7 @@ export function ApplicantsTab() {
                       >
                         View profile
                       </button>
-                      {app.status !== 'reviewing' && (
+                      {canManage && app.status !== 'reviewing' && (
                         <button
                           onClick={() => handleStatusChange(app.id, 'reviewing')}
                           className="text-xs font-medium text-accent hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/40 rounded"
@@ -112,7 +116,7 @@ export function ApplicantsTab() {
                           Mark reviewing
                         </button>
                       )}
-                      {app.status !== 'interviewing' && (
+                      {canManage && app.status !== 'interviewing' && (
                         <button
                           onClick={() => setInterviewModalApp(app)}
                           className="text-xs font-medium text-accent hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/40 rounded"
@@ -120,7 +124,7 @@ export function ApplicantsTab() {
                           Schedule Interview
                         </button>
                       )}
-                      {app.status !== 'offer' && (
+                      {canManage && app.status !== 'offer' && (
                         <button
                           onClick={() => setOfferModalApp(app)}
                           className="text-xs font-medium text-success hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/40 rounded"
@@ -128,7 +132,7 @@ export function ApplicantsTab() {
                           Make offer
                         </button>
                       )}
-                      {app.status !== 'rejected' && (
+                      {canManage && app.status !== 'rejected' && (
                         <button
                           onClick={() => handleStatusChange(app.id, 'rejected')}
                           className="text-xs font-medium text-error hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/40 rounded"
@@ -154,7 +158,7 @@ export function ApplicantsTab() {
           )
         })}
       </motion.div>
-      {interviewModalApp && (
+      {canManage && interviewModalApp && (
         <InterviewScheduleModal
           application={interviewModalApp}
           open={!!interviewModalApp}
@@ -162,7 +166,7 @@ export function ApplicantsTab() {
           onSuccess={() => setInterviewModalApp(null)}
         />
       )}
-      {offerModalApp && (
+      {canManage && offerModalApp && (
         <OfferLetterModal
           application={offerModalApp}
           open={!!offerModalApp}
@@ -176,6 +180,7 @@ export function ApplicantsTab() {
           open={!!viewApp}
           onOpenChange={(open) => { if (!open) setViewApp(null) }}
           onActionComplete={() => setViewApp(null)}
+          readOnly={!canManage}
         />
       )}
     </>

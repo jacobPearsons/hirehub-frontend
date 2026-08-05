@@ -2,6 +2,7 @@ import { render, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { useApplications } from '../../../context/ApplicationsContext'
+import { useAuth } from '../../../context/AuthContext'
 import { ApplicantsTab } from '../ApplicantsTab'
 
 vi.mock('../../../api/jobs', () => ({
@@ -10,6 +11,10 @@ vi.mock('../../../api/jobs', () => ({
 
 vi.mock('../../../context/ApplicationsContext', () => ({
   useApplications: vi.fn(() => ({ applications: [], updateApplicationStatus: vi.fn() })),
+}))
+
+vi.mock('../../../context/AuthContext', () => ({
+  useAuth: vi.fn(),
 }))
 
 const mockJob = {
@@ -45,7 +50,10 @@ const mockApp = {
   submittedAt: '2026-01-01T00:00:00.000Z',
 }
 
-function renderApplicantsTab() {
+function renderApplicantsTab(
+  user: { role: string; permissions?: string[] } = { role: 'employer', permissions: [] },
+) {
+  vi.mocked(useAuth).mockReturnValue({ user })
   const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } })
   return render(
     <QueryClientProvider client={queryClient}>
@@ -91,5 +99,33 @@ describe('ApplicantsTab', () => {
 
     renderApplicantsTab()
     expect(await screen.findByText('No applicants yet')).toBeInTheDocument()
+  })
+
+  it('shows pipeline action buttons when the user can manage applications', async () => {
+    const { listEmployerJobs } = await import('../../../api/jobs')
+    ;(listEmployerJobs as ReturnType<typeof vi.fn>).mockResolvedValue({ data: [mockJob] })
+    vi.mocked(useApplications).mockReturnValue({
+      applications: [mockApp],
+      updateApplicationStatus: vi.fn(),
+    })
+
+    renderApplicantsTab({ role: 'employer', permissions: ['application:update'] })
+    expect(await screen.findByText('Jane Doe')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Mark reviewing' })).toBeInTheDocument()
+  })
+
+  it('hides pipeline action buttons without application:update permission', async () => {
+    const { listEmployerJobs } = await import('../../../api/jobs')
+    ;(listEmployerJobs as ReturnType<typeof vi.fn>).mockResolvedValue({ data: [mockJob] })
+    vi.mocked(useApplications).mockReturnValue({
+      applications: [mockApp],
+      updateApplicationStatus: vi.fn(),
+    })
+
+    renderApplicantsTab({ role: 'employer', permissions: [] })
+    expect(await screen.findByText('Jane Doe')).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Mark reviewing' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Make offer' })).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'View profile' })).toBeInTheDocument()
   })
 })
