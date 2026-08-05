@@ -41,7 +41,7 @@ export function ApplicationsProvider({ children }: { children: ReactNode }) {
 
     init()
     return () => controller.abort()
-  }, [authLoading, user?.id])
+  }, [authLoading, user])
 
   const addApplication = useCallback((app: Application) => {
     setApplications(prev => [app, ...prev])
