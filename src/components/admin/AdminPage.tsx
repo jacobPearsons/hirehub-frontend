@@ -5,6 +5,7 @@ import { FileText, Building2, Users } from 'lucide-react'
 import { Card, TabsRoot, TabsList, TabsTrigger, TabsContent, SkeletonGrid, EmptyState, ErrorState, Avatar } from '../ui'
 import { listAdminApplications, listAdminEmployers, type AdminEmployer } from '../../api/admin'
 import { CandidateDetailDrawer } from '../candidate'
+import { EmployerPermissionsDialog } from './EmployerPermissionsDialog'
 import type { Application, ApplicationStatus } from '../../types/application'
 
 const statusConfig: Record<ApplicationStatus, { label: string; color: string }> = {
@@ -124,6 +125,7 @@ function AdminEmployersList() {
   const [employers, setEmployers] = useState<AdminEmployer[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [permissionsEmployer, setPermissionsEmployer] = useState<AdminEmployer | null>(null)
 
   function handleRetry() {
     setLoading(true)
@@ -158,38 +160,54 @@ function AdminEmployersList() {
   }
 
   return (
-    <div className="space-y-4">
-      {employers.map((emp) => (
-        <motion.div
-          key={emp.id}
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.2 }}
-        >
-          <Card variant="default" className="p-5">
-            <div className="flex items-start gap-4">
-              <Avatar name={emp.name} src={emp.avatarUrl} size="lg" />
-              <div className="flex-1 min-w-0">
-                <div className="flex items-start justify-between gap-3">
-                  <div>
-                    <h3 className="text-base font-medium text-ink">{emp.name}</h3>
-                    <p className="text-sm text-ink-muted">{emp.companyName || 'No company'}</p>
+    <>
+      <div className="space-y-4">
+        {employers.map((emp) => (
+          <motion.div
+            key={emp.id}
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.2 }}
+          >
+            <Card variant="default" className="p-5">
+              <div className="flex items-start gap-4">
+                <Avatar name={emp.name} src={emp.avatarUrl} size="lg" />
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <h3 className="text-base font-medium text-ink">{emp.name}</h3>
+                      <p className="text-sm text-ink-muted">{emp.companyName || 'No company'}</p>
+                    </div>
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-pill text-xs font-medium bg-ink-muted/10 text-ink-muted flex-shrink-0">
+                      <Building2 className="w-3.5 h-3.5" aria-hidden="true" />
+                      {emp._count.jobListings} jobs
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => setPermissionsEmployer(emp)}
+                      className="text-xs font-medium text-accent hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/40 rounded flex-shrink-0"
+                    >
+                      Manage permissions
+                    </button>
                   </div>
-                  <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-pill text-xs font-medium bg-ink-muted/10 text-ink-muted flex-shrink-0">
-                    <Building2 className="w-3.5 h-3.5" aria-hidden="true" />
-                    {emp._count.jobListings} jobs
-                  </span>
+                  <p className="text-sm text-ink-muted mt-2">{emp.email}</p>
+                  <p className="text-xs text-ink-tertiary mt-1">
+                    {emp.location || 'Location not set'} · Joined {formatDate(emp.createdAt)}
+                  </p>
                 </div>
-                <p className="text-sm text-ink-muted mt-2">{emp.email}</p>
-                <p className="text-xs text-ink-tertiary mt-1">
-                  {emp.location || 'Location not set'} · Joined {formatDate(emp.createdAt)}
-                </p>
               </div>
-            </div>
-          </Card>
-        </motion.div>
-      ))}
-    </div>
+            </Card>
+          </motion.div>
+        ))}
+      </div>
+      {permissionsEmployer && (
+        <EmployerPermissionsDialog
+          employer={permissionsEmployer}
+          open={!!permissionsEmployer}
+          onOpenChange={(open) => { if (!open) setPermissionsEmployer(null) }}
+        />
+      )}
+    </>
   )
 }
 
