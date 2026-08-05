@@ -34,7 +34,7 @@ const mockCandidate = {
   createdAt: '2026-01-01',
 }
 
-function renderDrawer(open = true) {
+function renderDrawer(open = true, readOnly = false) {
   const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } })
   return render(
     <QueryClientProvider client={queryClient}>
@@ -44,6 +44,7 @@ function renderDrawer(open = true) {
           open={open}
           onOpenChange={vi.fn()}
           onActionComplete={vi.fn()}
+          readOnly={readOnly}
         />
       </ToastProvider>
     </QueryClientProvider>
@@ -69,5 +70,20 @@ describe('CandidateDetailDrawer', () => {
 
     renderDrawer()
     expect(await screen.findByText('Jane Doe')).toBeInTheDocument()
+  })
+
+  it('hides actions when readOnly', async () => {
+    const { getCandidateProfile } = await import('../../../api/applications')
+    ;(getCandidateProfile as ReturnType<typeof vi.fn>).mockResolvedValue({
+      data: { candidate: mockCandidate, application: mockApp },
+    })
+
+    renderDrawer(true, true)
+    expect(await screen.findByText('Jane Doe')).toBeInTheDocument()
+    expect(screen.getByText('Hi there')).toBeInTheDocument()
+    expect(screen.queryByText('Mark reviewing')).not.toBeInTheDocument()
+    expect(screen.queryByText('Schedule Interview')).not.toBeInTheDocument()
+    expect(screen.queryByText('Make offer')).not.toBeInTheDocument()
+    expect(screen.queryByText('Reject')).not.toBeInTheDocument()
   })
 })

@@ -16,6 +16,7 @@ interface CandidateDetailDrawerProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   onActionComplete: () => void
+  readOnly?: boolean
 }
 
 function DetailRow({ icon, label, children }: { icon: React.ReactNode; label: string; children: React.ReactNode }) {
@@ -44,6 +45,7 @@ export function CandidateDetailDrawer({
   open,
   onOpenChange,
   onActionComplete,
+  readOnly = false,
 }: CandidateDetailDrawerProps) {
   const { data, isLoading, isError, refetch } = useCandidateProfileQuery(application.id, open)
   const [interviewOpen, setInterviewOpen] = useState(false)
@@ -216,37 +218,39 @@ export function CandidateDetailDrawer({
                         </Section>
                       )}
 
-                      <Section title="Actions">
-                        <div className="flex flex-wrap gap-2">
-                          {application.status !== 'reviewing' && (
-                            <Button
-                              variant="accent"
-                              size="sm"
-                              onClick={() => handleStatusChange('reviewing', 'Marked as under review')}
-                            >
-                              Mark reviewing
-                            </Button>
-                          )}
-                          {application.status !== 'interviewing' && (
-                            <Button variant="accent" size="sm" onClick={() => setInterviewOpen(true)}>
-                              Schedule Interview
-                            </Button>
-                          )}
-                          {application.status !== 'offer' && (
-                            <Button variant="accent" size="sm" onClick={() => setOfferOpen(true)}>
-                              Make offer
-                            </Button>
-                          )}
-                          {application.status !== 'rejected' && (
-                            <button
-                              className="text-xs font-medium text-error hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/40 rounded"
-                              onClick={() => handleStatusChange('rejected', 'Application rejected')}
-                            >
-                              Reject
-                            </button>
-                          )}
-                        </div>
-                      </Section>
+                      {!readOnly && (
+                        <Section title="Actions">
+                          <div className="flex flex-wrap gap-2">
+                            {application.status !== 'reviewing' && (
+                              <Button
+                                variant="accent"
+                                size="sm"
+                                onClick={() => handleStatusChange('reviewing', 'Marked as under review')}
+                              >
+                                Mark reviewing
+                              </Button>
+                            )}
+                            {application.status !== 'interviewing' && (
+                              <Button variant="accent" size="sm" onClick={() => setInterviewOpen(true)}>
+                                Schedule Interview
+                              </Button>
+                            )}
+                            {application.status !== 'offer' && (
+                              <Button variant="accent" size="sm" onClick={() => setOfferOpen(true)}>
+                                Make offer
+                              </Button>
+                            )}
+                            {application.status !== 'rejected' && (
+                              <button
+                                className="text-xs font-medium text-error hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/40 rounded"
+                                onClick={() => handleStatusChange('rejected', 'Application rejected')}
+                              >
+                                Reject
+                              </button>
+                            )}
+                          </div>
+                        </Section>
+                      )}
                     </>
                   )}
                 </div>
@@ -256,7 +260,7 @@ export function CandidateDetailDrawer({
         )}
       </AnimatePresence>
 
-      {interviewOpen && (
+      {!readOnly && interviewOpen && (
         <InterviewScheduleModal
           application={application}
           open={interviewOpen}
@@ -264,7 +268,7 @@ export function CandidateDetailDrawer({
           onSuccess={() => { setInterviewOpen(false); onActionComplete() }}
         />
       )}
-      {offerOpen && (
+      {!readOnly && offerOpen && (
         <OfferLetterModal
           application={application}
           open={offerOpen}
