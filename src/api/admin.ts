@@ -35,7 +35,8 @@ export interface RoleBinding {
   contextType: string
   contextId: string | null
   expiresAt: string | null
-  createdAt: string
+  grantedAt: string
+  status: string
   role?: Role
 }
 

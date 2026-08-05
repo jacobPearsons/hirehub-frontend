@@ -31,14 +31,14 @@ const employer: AdminEmployer = {
   _count: { jobListings: 4 },
 }
 
-const roleAdmin: Role = { id: 'role-admin', name: 'admin', description: 'Admin', capabilities: [] }
+const roleAdmin: Role = { id: 'admin', name: 'Administrator', description: 'Admin', capabilities: [] }
 const roleEmployer: Role = {
-  id: 'role-employer',
-  name: 'employer',
+  id: 'employer',
+  name: 'Employer',
   description: 'Employer',
   capabilities: ['job:create', 'application:read', 'application:update', 'legacy:cap'],
 }
-const roleSeeker: Role = { id: 'role-seeker', name: 'seeker', description: 'Seeker', capabilities: [] }
+const roleSeeker: Role = { id: 'seeker', name: 'Job Seeker', description: 'Seeker', capabilities: [] }
 
 const roles: Role[] = [roleAdmin, roleEmployer, roleSeeker]
 
@@ -49,7 +49,8 @@ const bindingEmployer: RoleBinding = {
   contextType: 'global',
   contextId: null,
   expiresAt: null,
-  createdAt: '2026-01-01T00:00:00.000Z',
+  grantedAt: '2026-01-01T00:00:00.000Z',
+  status: 'active',
   role: roleEmployer,
 }
 
@@ -60,7 +61,8 @@ const bindingOtherUser: RoleBinding = {
   contextType: 'global',
   contextId: null,
   expiresAt: null,
-  createdAt: '2026-01-01T00:00:00.000Z',
+  grantedAt: '2026-01-01T00:00:00.000Z',
+  status: 'active',
   role: roleSeeker,
 }
 
@@ -95,14 +97,28 @@ describe('EmployerPermissionsDialog', () => {
 
     const select = screen.getByLabelText('Role to grant')
     const options = within(select).getAllByRole('option').map((o) => o.textContent)
-    expect(options).toContain('employer')
-    expect(options).toContain('seeker')
-    expect(options).not.toContain('admin')
+    expect(options).toContain('Employer')
+    expect(options).toContain('Job Seeker')
+    expect(options).not.toContain('Administrator')
 
     expect(screen.getAllByRole('button', { name: 'Remove' })).toHaveLength(1)
     const unknownCap = screen.getByRole('checkbox', { name: 'legacy:cap' })
     expect(unknownCap).toBeChecked()
     expect(unknownCap).toBeDisabled()
+  })
+
+  it('excludes the Administrator role from the grant select but renders the Employer Capabilities editor with real seeded role data', async () => {
+    renderDialog()
+
+    const select = await screen.findByLabelText('Role to grant')
+    const options = within(select).getAllByRole('option').map((o) => o.textContent)
+    expect(options).not.toContain('Administrator')
+    expect(options).toEqual(['Select a role…', 'Employer', 'Job Seeker'])
+
+    const capabilityCheckboxes = screen.getAllByRole('checkbox')
+    expect(capabilityCheckboxes.length).toBeGreaterThan(0)
+    expect(screen.getByRole('checkbox', { name: 'job:create' })).toBeInTheDocument()
+    expect(screen.getByRole('checkbox', { name: 'application:update' })).toBeInTheDocument()
   })
 
   it('grants a role by calling createRoleBinding with (roleId, employer.id)', async () => {

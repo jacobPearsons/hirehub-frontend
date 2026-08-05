@@ -62,9 +62,9 @@ export function EmployerPermissionsDialog({ employer, open, onOpenChange }: Empl
   }, [])
 
   const employerBindings = bindings.filter((b) => b.userId === employer.id)
-  const employerRole = roles.find((r) => r.name === 'employer')
+  const employerRole = roles.find((r) => r.id === 'employer')
   const hasEmployerRole = employerBindings.some(
-    (b) => b.role?.name === 'employer' || (employerRole !== undefined && b.roleId === employerRole.id),
+    (b) => b.role?.id === 'employer' || (employerRole !== undefined && b.roleId === employerRole.id),
   )
 
   const catalogSet = new Set(EMPLOYER_CAPABILITIES)
@@ -260,7 +260,7 @@ export function EmployerPermissionsDialog({ employer, open, onOpenChange }: Empl
                           >
                             <option value="">Select a role…</option>
                             {roles
-                              .filter((r) => r.name !== 'admin')
+                              .filter((r) => r.id !== 'admin')
                               .map((r) => (
                                 <option key={r.id} value={r.id}>
                                   {r.name}

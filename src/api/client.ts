@@ -81,6 +81,8 @@ export async function apiFetch<T>(
     }
   }
 
+  if (res.status === 204) return { success: true, data: undefined as T }
+
   const json: ApiResponse<T> = await res.json()
 
   if (!res.ok || !json.success) {
