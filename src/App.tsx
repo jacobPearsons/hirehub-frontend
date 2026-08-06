@@ -24,6 +24,9 @@ const OnboardingWizard = lazy(() => import('./components/onboarding/OnboardingWi
 const AboutPage = lazy(() => import('./components/about/AboutPage'))
 const ContactPage = lazy(() => import('./components/contact/ContactPage'))
 const FAQPage = lazy(() => import('./components/faq/FAQPage'))
+const PrivacyPolicyPage = lazy(() => import('./components/legal/PrivacyPolicyPage'))
+const TermsPage = lazy(() => import('./components/legal/TermsPage'))
+const CookiePolicyPage = lazy(() => import('./components/legal/CookiePolicyPage'))
 const PostJobPage = lazy(() => import('./components/post-job/PostJobPage'))
 const DashboardPage = lazy(() => import('./components/dashboard/DashboardPage'))
 const EmployerDashboardPage = lazy(() => import('./components/employer-dashboard/EmployerDashboardPage'))
@@ -64,6 +67,9 @@ function App() {
               <Route path="/about" element={<ErrorBoundary><AboutPage /></ErrorBoundary>} />
               <Route path="/contact" element={<ErrorBoundary><ContactPage /></ErrorBoundary>} />
               <Route path="/faq" element={<ErrorBoundary><FAQPage /></ErrorBoundary>} />
+              <Route path="/privacy" element={<ErrorBoundary><PrivacyPolicyPage /></ErrorBoundary>} />
+              <Route path="/terms" element={<ErrorBoundary><TermsPage /></ErrorBoundary>} />
+              <Route path="/cookies" element={<ErrorBoundary><CookiePolicyPage /></ErrorBoundary>} />
               <Route path="/dashboard" element={
                 <ProtectedRoute allowedRoles={['seeker']}>
                   <DashboardShell>
