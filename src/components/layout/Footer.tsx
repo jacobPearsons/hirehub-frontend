@@ -13,7 +13,7 @@ const footerLinks = {
     { label: 'Blog', to: '/blog' },
     { label: 'Career Advice', to: '/blog' },
     { label: 'Salary Guide', to: '/blog' },
-    { label: 'Help Center', to: '#' },
+    { label: 'Help Center', to: '/help' },
     { label: 'FAQ', to: '/faq' },
   ],
   company: [
@@ -21,7 +21,9 @@ const footerLinks = {
     { label: 'For Employers', to: '/employers' },
     { label: 'Contact', to: '/contact' },
     { label: 'Post a Job', to: '/post-job' },
-    { label: 'Privacy Policy', to: '#' },
+    { label: 'Privacy Policy', to: '/privacy' },
+    { label: 'Terms of Service', to: '/terms' },
+    { label: 'Cookie Policy', to: '/cookies' },
   ],
 }
 
