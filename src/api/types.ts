@@ -70,9 +70,26 @@ export interface JobListParams {
   search?: string
   category?: string
   seniority?: string
+  location?: string
   remote?: string
+  salaryMin?: number
+  salaryMax?: number
+  featured?: string
+  sort?: 'relevance' | 'recent' | 'salary_high' | 'salary_low' | 'remote_first'
   cursor?: string
   take?: number
+}
+
+export interface TagFacet {
+  name: string
+  count: number
+}
+
+export interface JobFacets {
+  categories: TagFacet[]
+  seniorities: TagFacet[]
+  locations: TagFacet[]
+  remote: { true: number; false: number }
 }
 
 export interface BlogListParams {
