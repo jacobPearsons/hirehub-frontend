@@ -1,11 +1,13 @@
 import { renderHook, waitFor } from '@testing-library/react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { ReactNode } from 'react'
-import { useJobs } from '../useJobs'
-import { listJobs } from '../../api/jobs'
+import { useJobFacets } from '../useJobFacets'
+import { useJobTags } from '../useJobTags'
+import { getJobFacets, searchJobTags } from '../../api/jobs'
 
 vi.mock('../../api/jobs', () => ({
-  listJobs: vi.fn(),
+  getJobFacets: vi.fn(),
+  searchJobTags: vi.fn(),
 }))
 
 function createWrapper() {
@@ -17,62 +19,67 @@ function createWrapper() {
   )
 }
 
-const mockJobs = [
-  {
-    id: '1',
-    title: 'Frontend Developer',
-    company: 'Acme',
-    location: 'Remote',
-    remote: true,
-    currency: 'USD',
-    category: 'Engineering',
-    seniority: 'Mid',
-    tags: ['React', 'TypeScript'],
-    description: 'Build UI',
-    requirements: ['3 years exp'],
-    responsibilities: ['Develop features'],
-  },
-]
-
-describe('useJobs', () => {
+describe('useJobFacets', () => {
   beforeEach(() => {
     vi.clearAllMocks()
   })
 
   it('returns loading state initially', () => {
-    vi.mocked(listJobs).mockReturnValue(new Promise(() => {}))
+    vi.mocked(getJobFacets).mockReturnValue(new Promise(() => {}))
 
-    const { result } = renderHook(() => useJobs(), { wrapper: createWrapper() })
+    const { result } = renderHook(() => useJobFacets(), { wrapper: createWrapper() })
 
     expect(result.current.isLoading).toBe(true)
     expect(result.current.data).toBeUndefined()
   })
 
-  it('returns data after successful fetch', async () => {
-    vi.mocked(listJobs).mockResolvedValue({
-      data: mockJobs,
-      pagination: { total: mockJobs.length, cursor: null },
-    })
+  it('returns facets data after successful fetch', async () => {
+    const facets = {
+      categories: [{ name: 'Engineering', count: 4 }],
+      seniorities: [{ name: 'Senior', count: 3 }],
+      locations: [{ name: 'Austin', count: 2 }],
+      remote: { true: 5, false: 2 },
+    }
+    vi.mocked(getJobFacets).mockResolvedValue(facets)
 
-    const { result } = renderHook(() => useJobs(), { wrapper: createWrapper() })
+    const { result } = renderHook(() => useJobFacets(), { wrapper: createWrapper() })
 
     await waitFor(() => {
       expect(result.current.isSuccess).toBe(true)
     })
 
-    expect(result.current.data).toEqual(mockJobs)
+    expect(result.current.data).toEqual(facets)
+    expect(getJobFacets).toHaveBeenCalledTimes(1)
+  })
+})
+
+describe('useJobTags', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
   })
 
-  it('returns error state when API fails', async () => {
-    vi.mocked(listJobs).mockRejectedValue(new Error('Network error'))
+  it('is disabled when q is empty', () => {
+    const { result } = renderHook(() => useJobTags(''), { wrapper: createWrapper() })
 
-    const { result } = renderHook(() => useJobs(), { wrapper: createWrapper() })
+    expect(result.current.fetchStatus).toBe('idle')
+    expect(result.current.data).toBeUndefined()
+    expect(searchJobTags).not.toHaveBeenCalled()
+  })
+
+  it('returns tags for a query after successful fetch', async () => {
+    const tags = [
+      { name: 'React', count: 10 },
+      { name: 'React Native', count: 4 },
+    ]
+    vi.mocked(searchJobTags).mockResolvedValue(tags)
+
+    const { result } = renderHook(() => useJobTags('react'), { wrapper: createWrapper() })
 
     await waitFor(() => {
-      expect(result.current.isError).toBe(true)
+      expect(result.current.isSuccess).toBe(true)
     })
 
-    expect(result.current.error).toBeInstanceOf(Error)
-    expect(result.current.error?.message).toBe('Network error')
+    expect(result.current.data).toEqual(tags)
+    expect(searchJobTags).toHaveBeenCalledWith('react')
   })
 })

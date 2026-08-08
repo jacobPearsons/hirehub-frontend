@@ -64,9 +64,51 @@ describe('useInfiniteJobs', () => {
     expect(result.current.hasNextPage).toBe(true)
     expect(listJobs).toHaveBeenCalledWith({
       search: 'react',
-      category: '',
-      seniority: '',
       take: 12,
+    })
+  })
+
+  it('forwards search params and the pagination cursor', async () => {
+    vi.mocked(listJobs).mockResolvedValueOnce({
+      data: [jobA],
+      pagination: { total: 2, cursor: 'page-2' },
+    })
+    vi.mocked(listJobs).mockResolvedValueOnce({
+      data: [jobB],
+      pagination: { total: 2, cursor: null },
+    })
+
+    const { result } = renderHook(
+      () => useInfiniteJobs({ search: 'react', location: 'austin', sort: 'salary_high' }),
+      { wrapper: createWrapper() },
+    )
+
+    await waitFor(() => {
+      expect(result.current.data?.jobs).toHaveLength(1)
+    })
+
+    expect(listJobs).toHaveBeenCalledWith({
+      search: 'react',
+      location: 'austin',
+      sort: 'salary_high',
+      take: 12,
+    })
+
+    await act(async () => {
+      await result.current.fetchNextPage()
+    })
+
+    await waitFor(() => {
+      expect(result.current.data?.jobs).toEqual([jobA, jobB])
+    })
+
+    expect(result.current.hasNextPage).toBe(false)
+    expect(listJobs).toHaveBeenLastCalledWith({
+      search: 'react',
+      location: 'austin',
+      sort: 'salary_high',
+      take: 12,
+      cursor: 'page-2',
     })
   })
 
@@ -96,9 +138,6 @@ describe('useInfiniteJobs', () => {
 
     expect(result.current.hasNextPage).toBe(false)
     expect(listJobs).toHaveBeenLastCalledWith({
-      search: '',
-      category: '',
-      seniority: '',
       take: 12,
       cursor: 'page-2',
     })

@@ -16,15 +16,15 @@ export interface InfiniteJobsParams {
   search?: string
   category?: string
   seniority?: string
+  location?: string
+  remote?: string
+  salaryMin?: number
+  salaryMax?: number
+  sort?: 'relevance' | 'recent' | 'salary_high' | 'salary_low' | 'remote_first'
 }
 
 export function useInfiniteJobs(params: InfiniteJobsParams) {
-  const { search, category, seniority } = params
-  const filters = {
-    search: search ?? '',
-    category: category ?? '',
-    seniority: seniority ?? '',
-  }
+  const filters: InfiniteJobsParams = { ...params }
   return useInfiniteQuery({
     queryKey: ['jobs', 'infinite', filters],
     queryFn: ({ pageParam }) =>
