@@ -4,9 +4,11 @@ import { MemoryRouter } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { ToastProvider } from '../../ui/Toast'
 import JobBoardPage from '../JobBoardPage'
+import { getJobFacets } from '../../../api/jobs'
 
 vi.mock('../../../api/jobs', () => ({
   listJobs: vi.fn(),
+  getJobFacets: vi.fn(),
 }))
 
 vi.mock('../../../context/AppContext', async (importOriginal) => {
@@ -26,6 +28,12 @@ vi.mock('../../../utils/usePageMeta', () => ({
 
 function renderJobBoardPage() {
   const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } })
+  ;(getJobFacets as ReturnType<typeof vi.fn>).mockResolvedValue({
+    categories: [],
+    seniorities: [],
+    locations: [],
+    remote: { true: 0, false: 0 },
+  })
   return render(
     <QueryClientProvider client={queryClient}>
       <MemoryRouter initialEntries={['/jobs']}>

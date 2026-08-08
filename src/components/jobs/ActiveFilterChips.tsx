@@ -1,14 +1,14 @@
 import { X } from 'lucide-react'
 
 interface ActiveFilterChipsProps {
-  filters: { category: string; seniority: string; remote: string }
+  filters: { category: string; seniority: string; location: string; remote: string }
   onFilterChange: (key: string, value: string) => void
 }
 
 const labelMap: Record<string, string> = {
-  junior: 'Junior', mid: 'Mid', senior: 'Senior', lead: 'Lead', executive: 'Executive',
+  junior: 'Junior', mid: 'Mid', senior: 'Senior', lead: 'Lead', executive: 'Executive', expert: 'Expert',
   engineering: 'Engineering', design: 'Design', marketing: 'Marketing', sales: 'Sales', operations: 'Operations',
-  remote: 'Remote', 'on-site': 'On-site', hybrid: 'Hybrid',
+  'true': 'Remote', 'false': 'On-site',
 }
 
 function formatLabel(value: string): string {
@@ -20,6 +20,7 @@ export function ActiveFilterChips({ filters, onFilterChange }: ActiveFilterChips
 
   if (filters.category) chips.push({ key: 'category', label: formatLabel(filters.category) })
   if (filters.seniority) chips.push({ key: 'seniority', label: formatLabel(filters.seniority) })
+  if (filters.location) chips.push({ key: 'location', label: formatLabel(filters.location) })
   if (filters.remote) chips.push({ key: 'remote', label: formatLabel(filters.remote) })
 
   if (chips.length === 0) return null

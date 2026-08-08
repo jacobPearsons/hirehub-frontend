@@ -1,13 +1,21 @@
 import { Button } from '../ui'
+import type { JobFacets, TagFacet } from '../../api/types'
 
 interface FilterSidebarProps {
-  filters: { category: string; seniority: string; remote: string }
+  filters: { category: string; seniority: string; location: string; remote: string }
   onFilterChange: (key: string, value: string) => void
+  facets?: JobFacets
 }
 
-const categories = ['All', 'Engineering', 'Design', 'Marketing', 'Sales', 'Operations']
-const seniorities = ['All', 'Junior', 'Mid', 'Senior', 'Lead', 'Executive']
-const locations = ['All', 'Remote', 'On-site', 'Hybrid']
+const remoteOptions = [
+  { label: 'All', value: '' },
+  { label: 'Remote', value: 'true' },
+  { label: 'On-site', value: 'false' },
+]
+
+function facetOptions(list?: TagFacet[]): string[] {
+  return ['All', ...(list?.map((facet) => facet.name) ?? [])]
+}
 
 function FilterOption({
   label,
@@ -33,10 +41,15 @@ function FilterOption({
   )
 }
 
-export function FilterSidebar({ filters, onFilterChange }: FilterSidebarProps) {
+export function FilterSidebar({ filters, onFilterChange, facets }: FilterSidebarProps) {
+  const categories = facetOptions(facets?.categories)
+  const seniorities = facetOptions(facets?.seniorities)
+  const locations = facetOptions(facets?.locations)
+
   const handleClear = () => {
     onFilterChange('category', '')
     onFilterChange('seniority', '')
+    onFilterChange('location', '')
     onFilterChange('remote', '')
   }
 
@@ -63,7 +76,7 @@ export function FilterSidebar({ filters, onFilterChange }: FilterSidebarProps) {
         <legend className="text-sm font-medium mb-3">Seniority</legend>
         <div className="space-y-0.5">
           {seniorities.map((sen) => {
-            const value = sen === 'All' ? '' : sen.toLowerCase()
+            const value = sen === 'All' ? '' : sen
             return (
               <FilterOption
                 key={sen}
@@ -85,11 +98,25 @@ export function FilterSidebar({ filters, onFilterChange }: FilterSidebarProps) {
               <FilterOption
                 key={loc}
                 label={loc}
-                isSelected={filters.remote === value}
-                onClick={() => onFilterChange('remote', value)}
+                isSelected={filters.location === value}
+                onClick={() => onFilterChange('location', value)}
               />
             )
           })}
+        </div>
+      </fieldset>
+
+      <fieldset className="border-0 p-0 m-0 mt-6">
+        <legend className="text-sm font-medium mb-3">Remote</legend>
+        <div className="space-y-0.5">
+          {remoteOptions.map((opt) => (
+            <FilterOption
+              key={opt.value}
+              label={opt.label}
+              isSelected={filters.remote === opt.value}
+              onClick={() => onFilterChange('remote', opt.value)}
+            />
+          ))}
         </div>
       </fieldset>
 
