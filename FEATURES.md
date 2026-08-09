@@ -11,6 +11,11 @@ HireHub Community is a hiring platform where job seekers discover curated tech r
 ### For Job Seekers
 
 - **Browse Jobs** — Explore 30+ listings with filters by category, seniority, location, and remote preference
+- **URL-Synced Search** — The job board state lives in the URL (`/jobs?search=react&location=austin&category=Engineering&sort=salary_high`). Search, filters, and sort are shareable, bookmarkable, and survive refresh; typing is debounced (300ms) so results update as you type
+- **Facet-Driven Filters** — Filter sidebar (desktop) and drawer (mobile) built from live facet counts (`GET /jobs/facets`): category, seniority, location, and remote, with active-filter chips to clear individual filters
+- **Flexible Sorting** — Most recent, best match (relevance via Postgres full-text `ts_rank`), highest/lowest salary, and remote-first
+- **Cursor Pagination** — "Load more" infinite-scroll pagination keyed on an opaque cursor, so result sets scale without page-number drift
+- **Tag Search API** — Autocomplete-ready tag lookup (`GET /jobs/tags/search?q=`) with a `useJobTags` query hook wired for UI integration
 - **Job Details** — View full descriptions, requirements, responsibilities, salary ranges, and company info
 - **Save Jobs** — Bookmark interesting roles with a heart toggle; revisit them anytime from your dashboard
 - **Apply** — Submit applications with cover letter, portfolio, and contact info via an accessible modal form
@@ -39,4 +44,13 @@ HireHub Community is a hiring platform where job seekers discover curated tech r
 
 ## Tech Stack
 
-React 19, TypeScript, Tailwind CSS 3, Framer Motion, Radix UI, react-hook-form + Zod, Lucide icons, Vite
+React 19, TypeScript, Tailwind CSS 3, Framer Motion, Radix UI, react-hook-form + Zod, TanStack Query, Lucide icons, Vite
+
+## Search Engine
+
+Job search runs on a Postgres full-text engine (`websearch_to_tsquery` + `ts_rank` over title, company, description, tags, category, seniority, location, requirements, and responsibilities) shared across hirehub-backend and loft-backend:
+
+- **Combined filters** — `search`, `location`, `category`, `seniority`, `remote`, `salaryMin`, `salaryMax`, `featured`, and `sort` compose into a single SQL query
+- **Keyset pagination** — Cursor encodes the last row's sort tuple (`id`, `postedDate`, `salaryMax`, `remote`, or `rank`), so ordering stays stable across pages
+- **Canonical envelope** — Every list response is `{ success, data, pagination: { total, cursor } }`
+- **Facets & tags** — `GET /jobs/facets` returns category/seniority/location/remote counts; `GET /jobs/tags/search?q=` returns matching tags ordered by frequency

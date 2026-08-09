@@ -87,33 +87,35 @@ User profiles
 
 Users expect:
 
-Keyword search
-Company search
-Skill search
+Keyword search ✅ (Postgres full-text via websearch_to_tsquery)
+Company search ✅ (covered by the full-text `search` param)
+Skill search ✅ (via tag search — `GET /jobs/tags/search?q=`)
 8. Better Filters
 
 Current filters are good.
 
 Consider adding:
 
-Salary
-Experience
-Employment type
-Posted date
-Visa sponsorship
-Company size
-Industry
+Salary ✅ (salaryMin / salaryMax filters + salary sorting)
+Experience ✅ (seniority facet filter)
+Employment type ⬜
+Posted date ✅ (sort: recent)
+Visa sponsorship ⬜
+Company size ⬜
+Industry ⬜
 9. Sorting
 
 Examples:
 
-Newest
-Highest salary
-Remote first
-Relevance
+Newest ✅ (sort: recent)
+Highest salary ✅ (sort: salary_high)
+Remote first ✅ (sort: remote_first)
+Relevance ✅ (sort: relevance — ts_rank full-text ranking)
 10. Pagination / Infinite Scroll
 
-Never load hundreds of jobs at once.
+Never load hundreds of jobs at once. ✅
+
+Keyset (cursor) pagination with a stable sort tuple; the frontend implements infinite "Load more" via useInfiniteJobs.
 
 🟠 Employer Features
 Company Pages
