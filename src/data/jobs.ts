@@ -1,5 +1,12 @@
 export interface Job {
   id: string;
+  screeningQuestions?: {
+    id: string;
+    prompt: string;
+    expectedKeywords: string[];
+    maxScore: number;
+    order: number;
+  }[];
   title: string;
   company: string;
   companyLogo: string;

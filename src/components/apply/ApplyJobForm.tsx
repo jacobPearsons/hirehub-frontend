@@ -1,4 +1,4 @@
-import { useRef, type ChangeEvent } from 'react'
+import { useRef, useState, type ChangeEvent } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { X, File as FileIcon } from 'lucide-react'
@@ -27,6 +27,9 @@ export function ApplyJobForm({ job, onSuccess, resumeFile, resumeFileName, onRes
   const existingResumeFileName = user?.resumeFileName ?? null
   const hasResume = Boolean(user?.resumeFileName || user?.resumePath)
   const coverOnly = Boolean(user && hasResume)
+  const screeningQuestions = job.screeningQuestions ?? []
+  const [answers, setAnswers] = useState<Record<string, string>>({})
+  const [answerErrors, setAnswerErrors] = useState<Record<string, string>>({})
 
   const { register, handleSubmit, control, formState: { errors, isSubmitting } } = useForm<ApplicationFormData>({
     resolver: zodResolver(applicationSchema),
@@ -58,6 +61,17 @@ export function ApplyJobForm({ job, onSuccess, resumeFile, resumeFileName, onRes
 
   const onSubmit = async (data: ApplicationFormData) => {
     try {
+      if (screeningQuestions.length > 0) {
+        const invalid: Record<string, string> = {}
+        for (const q of screeningQuestions) {
+          if (!(answers[q.id] ?? '').trim()) invalid[q.id] = 'Answer is required'
+        }
+        if (Object.keys(invalid).length > 0) {
+          setAnswerErrors(invalid)
+          return
+        }
+        setAnswerErrors({})
+      }
       const { createApplication } = await import('../../api/applications')
       let resumePath: string | undefined
       let uploadedFileName: string | undefined
@@ -75,6 +89,11 @@ export function ApplyJobForm({ job, onSuccess, resumeFile, resumeFileName, onRes
         coverLetter: data.coverLetter,
         resumePath: resumePath ?? existingResumePath ?? undefined,
         resumeFileName: uploadedFileName ?? existingResumeFileName ?? undefined,
+        ...(screeningQuestions.length > 0
+          ? {
+              screeningAnswers: screeningQuestions.map((q) => ({ questionId: q.id, answerText: answers[q.id] ?? '' })),
+            }
+          : {}),
       })
       addApplication(res.data)
       onSuccess(uploadedFileName || resumeFileName || existingResumeFileName || undefined)
@@ -97,6 +116,29 @@ export function ApplyJobForm({ job, onSuccess, resumeFile, resumeFileName, onRes
           {coverLetterValue?.length ?? 0}/{COVER_LETTER_MAX} characters
         </p>
       </div>
+      {screeningQuestions.length > 0 && (
+        <div className="space-y-4">
+          {screeningQuestions.map((question) => (
+            <Textarea
+              key={question.id}
+              label={question.prompt}
+              id={`screening-${question.id}`}
+              rows={4}
+              required
+              error={answerErrors[question.id]}
+              value={answers[question.id] ?? ''}
+              onChange={(e) => {
+                setAnswers((prev) => ({ ...prev, [question.id]: e.target.value }))
+                setAnswerErrors((prev) => {
+                  const next = { ...prev }
+                  delete next[question.id]
+                  return next
+                })
+              }}
+            />
+          ))}
+        </div>
+      )}
       {!coverOnly && (
         <div>
           {existingResumePath ? (
