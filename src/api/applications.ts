@@ -1,5 +1,5 @@
 import { apiGet, apiPost, apiPatch } from './client'
-import type { Application, ApplicationStatus } from '../types/application'
+import type { Application, ApplicationStatus, ScreeningAnswer, ScreeningResult, TimelineEntry } from '../types/application'
 import type { InterviewDetails, OfferDetails, OnboardingChecklistItem, OrientationDetails } from '../types/hiring-flow'
 
 interface BackendJobSummary {
@@ -20,6 +20,15 @@ export interface BackendApplication {
   resumeFileName?: string | null
   status: string
   submittedAt: string
+  screeningResult?: ScreeningResult | null
+  screeningAnswers?: Array<ScreeningAnswer & { question?: { prompt: string; expectedKeywords: string[]; maxScore: number } | null }> | null
+  timeline?: Array<{
+    id: string
+    fromStatus?: string | null
+    toStatus: string
+    actorRole: string
+    createdAt: string
+  }> | null
   interviewData?: unknown
   offerData?: unknown
   preboardingData?: unknown
@@ -28,14 +37,26 @@ export interface BackendApplication {
 
 const STATUS_TO_UPPER: Record<ApplicationStatus, string> = {
   applied: 'APPLIED',
-  reviewing: 'REVIEWING',
+  screening: 'SCREENING',
+  shortlist: 'SHORTLIST',
   interviewing: 'INTERVIEWING',
-  rejected: 'REJECTED',
   offer: 'OFFER',
+  hired: 'HIRED',
+  rejected: 'REJECTED',
+  withdrawn: 'WITHDRAWN',
 }
 
 export function normalizeApplication(raw: BackendApplication): Application {
   const status = String(raw.status ?? 'APPLIED').toLowerCase() as ApplicationStatus
+  const timeline: TimelineEntry[] | undefined = raw.timeline
+    ? raw.timeline.map((entry) => ({
+        id: entry.id,
+        fromStatus: entry.fromStatus ? entry.fromStatus.toLowerCase() as ApplicationStatus : null,
+        toStatus: entry.toStatus.toLowerCase() as ApplicationStatus,
+        actorRole: entry.actorRole,
+        createdAt: String(entry.createdAt ?? ''),
+      }))
+    : undefined
   return {
     id: raw.id,
     jobId: raw.jobId,
@@ -50,6 +71,9 @@ export function normalizeApplication(raw: BackendApplication): Application {
     resumeFileName: raw.resumeFileName ?? undefined,
     status,
     submittedAt: raw.submittedAt,
+    screeningResult: raw.screeningResult ?? undefined,
+    screeningAnswers: raw.screeningAnswers ?? undefined,
+    timeline,
     interviewDetails: (raw.interviewData as InterviewDetails) ?? undefined,
     offerDetails: (raw.offerData as OfferDetails) ?? undefined,
     preBoardingChecklist: (raw.preboardingData as OnboardingChecklistItem[]) ?? undefined,
@@ -66,8 +90,19 @@ export async function createApplication(data: {
   portfolioUrl?: string
   resumePath?: string
   resumeFileName?: string
+  screeningAnswers?: { questionId: string; answerText: string }[]
 }) {
   const res = await apiPost<BackendApplication>('/applications', data)
+  return { ...res, data: normalizeApplication(res.data) }
+}
+
+export async function getApplication(id: string) {
+  const res = await apiGet<BackendApplication>(`/applications/${id}`)
+  return { ...res, data: normalizeApplication(res.data) }
+}
+
+export async function withdrawApplication(id: string) {
+  const res = await apiPost<BackendApplication>(`/applications/${id}/withdraw`)
   return { ...res, data: normalizeApplication(res.data) }
 }
 

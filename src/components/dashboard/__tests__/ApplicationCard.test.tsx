@@ -13,7 +13,7 @@ const app: Application = {
   applicantName: 'Jane Doe',
   applicantEmail: 'jane@example.com',
   coverLetter: '',
-  status: 'reviewing',
+  status: 'screening',
   submittedAt: '2026-07-01T00:00:00Z',
 }
 

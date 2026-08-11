@@ -6,17 +6,22 @@ import type { Application, ApplicationStatus } from '../../types/application'
 
 const STAGES: { key: ApplicationStatus; label: string; description: string }[] = [
   { key: 'applied', label: 'Applied', description: 'Your application has been received by the employer.' },
-  { key: 'reviewing', label: 'Under Review', description: 'The hiring team is reviewing your profile and resume.' },
+  { key: 'screening', label: 'Screening', description: 'Your application is being screened against the job requirements.' },
+  { key: 'shortlist', label: 'Shortlist', description: 'You have been shortlisted for this role.' },
   { key: 'interviewing', label: 'Interviewing', description: 'Selected candidates move on to interviews.' },
   { key: 'offer', label: 'Offer', description: 'The employer has extended an offer.' },
+  { key: 'hired', label: 'Hired', description: 'Congratulations — you have been hired!' },
 ]
 
 const STATUS_ORDER: Record<ApplicationStatus, number> = {
   applied: 0,
-  reviewing: 1,
-  interviewing: 2,
-  rejected: 2,
-  offer: 3,
+  screening: 1,
+  shortlist: 2,
+  interviewing: 3,
+  offer: 4,
+  hired: 5,
+  rejected: 3,
+  withdrawn: 0,
 }
 
 interface HiringFlowModalProps {

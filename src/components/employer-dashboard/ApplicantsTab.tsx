@@ -12,15 +12,8 @@ import { useEmployerJobsQuery } from '../../hooks/useEmployerJobsQuery'
 import { useApplications } from '../../context/ApplicationsContext'
 import { useAuth } from '../../context/AuthContext'
 import { canManageApplications } from '../../utils/permissions'
+import { STATUS_CONFIG } from '../../utils/status'
 import type { Application, ApplicationStatus } from '../../types/application'
-
-const statusConfig: Record<ApplicationStatus, { label: string; color: string }> = {
-  applied: { label: 'Applied', color: 'bg-accent/10 text-accent' },
-  reviewing: { label: 'Under Review', color: 'bg-ink-muted/10 text-ink-muted' },
-  interviewing: { label: 'Interviewing', color: 'bg-surface-2 text-ink' },
-  rejected: { label: 'Rejected', color: 'bg-error/10 text-error' },
-  offer: { label: 'Offer', color: 'bg-success/10 text-success' },
-}
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -73,7 +66,7 @@ export function ApplicantsTab() {
         className="space-y-4"
       >
         {apps.map((app) => {
-          const status = statusConfig[app.status]
+          const status = STATUS_CONFIG[app.status]
           const submittedDate = new Date(app.submittedAt).toLocaleDateString('en-US', {
             year: 'numeric',
             month: 'long',
@@ -108,9 +101,9 @@ export function ApplicantsTab() {
                       >
                         View profile
                       </button>
-                      {canManage && app.status !== 'reviewing' && (
+                      {canManage && app.status !== 'screening' && (
                         <button
-                          onClick={() => handleStatusChange(app.id, 'reviewing')}
+                          onClick={() => handleStatusChange(app.id, 'screening')}
                           className="text-xs font-medium text-accent hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/40 rounded"
                         >
                           Mark reviewing

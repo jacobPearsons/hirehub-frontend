@@ -1,5 +1,5 @@
 import { describe, expect, it, afterEach, vi } from 'vitest'
-import { normalizeApplication, createApplication, updateApplicationStatus, listApplications, getCandidateProfile, resumeFileUrl } from '../applications'
+import { normalizeApplication, createApplication, updateApplicationStatus, listApplications, getCandidateProfile, getApplication, withdrawApplication, resumeFileUrl } from '../applications'
 
 afterEach(() => {
   vi.unstubAllGlobals()
@@ -55,6 +55,46 @@ describe('normalizeApplication', () => {
     expect(app.jobTitle).toBe('')
     expect(app.company).toBe('')
     expect(app.status).toBe('applied')
+  })
+
+  it('maps screening result, screening answers, and timeline', () => {
+    const app = normalizeApplication({
+      id: 'app-1',
+      jobId: 'job-1',
+      applicantName: 'Jane Doe',
+      applicantEmail: 'jane@example.com',
+      coverLetter: 'Letter',
+      status: 'SCREENING',
+      submittedAt: '2026-07-01T00:00:00.000Z',
+      screeningResult: { score: 72, maxPossible: 100 },
+      screeningAnswers: [
+        {
+          questionId: 'q1',
+          answerText: 'I have 5 years of React experience.',
+          score: 8,
+          matchedKeywords: ['react', 'typescript'],
+          question: { prompt: 'Describe your React experience', expectedKeywords: ['react'], maxScore: 10 },
+        },
+      ],
+      timeline: [
+        { id: 't1', fromStatus: null, toStatus: 'APPLIED', actorRole: 'SEEKER', createdAt: '2026-07-01T00:00:00.000Z' },
+        { id: 't2', fromStatus: 'APPLIED', toStatus: 'SCREENING', actorRole: 'EMPLOYER', createdAt: '2026-07-02T00:00:00.000Z' },
+      ],
+    })
+
+    expect(app.screeningResult).toEqual({ score: 72, maxPossible: 100 })
+    expect(app.screeningAnswers?.[0].questionId).toBe('q1')
+    expect(app.screeningAnswers?.[0].score).toBe(8)
+    expect(app.screeningAnswers?.[0].question?.prompt).toBe('Describe your React experience')
+    expect(app.timeline).toHaveLength(2)
+    expect(app.timeline?.[0]).toEqual({
+      id: 't1',
+      fromStatus: null,
+      toStatus: 'applied',
+      actorRole: 'SEEKER',
+      createdAt: '2026-07-01T00:00:00.000Z',
+    })
+    expect(app.timeline?.[1].toStatus).toBe('screening')
   })
 })
 
@@ -127,7 +167,7 @@ describe('application API mapping', () => {
             applicantName: 'Jane Doe',
             applicantEmail: 'jane@example.com',
             coverLetter: 'Letter',
-            status: 'REVIEWING',
+            status: 'SCREENING',
             submittedAt: '2026-07-01T00:00:00.000Z',
           },
         ],
@@ -135,8 +175,91 @@ describe('application API mapping', () => {
     }))
 
     const res = await listApplications()
-    expect(res.data[0].status).toBe('reviewing')
+    expect(res.data[0].status).toBe('screening')
     expect(res.data[0].jobTitle).toBe('Senior Engineer')
+  })
+
+  it('createApplication forwards screeningAnswers', async () => {
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      status: 201,
+      json: async () => ({
+        success: true,
+        data: {
+          id: 'app-1',
+          jobId: 'job-1',
+          applicantName: 'Jane Doe',
+          applicantEmail: 'jane@example.com',
+          coverLetter: 'Letter',
+          status: 'SCREENING',
+          submittedAt: '2026-07-01T00:00:00.000Z',
+        },
+      }),
+    })
+    vi.stubGlobal('fetch', fetchMock)
+
+    await createApplication({
+      jobId: 'job-1',
+      applicantName: 'Jane Doe',
+      applicantEmail: 'jane@example.com',
+      coverLetter: 'Letter',
+      screeningAnswers: [{ questionId: 'q1', answerText: 'Yes' }],
+    })
+
+    const [, options] = fetchMock.mock.calls[0]
+    expect(JSON.parse(options.body).screeningAnswers).toEqual([{ questionId: 'q1', answerText: 'Yes' }])
+  })
+
+  it('getApplication GETs the application and normalizes it', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: async () => ({
+        success: true,
+        data: {
+          id: 'app-1',
+          jobId: 'job-1',
+          applicantName: 'Jane Doe',
+          applicantEmail: 'jane@example.com',
+          coverLetter: 'Letter',
+          status: 'SHORTLIST',
+          submittedAt: '2026-07-01T00:00:00.000Z',
+        },
+      }),
+    }))
+
+    const res = await getApplication('app-1')
+    expect(res.data.status).toBe('shortlist')
+
+    const [url] = vi.mocked(fetch).mock.calls[0] as [string]
+    expect(url).toBe('http://localhost:4000/api/applications/app-1')
+  })
+
+  it('withdrawApplication POSTs to the withdraw endpoint and normalizes', async () => {
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: async () => ({
+        success: true,
+        data: {
+          id: 'app-1',
+          jobId: 'job-1',
+          applicantName: 'Jane Doe',
+          applicantEmail: 'jane@example.com',
+          coverLetter: 'Letter',
+          status: 'WITHDRAWN',
+          submittedAt: '2026-07-01T00:00:00.000Z',
+        },
+      }),
+    })
+    vi.stubGlobal('fetch', fetchMock)
+
+    const res = await withdrawApplication('app-1')
+    expect(res.data.status).toBe('withdrawn')
+
+    const [url, options] = fetchMock.mock.calls[0] as [string, RequestInit]
+    expect(url).toBe('http://localhost:4000/api/applications/app-1/withdraw')
+    expect(options.method).toBe('POST')
   })
 })
 

@@ -8,15 +8,8 @@ import { OfferLetterView } from '../offer/OfferLetterView'
 import { OrientationCard } from '../orientation/OrientationCard'
 import { PreBoardingChecklist } from '../preboarding/PreBoardingChecklist'
 import { HiringFlowModal } from './HiringFlowModal'
+import { STATUS_CONFIG } from '../../utils/status'
 import type { Application, ApplicationStatus } from '../../types/application'
-
-const statusConfig: Record<ApplicationStatus, { label: string; color: string }> = {
-  applied: { label: 'Applied', color: 'bg-accent/10 text-accent' },
-  reviewing: { label: 'Under Review', color: 'bg-ink-muted/10 text-ink-muted' },
-  interviewing: { label: 'Interviewing', color: 'bg-surface-2 text-ink' },
-  rejected: { label: 'Rejected', color: 'bg-error/10 text-error' },
-  offer: { label: 'Offer', color: 'bg-success/10 text-success' },
-}
 
 interface ApplicationCardProps {
   application: Application
@@ -25,7 +18,7 @@ interface ApplicationCardProps {
 
 export function ApplicationCard({ application, onStatusUpdate }: ApplicationCardProps) {
   const [flowOpen, setFlowOpen] = useState(false)
-  const status = statusConfig[application.status]
+  const status = STATUS_CONFIG[application.status]
   const submittedDate = new Date(application.submittedAt).toLocaleDateString('en-US', {
     year: 'numeric',
     month: 'long',

@@ -6,15 +6,8 @@ import { Card, TabsRoot, TabsList, TabsTrigger, TabsContent, SkeletonGrid, Empty
 import { listAdminApplications, listAdminEmployers, type AdminEmployer } from '../../api/admin'
 import { CandidateDetailDrawer } from '../candidate'
 import { EmployerPermissionsDialog } from './EmployerPermissionsDialog'
-import type { Application, ApplicationStatus } from '../../types/application'
-
-const statusConfig: Record<ApplicationStatus, { label: string; color: string }> = {
-  applied: { label: 'Applied', color: 'bg-accent/10 text-accent' },
-  reviewing: { label: 'Under Review', color: 'bg-ink-muted/10 text-ink-muted' },
-  interviewing: { label: 'Interviewing', color: 'bg-surface-2 text-ink' },
-  rejected: { label: 'Rejected', color: 'bg-error/10 text-error' },
-  offer: { label: 'Offer', color: 'bg-success/10 text-success' },
-}
+import { STATUS_CONFIG } from '../../utils/status'
+import type { Application } from '../../types/application'
 
 function formatDate(value: string) {
   return new Date(value).toLocaleDateString('en-US', {
@@ -66,7 +59,7 @@ function AdminApplicationsList() {
     <>
       <div className="space-y-4">
         {apps.map((app) => {
-          const status = statusConfig[app.status]
+          const status = STATUS_CONFIG[app.status]
           return (
             <motion.div
               key={app.id}

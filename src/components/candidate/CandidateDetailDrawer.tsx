@@ -221,11 +221,11 @@ export function CandidateDetailDrawer({
                       {!readOnly && (
                         <Section title="Actions">
                           <div className="flex flex-wrap gap-2">
-                            {application.status !== 'reviewing' && (
+                            {application.status !== 'screening' && (
                               <Button
                                 variant="accent"
                                 size="sm"
-                                onClick={() => handleStatusChange('reviewing', 'Marked as under review')}
+                                onClick={() => handleStatusChange('screening', 'Marked as under review')}
                               >
                                 Mark reviewing
                               </Button>
