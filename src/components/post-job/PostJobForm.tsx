@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -31,6 +31,13 @@ const jobSchema = z.object({
 
 type JobFormData = z.infer<typeof jobSchema>
 
+interface ScreeningQuestionDraft {
+  id: string
+  prompt: string
+  expectedKeywords: string
+  maxScore: number
+}
+
 const selectClass =
   'w-full rounded-md border border-hairline bg-surface-1 text-ink outline-none focus-visible:ring-2 focus-visible:ring-ink/40 focus-visible:border-ink px-3 py-2.5 text-sm'
 const textareaClass =
@@ -38,6 +45,30 @@ const textareaClass =
 
 export default function PostJobForm() {
   const [submitError, setSubmitError] = useState<string | null>(null)
+  const [screeningQuestions, setScreeningQuestions] = useState<ScreeningQuestionDraft[]>([])
+  const [isScreeningOpen, setIsScreeningOpen] = useState(false)
+  const nextQuestionId = useRef(1)
+
+  const addScreeningQuestion = () => {
+    setIsScreeningOpen(true)
+    setScreeningQuestions((prev) => [
+      ...prev,
+      { id: `q${nextQuestionId.current++}`, prompt: '', expectedKeywords: '', maxScore: 5 },
+    ])
+  }
+
+  const removeScreeningQuestion = (id: string) => {
+    setScreeningQuestions((prev) => prev.filter((question) => question.id !== id))
+  }
+
+  const updateScreeningQuestion = (
+    id: string,
+    patch: Partial<Omit<ScreeningQuestionDraft, 'id'>>
+  ) => {
+    setScreeningQuestions((prev) =>
+      prev.map((question) => (question.id === id ? { ...question, ...patch } : question))
+    )
+  }
 
   const {
     register,
@@ -91,6 +122,19 @@ export default function PostJobForm() {
           .map(r => r.trim())
           .filter(Boolean),
         applicationUrl: data.applicationUrl as string | undefined,
+        ...(screeningQuestions.length > 0
+          ? {
+              screeningQuestions: screeningQuestions.map((draft, index) => ({
+                prompt: draft.prompt,
+                expectedKeywords: draft.expectedKeywords
+                  .split(',')
+                  .map(s => s.trim())
+                  .filter(Boolean),
+                maxScore: Number(draft.maxScore) || 5,
+                order: index + 1,
+              })),
+            }
+          : {}),
       })
       reset(undefined, { keepIsSubmitSuccessful: true })
     } catch (err) {
@@ -280,6 +324,79 @@ export default function PostJobForm() {
           className={textareaClass}
           {...register('responsibilities')}
         />
+      </div>
+
+      <div className="rounded-lg border border-hairline">
+        <div className="flex items-center justify-between gap-3 p-4">
+          <button
+            type="button"
+            onClick={() => setIsScreeningOpen((open) => !open)}
+            className="flex items-center gap-2 text-sm font-semibold text-ink"
+          >
+            Screening questions (optional)
+            <span aria-hidden="true">{isScreeningOpen ? '−' : '+'}</span>
+          </button>
+          <Button variant="secondary" size="sm" type="button" onClick={addScreeningQuestion}>
+            Add screening question
+          </Button>
+        </div>
+
+        {isScreeningOpen && (
+          <div className="space-y-4 border-t border-hairline p-4">
+            {screeningQuestions.length === 0 ? (
+              <p className="text-sm text-ink-muted">
+                No screening questions yet. Add one to quiz applicants on key skills.
+              </p>
+            ) : (
+              screeningQuestions.map((question, index) => (
+                <div key={question.id} className="rounded-md border border-hairline p-4">
+                  <div className="flex items-center justify-between gap-3">
+                    <p className="text-sm font-medium text-ink">Question {index + 1}</p>
+                    <button
+                      type="button"
+                      onClick={() => removeScreeningQuestion(question.id)}
+                      className="text-sm text-ink-muted hover:text-error"
+                    >
+                      Remove question
+                    </button>
+                  </div>
+                  <div className="mt-3 space-y-3">
+                    <Input
+                      label="Question prompt"
+                      id={`${question.id}-prompt`}
+                      value={question.prompt}
+                      onChange={(e) =>
+                        updateScreeningQuestion(question.id, { prompt: e.target.value })
+                      }
+                    />
+                    <Input
+                      label="Expected keywords"
+                      id={`${question.id}-keywords`}
+                      placeholder="e.g. python, fastapi"
+                      value={question.expectedKeywords}
+                      onChange={(e) =>
+                        updateScreeningQuestion(question.id, { expectedKeywords: e.target.value })
+                      }
+                    />
+                    <Input
+                      label="Max score"
+                      id={`${question.id}-max-score`}
+                      type="number"
+                      min={1}
+                      max={100}
+                      value={question.maxScore}
+                      onChange={(e) =>
+                        updateScreeningQuestion(question.id, {
+                          maxScore: Number(e.target.value),
+                        })
+                      }
+                    />
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        )}
       </div>
 
       <Input

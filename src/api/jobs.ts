@@ -1,6 +1,13 @@
 import { apiGet, apiPost, apiPatch, apiDelete } from './client'
 import type { Job, JobListParams, TagFacet, JobFacets } from './types'
 
+export interface ScreeningQuestionInput {
+  prompt: string
+  expectedKeywords: string[]
+  maxScore: number
+  order: number
+}
+
 export interface CreateJobParams {
   title: string
   company: string
@@ -16,6 +23,7 @@ export interface CreateJobParams {
   requirements: string[]
   responsibilities: string[]
   applicationUrl?: string
+  screeningQuestions?: ScreeningQuestionInput[]
 }
 
 export async function createJob(data: CreateJobParams) {
