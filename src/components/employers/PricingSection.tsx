@@ -72,12 +72,14 @@ export function PricingSection() {
         </div>
         )}
       </Container>
-      <PaymentModal
-        tier={selectedTier!}
-        open={!!selectedTier}
-        onOpenChange={(o) => !o && setSelectedTier(null)}
-        onPaid={handlePaid}
-      />
+      {selectedTier && (
+        <PaymentModal
+          tier={selectedTier}
+          open
+          onOpenChange={(o) => !o && setSelectedTier(null)}
+          onPaid={handlePaid}
+        />
+      )}
     </Section>
   )
 }
