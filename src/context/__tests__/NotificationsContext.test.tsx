@@ -1,6 +1,6 @@
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { act, useEffect, useState } from 'react'
+import { act, useCallback, useEffect, useState } from 'react'
 import { NotificationsProvider, useNotifications } from '../NotificationsContext'
 import type { Notification } from '../../types/notification'
 
@@ -45,7 +45,7 @@ class MockEventSource {
   onmessage: ((e: unknown) => void) | null = null
   onerror: ((e: unknown) => void) | null = null
   onopen: ((e: unknown) => void) | null = null
-  listeners: Record<string, (e: unknown) => void> = {}
+  listeners: Record<string, Array<(e: unknown) => void>> = {}
   closed = false
 
   constructor(url: string) {
@@ -58,8 +58,15 @@ class MockEventSource {
   }
 
   addEventListener(type: string, cb: (e: unknown) => void) {
-    this.listeners[type] = cb
+    const list = this.listeners[type] ?? []
+    list.push(cb)
+    this.listeners[type] = list
   }
+}
+
+function dispatch(type: string, data: unknown) {
+  const es = MockEventSource.instances[0]
+  es.listeners[type]?.forEach((cb) => cb({ data: JSON.stringify(data) }))
 }
 
 const originalEventSource = globalThis.EventSource
@@ -121,6 +128,29 @@ function LateSubscribingConsumer() {
   )
 }
 
+function ResubscribingConsumer() {
+  const { subscribe, unsubscribe } = useNotifications()
+  const [count, setCount] = useState(0)
+  const [active, setActive] = useState(true)
+
+  const handleEvent = useCallback(() => {
+    setCount((c) => c + 1)
+  }, [])
+
+  useEffect(() => {
+    if (active) subscribe('application:updated', handleEvent)
+    else unsubscribe('application:updated', handleEvent)
+  }, [active, subscribe, unsubscribe, handleEvent])
+
+  return (
+    <div>
+      <span data-testid="stream-count">{count}</span>
+      <button onClick={() => setActive(false)}>unsubscribe</button>
+      <button onClick={() => setActive(true)}>resubscribe</button>
+    </div>
+  )
+}
+
 function renderSubscribed() {
   useAuthMock.mockReturnValue({ user: mockUser, loading: false })
   return render(
@@ -135,6 +165,15 @@ function renderLateSubscribing() {
   return render(
     <NotificationsProvider>
       <LateSubscribingConsumer />
+    </NotificationsProvider>
+  )
+}
+
+function renderResubscribing() {
+  useAuthMock.mockReturnValue({ user: mockUser, loading: false })
+  return render(
+    <NotificationsProvider>
+      <ResubscribingConsumer />
     </NotificationsProvider>
   )
 }
@@ -183,7 +222,7 @@ describe('NotificationsContext', () => {
     })
 
     const live: Notification = { id: 'n3', type: 'NEW_MESSAGE', title: 'New message', body: 'Hi there', read: false, createdAt: '2025-01-02T00:00:00.000Z' }
-    MockEventSource.instances[0].listeners['notification']({ data: JSON.stringify(live) })
+    dispatch('notification', live)
 
     await waitFor(() => {
       const items = JSON.parse(screen.getByTestId('items').textContent!)
@@ -203,9 +242,8 @@ describe('NotificationsContext', () => {
     })
 
     const live: Notification = { id: 'n9', type: 'SYSTEM', title: 'Dup', body: 'x', read: false, createdAt: '2025-01-02T00:00:00.000Z' }
-    const es = MockEventSource.instances[0]
-    es.listeners['notification']({ data: JSON.stringify(live) })
-    es.listeners['notification']({ data: JSON.stringify(live) })
+    dispatch('notification', live)
+    dispatch('notification', live)
 
     await waitFor(() => {
       const items = JSON.parse(screen.getByTestId('items').textContent!)
@@ -314,7 +352,7 @@ describe('NotificationsContext', () => {
     })
 
     act(() => {
-      MockEventSource.instances[0].listeners['application:updated']({ data: JSON.stringify({ applicationId: 'a1' }) })
+      dispatch('application:updated', { applicationId: 'a1' })
     })
 
     expect(screen.getByTestId('stream-count')).toHaveTextContent('1')
@@ -333,11 +371,42 @@ describe('NotificationsContext', () => {
     await user.click(screen.getByRole('button', { name: 'subscribe' }))
 
     act(() => {
-      MockEventSource.instances[0].listeners['application:updated']({ data: JSON.stringify({ applicationId: 'a1' }) })
-      MockEventSource.instances[0].listeners['application:updated']({ data: JSON.stringify({ applicationId: 'a2' }) })
+      dispatch('application:updated', { applicationId: 'a1' })
+      dispatch('application:updated', { applicationId: 'a2' })
     })
 
     expect(screen.getByTestId('stream-count')).toHaveTextContent('2')
     expect(MockEventSource.instances).toHaveLength(1)
+  })
+
+  it('reuses a single dispatcher across unsubscribe → resubscribe on the same live connection', async () => {
+    listNotificationsMock.mockResolvedValue({ data: { items: [], unreadCount: 0 }, success: true })
+    const user = userEvent.setup()
+    renderResubscribing()
+
+    await waitFor(() => {
+      expect(MockEventSource.instances).toHaveLength(1)
+    })
+    expect(MockEventSource.instances[0].listeners['application:updated']).toHaveLength(1)
+
+    await user.click(screen.getByRole('button', { name: 'unsubscribe' }))
+    await user.click(screen.getByRole('button', { name: 'resubscribe' }))
+
+    expect(MockEventSource.instances[0].listeners['application:updated']).toHaveLength(1)
+
+    act(() => {
+      dispatch('application:updated', { applicationId: 'a1' })
+    })
+
+    expect(screen.getByTestId('stream-count')).toHaveTextContent('1')
+    expect(MockEventSource.instances).toHaveLength(1)
+
+    await user.click(screen.getByRole('button', { name: 'unsubscribe' }))
+
+    act(() => {
+      dispatch('application:updated', { applicationId: 'a2' })
+    })
+
+    expect(screen.getByTestId('stream-count')).toHaveTextContent('1')
   })
 })

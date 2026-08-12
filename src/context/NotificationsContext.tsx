@@ -15,7 +15,9 @@ export type SSEHandler = (event: MessageEvent) => void
 
 type SSEHandlerRegistry = Map<string, Set<SSEHandler>>
 
-function attachEventDispatcher(es: EventSource, registry: SSEHandlerRegistry, eventName: string) {
+function attachEventDispatcher(es: EventSource, registry: SSEHandlerRegistry, attached: Set<string>, eventName: string) {
+  if (attached.has(eventName)) return
+  attached.add(eventName)
   es.addEventListener(eventName, (e: Event) => {
     const messageEvent = e as MessageEvent
     registry.get(eventName)?.forEach((handler) => handler(messageEvent))
@@ -41,6 +43,7 @@ export function NotificationsProvider({ children }: { children: ReactNode }) {
   const mountedRef = useRef(true)
   const esRef = useRef<EventSource | null>(null)
   const eventHandlersRef = useRef<SSEHandlerRegistry>(new Map())
+  const attachedEventNamesRef = useRef<Set<string>>(new Set())
 
   const subscribe = useCallback((eventName: string, handler: SSEHandler) => {
     const handlers = eventHandlersRef.current.get(eventName) ?? new Set()
@@ -48,7 +51,7 @@ export function NotificationsProvider({ children }: { children: ReactNode }) {
     handlers.add(handler)
     eventHandlersRef.current.set(eventName, handlers)
     if (isNewEvent && esRef.current) {
-      attachEventDispatcher(esRef.current, eventHandlersRef.current, eventName)
+      attachEventDispatcher(esRef.current, eventHandlersRef.current, attachedEventNamesRef.current, eventName)
     }
   }, [])
 
@@ -91,6 +94,7 @@ export function NotificationsProvider({ children }: { children: ReactNode }) {
       const nextEs = new EventSource(`${API_BASE}/notifications/stream?token=${token}`)
       es = nextEs
       esRef.current = nextEs
+      attachedEventNamesRef.current = new Set()
 
       nextEs.addEventListener('notification', (e) => {
         try {
@@ -101,7 +105,7 @@ export function NotificationsProvider({ children }: { children: ReactNode }) {
       })
 
       eventHandlersRef.current.forEach((_handlers, eventName) => {
-        attachEventDispatcher(nextEs, eventHandlersRef.current, eventName)
+        attachEventDispatcher(nextEs, eventHandlersRef.current, attachedEventNamesRef.current, eventName)
       })
 
       nextEs.onerror = () => {
