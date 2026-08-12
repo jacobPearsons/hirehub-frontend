@@ -75,7 +75,7 @@ export interface JobListParams {
   salaryMin?: number
   salaryMax?: number
   featured?: string
-  sort?: 'relevance' | 'recent' | 'salary_high' | 'salary_low' | 'remote_first'
+  sort?: 'relevance' | 'recent' | 'salary_high' | 'salary_low' | 'remote_first' | 'random'
   cursor?: string
   take?: number
 }

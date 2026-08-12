@@ -14,6 +14,7 @@ import { useJobFacets } from '../../hooks/useJobFacets'
 import type { InfiniteJobsParams } from '../../hooks/useJobs'
 
 const SORT_OPTIONS = [
+  { value: 'random', label: 'Shuffle' },
   { value: 'recent', label: 'Most Recent' },
   { value: 'relevance', label: 'Best Match' },
   { value: 'salary_high', label: 'Highest Salary' },
@@ -58,10 +59,10 @@ export default function JobBoardPage() {
   const category = searchParams.get('category') ?? ''
   const seniority = searchParams.get('seniority') ?? ''
   const remote = searchParams.get('remote') ?? ''
-  const sortParam = searchParams.get('sort') ?? 'recent'
+  const sortParam = searchParams.get('sort') ?? 'random'
   const sort: JobSort = SORT_VALUES.includes(sortParam)
     ? (sortParam as JobSort)
-    : 'recent'
+    : 'random'
 
   const handleParamChange = useCallback(
     (key: string, value: string, replace = false) => {

@@ -20,7 +20,7 @@ export interface InfiniteJobsParams {
   remote?: string
   salaryMin?: number
   salaryMax?: number
-  sort?: 'relevance' | 'recent' | 'salary_high' | 'salary_low' | 'remote_first'
+  sort?: 'relevance' | 'recent' | 'salary_high' | 'salary_low' | 'remote_first' | 'random'
 }
 
 export function useInfiniteJobs(params: InfiniteJobsParams) {

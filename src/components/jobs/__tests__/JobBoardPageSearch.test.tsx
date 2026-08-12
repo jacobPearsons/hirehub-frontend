@@ -82,7 +82,7 @@ describe('JobBoardPage URL sync', () => {
     })
   })
 
-  it('defaults sort to recent when absent from the URL', async () => {
+  it('defaults sort to random when absent from the URL', async () => {
     renderJobBoardPage('/jobs')
 
     await waitFor(() => {
@@ -90,7 +90,7 @@ describe('JobBoardPage URL sync', () => {
     })
 
     const params = (listJobs as ReturnType<typeof vi.fn>).mock.calls.at(-1)?.[0] as Record<string, unknown>
-    expect(params).toMatchObject({ sort: 'recent' })
+    expect(params).toMatchObject({ sort: 'random' })
   })
 
   it('updates the URL when the keyword changes', async () => {
