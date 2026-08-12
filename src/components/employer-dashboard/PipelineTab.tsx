@@ -1,7 +1,9 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { DndContext, DragOverlay, useDraggable, useDroppable, type DragEndEvent } from '@dnd-kit/core'
 import { useApplications } from '../../context/ApplicationsContext'
 import { useToast } from '../ui/Toast'
+import { usePipelineStream } from '../../hooks/usePipelineStream'
+import { listEmployerApplications } from '../../api/applications'
 import { ApplicationCard } from '../dashboard/ApplicationCard'
 import { PIPELINE_COLUMNS, TERMINAL_STATUSES, groupByStatus, moveCard } from '../../utils/kanban'
 import type { Application, ApplicationStatus } from '../../types/application'
@@ -74,11 +76,31 @@ function PipelineColumn({ appKey, apps }: { appKey: string; apps: Application[] 
 }
 
 export function PipelineTab({ applications }: PipelineTabProps) {
-  const { updateApplicationStatus } = useApplications()
+  const { updateApplicationStatus, setApplications } = useApplications()
+  const streamVersion = usePipelineStream()
   const { showToast } = useToast()
   const [columns, setColumns] = useState(() => groupByStatus(applications))
   const [prevApplications, setPrevApplications] = useState(applications)
   const [activeId, setActiveId] = useState<string | null>(null)
+  const skipFirstStreamRef = useRef(true)
+
+  useEffect(() => {
+    if (skipFirstStreamRef.current) {
+      skipFirstStreamRef.current = false
+      return
+    }
+    let cancelled = false
+    listEmployerApplications()
+      .then((res) => {
+        if (!cancelled) setApplications(res.data)
+      })
+      .catch(() => {
+        if (!cancelled) showToast('error', "Couldn't refresh the pipeline. Please try again.")
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [streamVersion, setApplications, showToast])
 
   if (prevApplications !== applications) {
     setPrevApplications(applications)

@@ -32,7 +32,11 @@ function drag(appId: string, from: string, to: string) {
 }
 
 vi.mock('../../../context/ApplicationsContext', () => ({
-  useApplications: vi.fn(() => ({ applications: [], updateApplicationStatus: vi.fn() })),
+  useApplications: vi.fn(() => ({ applications: [], setApplications: vi.fn(), updateApplicationStatus: vi.fn() })),
+}))
+
+vi.mock('../../../hooks/usePipelineStream', () => ({
+  usePipelineStream: () => 0,
 }))
 
 const baseApp = (overrides: Partial<Application>): Application => ({
@@ -51,7 +55,7 @@ const baseApp = (overrides: Partial<Application>): Application => ({
 
 function renderPipelineTab(applications: Application[]) {
   const updateApplicationStatus = vi.fn().mockResolvedValue(undefined)
-  vi.mocked(useApplications).mockReturnValue({ applications, updateApplicationStatus })
+  vi.mocked(useApplications).mockReturnValue({ applications, setApplications: vi.fn(), updateApplicationStatus })
   render(
     <ToastProvider>
       <MemoryRouter>

@@ -1,5 +1,6 @@
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { act, useEffect, useState } from 'react'
 import { NotificationsProvider, useNotifications } from '../NotificationsContext'
 import type { Notification } from '../../types/notification'
 
@@ -93,6 +94,47 @@ function renderWithUser(user: typeof mockUser | null) {
   return render(
     <NotificationsProvider>
       <Consumer />
+    </NotificationsProvider>
+  )
+}
+
+function SubscribedConsumer() {
+  const { subscribe } = useNotifications()
+  const [count, setCount] = useState(0)
+
+  useEffect(() => {
+    subscribe('application:updated', () => setCount((c) => c + 1))
+  }, [subscribe])
+
+  return <span data-testid="stream-count">{count}</span>
+}
+
+function LateSubscribingConsumer() {
+  const { subscribe } = useNotifications()
+  const [count, setCount] = useState(0)
+
+  return (
+    <div>
+      <span data-testid="stream-count">{count}</span>
+      <button onClick={() => subscribe('application:updated', () => setCount((c) => c + 1))}>subscribe</button>
+    </div>
+  )
+}
+
+function renderSubscribed() {
+  useAuthMock.mockReturnValue({ user: mockUser, loading: false })
+  return render(
+    <NotificationsProvider>
+      <SubscribedConsumer />
+    </NotificationsProvider>
+  )
+}
+
+function renderLateSubscribing() {
+  useAuthMock.mockReturnValue({ user: mockUser, loading: false })
+  return render(
+    <NotificationsProvider>
+      <LateSubscribingConsumer />
     </NotificationsProvider>
   )
 }
@@ -261,5 +303,41 @@ describe('NotificationsContext', () => {
       expect(listNotificationsMock).toHaveBeenCalledTimes(2)
       expect(screen.getByTestId('count')).toHaveTextContent('1')
     })
+  })
+
+  it('subscribes before connect and forwards application:updated over the single SSE stream', async () => {
+    listNotificationsMock.mockResolvedValue({ data: { items: [], unreadCount: 0 }, success: true })
+    renderSubscribed()
+
+    await waitFor(() => {
+      expect(MockEventSource.instances).toHaveLength(1)
+    })
+
+    act(() => {
+      MockEventSource.instances[0].listeners['application:updated']({ data: JSON.stringify({ applicationId: 'a1' }) })
+    })
+
+    expect(screen.getByTestId('stream-count')).toHaveTextContent('1')
+    expect(MockEventSource.instances).toHaveLength(1)
+  })
+
+  it('attaches a subscriber to the already-open SSE stream without opening a second connection', async () => {
+    listNotificationsMock.mockResolvedValue({ data: { items: [], unreadCount: 0 }, success: true })
+    const user = userEvent.setup()
+    renderLateSubscribing()
+
+    await waitFor(() => {
+      expect(MockEventSource.instances).toHaveLength(1)
+    })
+
+    await user.click(screen.getByRole('button', { name: 'subscribe' }))
+
+    act(() => {
+      MockEventSource.instances[0].listeners['application:updated']({ data: JSON.stringify({ applicationId: 'a1' }) })
+      MockEventSource.instances[0].listeners['application:updated']({ data: JSON.stringify({ applicationId: 'a2' }) })
+    })
+
+    expect(screen.getByTestId('stream-count')).toHaveTextContent('2')
+    expect(MockEventSource.instances).toHaveLength(1)
   })
 })

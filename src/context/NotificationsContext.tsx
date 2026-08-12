@@ -11,12 +11,25 @@ declare global {
   }
 }
 
+export type SSEHandler = (event: MessageEvent) => void
+
+type SSEHandlerRegistry = Map<string, Set<SSEHandler>>
+
+function attachEventDispatcher(es: EventSource, registry: SSEHandlerRegistry, eventName: string) {
+  es.addEventListener(eventName, (e: Event) => {
+    const messageEvent = e as MessageEvent
+    registry.get(eventName)?.forEach((handler) => handler(messageEvent))
+  })
+}
+
 interface NotificationsContextValue {
   notifications: Notification[]
   unreadCount: number
   markRead: (id: string) => Promise<void>
   markAllRead: () => Promise<void>
   refresh: () => Promise<void>
+  subscribe: (eventName: string, handler: SSEHandler) => void
+  unsubscribe: (eventName: string, handler: SSEHandler) => void
 }
 
 const NotificationsContext = createContext<NotificationsContextValue | null>(null)
@@ -26,6 +39,25 @@ export function NotificationsProvider({ children }: { children: ReactNode }) {
   const { showToast } = useToast()
   const [notifications, setNotifications] = useState<Notification[]>([])
   const mountedRef = useRef(true)
+  const esRef = useRef<EventSource | null>(null)
+  const eventHandlersRef = useRef<SSEHandlerRegistry>(new Map())
+
+  const subscribe = useCallback((eventName: string, handler: SSEHandler) => {
+    const handlers = eventHandlersRef.current.get(eventName) ?? new Set()
+    const isNewEvent = handlers.size === 0
+    handlers.add(handler)
+    eventHandlersRef.current.set(eventName, handlers)
+    if (isNewEvent && esRef.current) {
+      attachEventDispatcher(esRef.current, eventHandlersRef.current, eventName)
+    }
+  }, [])
+
+  const unsubscribe = useCallback((eventName: string, handler: SSEHandler) => {
+    const handlers = eventHandlersRef.current.get(eventName)
+    if (!handlers) return
+    handlers.delete(handler)
+    if (handlers.size === 0) eventHandlersRef.current.delete(eventName)
+  }, [])
 
   const unreadCount = notifications.filter(n => !n.read).length
 
@@ -56,9 +88,11 @@ export function NotificationsProvider({ children }: { children: ReactNode }) {
       const token = getAccessToken()
       if (!token) return
 
-      es = new EventSource(`${API_BASE}/notifications/stream?token=${token}`)
+      const nextEs = new EventSource(`${API_BASE}/notifications/stream?token=${token}`)
+      es = nextEs
+      esRef.current = nextEs
 
-      es.addEventListener('notification', (e) => {
+      nextEs.addEventListener('notification', (e) => {
         try {
           const notification = JSON.parse(e.data) as Notification
           setNotifications(prev => prev.some(n => n.id === notification.id) ? prev : [notification, ...prev])
@@ -66,9 +100,14 @@ export function NotificationsProvider({ children }: { children: ReactNode }) {
         } catch { /* intentionally empty */ }
       })
 
-      es.onerror = () => {
-        es?.close()
+      eventHandlersRef.current.forEach((_handlers, eventName) => {
+        attachEventDispatcher(nextEs, eventHandlersRef.current, eventName)
+      })
+
+      nextEs.onerror = () => {
+        nextEs.close()
         es = null
+        esRef.current = null
         if (mountedRef.current) {
           if (retryTimer) window.clearTimeout(retryTimer)
           retryTimer = window.setTimeout(connect, 3000)
@@ -84,6 +123,7 @@ export function NotificationsProvider({ children }: { children: ReactNode }) {
       mountedRef.current = false
       es?.close()
       es = null
+      esRef.current = null
       if (retryTimer) window.clearTimeout(retryTimer)
     }
   }, [user, showToast, fetchList])
@@ -111,8 +151,8 @@ export function NotificationsProvider({ children }: { children: ReactNode }) {
   }, [fetchList])
 
   const value = useMemo(
-    () => ({ notifications, unreadCount, markRead, markAllRead, refresh }),
-    [notifications, unreadCount, markRead, markAllRead, refresh],
+    () => ({ notifications, unreadCount, markRead, markAllRead, refresh, subscribe, unsubscribe }),
+    [notifications, unreadCount, markRead, markAllRead, refresh, subscribe, unsubscribe],
   )
 
   return <NotificationsContext.Provider value={value}>{children}</NotificationsContext.Provider>
