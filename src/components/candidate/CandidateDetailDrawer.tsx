@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import * as Dialog from '@radix-ui/react-dialog'
 import { AnimatePresence, motion } from 'framer-motion'
-import { X, FileText, Mail, Phone, Globe, MapPin, Calendar } from 'lucide-react'
+import { X, FileText, Mail, Phone, Globe, MapPin, Calendar, ArrowRight } from 'lucide-react'
 import { Avatar, Button } from '../ui'
 import { useToast } from '../ui/Toast'
 import { resumeFileUrl } from '../../api/applications'
@@ -9,6 +9,8 @@ import { useCandidateProfileQuery } from '../../hooks/useCandidateProfileQuery'
 import { useApplications } from '../../context/ApplicationsContext'
 import { InterviewScheduleModal, InterviewDetails } from '../interview'
 import { OfferLetterModal } from '../offer'
+import { STATUS_CONFIG, canTransition } from '../../utils/status'
+import { formatDate } from '../../utils/date'
 import type { Application } from '../../types/application'
 
 interface CandidateDetailDrawerProps {
@@ -55,6 +57,16 @@ export function CandidateDetailDrawer({
 
   const candidate = data?.data.candidate ?? null
   const error = isError ? 'Failed to load candidate profile.' : null
+
+  const screeningResult = application.screeningResult
+  const screeningPct =
+    screeningResult && screeningResult.maxPossible > 0
+      ? Math.max(0, Math.min(100, Math.round((screeningResult.score / screeningResult.maxPossible) * 100)))
+      : 0
+
+  const timelineEntries = application.timeline
+    ? [...application.timeline].sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime())
+    : []
 
   async function handleStatusChange(status: Application['status'], message: string) {
     try {
@@ -212,6 +224,69 @@ export function CandidateDetailDrawer({
                         <p className="text-sm text-ink whitespace-pre-line">{application.coverLetter}</p>
                       </Section>
 
+                      {screeningResult && (
+                        <Section title="Screening">
+                          <div className="space-y-3">
+                            <div>
+                              <div className="flex items-center justify-between mb-1.5">
+                                <span className="text-sm text-ink-tertiary">Score</span>
+                                <span className="text-sm font-medium text-ink">
+                                  {screeningResult.score} / {screeningResult.maxPossible}
+                                </span>
+                              </div>
+                              <div className="h-1.5 rounded-full bg-surface-2 overflow-hidden" aria-hidden="true">
+                                <div
+                                  className="h-full bg-accent rounded-full transition-all duration-300"
+                                  style={{ width: `${screeningPct}%` }}
+                                />
+                              </div>
+                            </div>
+                            {application.screeningAnswers?.map((answer) => (
+                              <div key={answer.questionId} className="rounded-lg border border-hairline p-3">
+                                <div className="flex items-start justify-between gap-3">
+                                  <p className="text-sm font-medium text-ink">
+                                    {answer.question?.prompt ?? answer.questionId}
+                                  </p>
+                                  {answer.score != null && (
+                                    <span className="text-xs text-ink-tertiary flex-shrink-0">{answer.score} pts</span>
+                                  )}
+                                </div>
+                                <p className="text-sm text-ink-muted mt-1 whitespace-pre-line">{answer.answerText}</p>
+                              </div>
+                            ))}
+                          </div>
+                        </Section>
+                      )}
+
+                      {timelineEntries.length > 0 && (
+                        <Section title="Timeline">
+                          <ol className="space-y-3">
+                            {timelineEntries.map((entry) => {
+                              const fromLabel = entry.fromStatus
+                                ? STATUS_CONFIG[entry.fromStatus].label
+                                : 'Submitted'
+                              const actor =
+                                entry.actorRole.charAt(0) + entry.actorRole.slice(1).toLowerCase()
+                              return (
+                                <li key={entry.id} className="flex items-start gap-2.5">
+                                  <ArrowRight className="w-4 h-4 text-ink-tertiary mt-0.5 flex-shrink-0" aria-hidden="true" />
+                                  <div className="min-w-0">
+                                    <p className="text-sm font-medium text-ink">
+                                      {fromLabel} → {STATUS_CONFIG[entry.toStatus].label}
+                                    </p>
+                                    <p className="text-xs text-ink-tertiary mt-0.5 flex items-center gap-1.5">
+                                      <span>{actor}</span>
+                                      <span aria-hidden="true">·</span>
+                                      <span>{formatDate(entry.createdAt)}</span>
+                                    </p>
+                                  </div>
+                                </li>
+                              )
+                            })}
+                          </ol>
+                        </Section>
+                      )}
+
                       {application.interviewDetails && (
                         <Section title="Hiring Progress">
                           <InterviewDetails details={application.interviewDetails} />
@@ -221,31 +296,33 @@ export function CandidateDetailDrawer({
                       {!readOnly && (
                         <Section title="Actions">
                           <div className="flex flex-wrap gap-2">
-                            {application.status !== 'screening' && (
+                            {canTransition(application.status, 'screening') && (
                               <Button
                                 variant="accent"
                                 size="sm"
-                                onClick={() => handleStatusChange('screening', 'Marked as under review')}
+                                onClick={() =>
+                                  handleStatusChange('screening', `Moved to ${STATUS_CONFIG.screening.label.toLowerCase()}`)
+                                }
                               >
-                                Mark reviewing
+                                Move to {STATUS_CONFIG.screening.label}
                               </Button>
                             )}
-                            {application.status !== 'interviewing' && (
+                            {canTransition(application.status, 'interviewing') && (
                               <Button variant="accent" size="sm" onClick={() => setInterviewOpen(true)}>
                                 Schedule Interview
                               </Button>
                             )}
-                            {application.status !== 'offer' && (
+                            {canTransition(application.status, 'offer') && (
                               <Button variant="accent" size="sm" onClick={() => setOfferOpen(true)}>
                                 Make offer
                               </Button>
                             )}
-                            {application.status !== 'rejected' && (
+                            {canTransition(application.status, 'rejected') && (
                               <button
                                 className="text-xs font-medium text-error hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/40 rounded"
                                 onClick={() => handleStatusChange('rejected', 'Application rejected')}
                               >
-                                Reject
+                                Move to {STATUS_CONFIG.rejected.label}
                               </button>
                             )}
                           </div>
