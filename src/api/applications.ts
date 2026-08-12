@@ -117,7 +117,8 @@ export async function listEmployerApplications() {
 }
 
 export async function updateApplicationStatus(id: string, status: ApplicationStatus) {
-  const res = await apiPatch<BackendApplication>(`/applications/${id}/status`, { status: STATUS_TO_UPPER[status] })
+  const normalizedStatus = String(status).toLowerCase() as ApplicationStatus
+  const res = await apiPatch<BackendApplication>(`/applications/${id}/status`, { status: STATUS_TO_UPPER[normalizedStatus] })
   return { ...res, data: normalizeApplication(res.data) }
 }
 
