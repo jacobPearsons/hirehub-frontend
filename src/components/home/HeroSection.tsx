@@ -32,7 +32,7 @@ export function HeroSection() {
             <div className="flex flex-col sm:flex-row gap-4 mt-12 justify-center">
               <Link
                 to="/jobs"
-                className="inline-flex items-center justify-center px-6 py-3 text-base rounded-md font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/30 bg-ink dark:text-accent text-white hover:bg-accent"
+                className="inline-flex items-center justify-center px-6 py-3 text-base  rounded-md font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/30 bg-ink dark:text-accent text-white hover:bg-black"
               >
                 Browse Jobs
               </Link>
