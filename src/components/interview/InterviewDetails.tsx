@@ -1,3 +1,5 @@
+import { Link } from 'react-router-dom'
+import { useApp } from '../../context/AppContext'
 import type { InterviewDetails as InterviewDetailsType, InterviewType } from '../../types/hiring-flow'
 
 const typeBadgeConfig: Record<InterviewType, { label: string; color: string }> = {
@@ -12,6 +14,8 @@ interface InterviewDetailsProps {
 
 export function InterviewDetails({ details }: InterviewDetailsProps) {
   const badge = typeBadgeConfig[details.interviewType]
+  const { user } = useApp()
+  const base = user?.role === 'employer' ? '/employer/dashboard' : '/dashboard'
 
   return (
     <div className="space-y-3">
@@ -54,6 +58,31 @@ export function InterviewDetails({ details }: InterviewDetailsProps) {
           >
             {details.meetingLink}
           </a>
+        </div>
+      )}
+
+      {details.interviewType === 'website-chat' && (
+        <div className="text-sm space-y-2">
+          {details.conversationId && (
+            <Link
+              to={`${base}?tab=messages&conv=${details.conversationId}`}
+              className="inline-flex items-center gap-1.5 rounded-pill bg-accent px-3 py-1.5 text-xs font-medium text-white hover:bg-accent-dark focus-visible:ring-2 focus-visible:ring-ink/30"
+            >
+              Open interview chat
+            </Link>
+          )}
+          {details.questions && details.questions.length > 0 && (
+            <div>
+              <p className="text-ink-tertiary text-xs">Questions</p>
+              <ul className="mt-1 space-y-1 text-ink">
+                {details.questions.map((question, index) => (
+                  <li key={question.id}>
+                    {index + 1}. {question.prompt}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
         </div>
       )}
 
