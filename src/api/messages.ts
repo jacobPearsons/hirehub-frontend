@@ -16,3 +16,7 @@ export async function getMessages(conversationId: string) {
 export async function sendMessage(conversationId: string, content: string) {
   return apiPost<ChatMessage>('/messages', { conversationId, content })
 }
+
+export async function openInterviewConversation(applicationId: string) {
+  return apiPost<{ conversation: { id: string } }>(`/applications/${applicationId}/interview-conversation`, {})
+}

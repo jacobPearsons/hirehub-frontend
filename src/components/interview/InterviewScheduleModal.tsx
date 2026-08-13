@@ -4,13 +4,16 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { X } from 'lucide-react'
 import { useForm, useWatch } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useNavigate } from 'react-router-dom'
 import { z } from 'zod'
 import { Input, Textarea, Button } from '../ui'
 import { useToast } from '../ui/Toast'
 import { sendInterviewInvitation } from '../../api/emails'
+import { openInterviewConversation } from '../../api/messages'
 import { useApplications } from '../../context/ApplicationsContext'
+import { useApp } from '../../context/AppContext'
+import { useJob } from '../../hooks/useJob'
 import type { Application } from '../../types/application'
-
 
 const interviewSchema = z.object({
   interviewType: z.enum(['phone', 'video', 'website-chat']),
@@ -19,7 +22,6 @@ const interviewSchema = z.object({
   interviewerName: z.string().min(1, 'Interviewer name is required'),
   interviewerTitle: z.string().min(1, 'Interviewer title is required'),
   meetingLink: z.string().url('Must be a valid URL').optional().or(z.literal('')),
-  meetingLocation: z.string().optional(),
   notes: z.string().optional(),
 })
 
@@ -39,8 +41,12 @@ export function InterviewScheduleModal({
   onSuccess,
 }: InterviewScheduleModalProps) {
   const [submitting, setSubmitting] = useState(false)
+  const [selectedQuestionIds, setSelectedQuestionIds] = useState<string[] | null>(null)
   const { showToast } = useToast()
+  const { user } = useApp()
+  const navigate = useNavigate()
   const { updateApplicationInterview, updateApplicationStatus } = useApplications()
+  const { data: job } = useJob(application.jobId)
 
   const {
     register,
@@ -57,12 +63,12 @@ export function InterviewScheduleModal({
       interviewerName: '',
       interviewerTitle: '',
       meetingLink: '',
-      meetingLocation: '',
       notes: '',
     },
   })
 
   const interviewType = useWatch({ control, name: 'interviewType' })
+  const questionOptions = (interviewType === 'website-chat' ? job?.screeningQuestions : undefined) ?? []
 
   function handleClose() {
     reset()
@@ -72,6 +78,31 @@ export function InterviewScheduleModal({
   const onSubmit = async (data: InterviewFormData) => {
     setSubmitting(true)
     try {
+      if (data.interviewType === 'website-chat') {
+        const selectedIds = selectedQuestionIds ?? questionOptions.map((q) => q.id)
+        const questions = questionOptions
+          .filter((q) => selectedIds.includes(q.id))
+          .map((q) => ({ id: q.id, prompt: q.prompt }))
+
+        await updateApplicationInterview(application.id, {
+          interviewType: 'website-chat',
+          interviewDate: data.interviewDate,
+          interviewTime: data.interviewTime,
+          interviewerName: data.interviewerName,
+          interviewerTitle: data.interviewerTitle,
+          notes: data.notes || undefined,
+          scheduledAt: new Date().toISOString(),
+          questions,
+        })
+
+        await updateApplicationStatus(application.id, 'interviewing')
+
+        const { data: conversationRes } = await openInterviewConversation(application.id)
+        const base = user?.role === 'employer' ? '/employer/dashboard' : '/dashboard'
+        navigate(`${base}?tab=messages&conv=${conversationRes.conversation.id}`)
+        return
+      }
+
       await updateApplicationStatus(application.id, 'interviewing')
 
       const interviewDetails = {
@@ -81,7 +112,6 @@ export function InterviewScheduleModal({
         interviewerName: data.interviewerName,
         interviewerTitle: data.interviewerTitle,
         meetingLink: data.meetingLink || undefined,
-        meetingLocation: data.meetingLocation || undefined,
         notes: data.notes || undefined,
         scheduledAt: new Date().toISOString(),
       }
@@ -98,7 +128,7 @@ export function InterviewScheduleModal({
         interviewerName: data.interviewerName,
         interviewerTitle: data.interviewerTitle,
         meetingLink: data.meetingLink || '',
-        meetingLocation: data.meetingLocation || '',
+        meetingLocation: '',
       }).catch(() => {})
 
       showToast('success', `Interview scheduled for ${application.applicantName}`)
@@ -158,11 +188,12 @@ export function InterviewScheduleModal({
                     <div>
                       <label className="block text-sm font-medium text-ink mb-1">Interview Type</label>
                       <select
-                        {...register('interviewType')}
+                        {...register('interviewType', { onChange: () => setSelectedQuestionIds(null) })}
                         className="w-full rounded-md border border-hairline bg-surface-1 px-3 py-2 text-sm text-ink focus:outline-none focus:ring-2 focus:ring-ink/20"
                       >
                         <option value="video">Video</option>
                         <option value="phone">Phone</option>
+                        <option value="website-chat">Website Chat</option>
                       </select>
                     </div>
 
@@ -203,6 +234,35 @@ export function InterviewScheduleModal({
                         error={errors.meetingLink?.message}
                         {...register('meetingLink')}
                       />
+                    )}
+
+                    {interviewType === 'website-chat' && questionOptions.length > 0 && (
+                      <div>
+                        <p className="block text-sm font-medium text-ink mb-1">Interview Questions</p>
+                        <div className="space-y-2 rounded-md border border-hairline bg-surface-1 p-3">
+                          {questionOptions.map((question) => {
+                            const checked = selectedQuestionIds === null || selectedQuestionIds.includes(question.id)
+                            return (
+                              <label key={question.id} className="flex items-start gap-2 text-sm text-ink">
+                                <input
+                                  type="checkbox"
+                                  checked={checked}
+                                  onChange={() =>
+                                    setSelectedQuestionIds((prev) => {
+                                      const base = prev ?? questionOptions.map((q) => q.id)
+                                      return base.includes(question.id)
+                                        ? base.filter((id) => id !== question.id)
+                                        : [...base, question.id]
+                                    })
+                                  }
+                                  className="mt-0.5 rounded border-hairline text-accent focus-visible:ring-2 focus-visible:ring-ink/30"
+                                />
+                                <span>{question.prompt}</span>
+                              </label>
+                            )
+                          })}
+                        </div>
+                      </div>
                     )}
 
                     <Textarea
