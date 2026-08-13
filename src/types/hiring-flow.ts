@@ -1,4 +1,4 @@
-export type InterviewType = 'phone' | 'video' | 'in-person'
+export type InterviewType = 'phone' | 'video' | 'website-chat'
 
 export interface InterviewDetails {
   interviewType: InterviewType
@@ -7,9 +7,10 @@ export interface InterviewDetails {
   interviewerName: string
   interviewerTitle: string
   meetingLink?: string
-  meetingLocation?: string
   notes?: string
   scheduledAt: string
+  conversationId?: string
+  questions?: { id: string; prompt: string }[]
 }
 
 export type EmploymentType = 'full-time' | 'part-time' | 'contract'

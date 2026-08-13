@@ -3,7 +3,7 @@ import type { InterviewDetails as InterviewDetailsType, InterviewType } from '..
 const typeBadgeConfig: Record<InterviewType, { label: string; color: string }> = {
   phone: { label: 'Phone', color: 'bg-accent/10 text-accent' },
   video: { label: 'Video', color: 'bg-ink-muted/10 text-ink-muted' },
-  'in-person': { label: 'In-Person', color: 'bg-success/10 text-success' },
+  'website-chat': { label: 'Website Chat', color: 'bg-success/10 text-success' },
 }
 
 interface InterviewDetailsProps {
@@ -54,13 +54,6 @@ export function InterviewDetails({ details }: InterviewDetailsProps) {
           >
             {details.meetingLink}
           </a>
-        </div>
-      )}
-
-      {details.interviewType === 'in-person' && details.meetingLocation && (
-        <div className="text-sm">
-          <p className="text-ink-tertiary text-xs">Location</p>
-          <p className="text-ink">{details.meetingLocation}</p>
         </div>
       )}
 

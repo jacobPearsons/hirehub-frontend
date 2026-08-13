@@ -13,7 +13,7 @@ import type { Application } from '../../types/application'
 
 
 const interviewSchema = z.object({
-  interviewType: z.enum(['phone', 'video', 'in-person']),
+  interviewType: z.enum(['phone', 'video', 'website-chat']),
   interviewDate: z.string().min(1, 'Date is required'),
   interviewTime: z.string().min(1, 'Time is required'),
   interviewerName: z.string().min(1, 'Interviewer name is required'),
@@ -163,7 +163,6 @@ export function InterviewScheduleModal({
                       >
                         <option value="video">Video</option>
                         <option value="phone">Phone</option>
-                        <option value="in-person">In-Person</option>
                       </select>
                     </div>
 
@@ -203,15 +202,6 @@ export function InterviewScheduleModal({
                         placeholder="https://meet.google.com/abc-defg-hij"
                         error={errors.meetingLink?.message}
                         {...register('meetingLink')}
-                      />
-                    )}
-
-                    {interviewType === 'in-person' && (
-                      <Input
-                        label="Meeting Location"
-                        placeholder="123 Main St, Suite 100"
-                        error={errors.meetingLocation?.message}
-                        {...register('meetingLocation')}
                       />
                     )}
 
