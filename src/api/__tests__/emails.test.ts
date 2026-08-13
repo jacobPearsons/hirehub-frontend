@@ -57,7 +57,6 @@ describe('renderEmailTemplate', () => {
       interviewerName: 'Bob',
       interviewerTitle: 'CTO',
       meetingLink: 'https://meet.example.com/x',
-      meetingLocation: '',
     })
     expect(subject).toBe('Interview Invitation: Barista at HireHub Community')
     expect(html).toContain('Dear Alice,')
@@ -75,7 +74,6 @@ describe('renderEmailTemplate', () => {
       interviewerName: 'Bob',
       interviewerTitle: 'CTO',
       meetingLink: 'javascript:alert(1)',
-      meetingLocation: '',
     })
     expect(html).not.toContain('javascript:')
   })

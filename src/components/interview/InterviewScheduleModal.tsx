@@ -128,7 +128,6 @@ export function InterviewScheduleModal({
         interviewerName: data.interviewerName,
         interviewerTitle: data.interviewerTitle,
         meetingLink: data.meetingLink || '',
-        meetingLocation: '',
       }).catch(() => {})
 
       showToast('success', `Interview scheduled for ${application.applicantName}`)

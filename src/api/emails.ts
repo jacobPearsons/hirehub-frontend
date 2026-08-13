@@ -10,7 +10,6 @@ export interface InterviewEmailParams {
   interviewerName: string
   interviewerTitle: string
   meetingLink: string
-  meetingLocation: string
 }
 
 export interface PostInterviewEmailParams {
@@ -263,7 +262,6 @@ function interviewTemplate(p: InterviewEmailParams): RenderedEmail {
       <tr>${detailRow('Time', escapeHtml(p.interviewTime))}</tr>
       <tr>${detailRow('Interviewer', `${escapeHtml(p.interviewerName)} — ${escapeHtml(p.interviewerTitle)}`)}</tr>
       ${meetingLinkRow(p.meetingLink)}
-      ${p.meetingLocation ? `<tr>${detailRow('Location', escapeHtml(p.meetingLocation))}</tr>` : ''}
     </table>
     ${para('<strong>Preparation Tips:</strong>')}
     ${bulletList([
