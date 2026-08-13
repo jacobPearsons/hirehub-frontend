@@ -3,6 +3,7 @@ import { useSearchParams } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { Send, MessageSquare } from 'lucide-react'
 import { useApp } from '../../context/AppContext'
+import { useNotifications } from '../../context/NotificationsContext'
 import { listConversations, getMessages, sendMessage } from '../../api/messages'
 import { SkeletonGrid } from '../ui/SkeletonGrid'
 import { ErrorState } from '../ui/ErrorState'
@@ -25,6 +26,7 @@ function formatTime(iso: string) {
 
 export function MessagesTab() {
   const { user } = useApp()
+  const { subscribe, unsubscribe } = useNotifications()
   const [searchParams] = useSearchParams()
   const [conversations, setConversations] = useState<Conversation[]>([])
   const [loading, setLoading] = useState(true)
@@ -36,6 +38,30 @@ export function MessagesTab() {
   const [sending, setSending] = useState(false)
   const tempIdRef = useRef(0)
   const requestedConvIdRef = useRef(searchParams.get('conv'))
+  const activeIdRef = useRef(activeId)
+
+  useEffect(() => {
+    activeIdRef.current = activeId
+  }, [activeId])
+
+  useEffect(() => {
+    const handleNewMessage = (event: MessageEvent) => {
+      try {
+        const message = JSON.parse(event.data) as ChatMessage
+        const currentActiveId = activeIdRef.current
+        if (currentActiveId && message.conversationId === currentActiveId) {
+          getMessages(currentActiveId)
+            .then((res) => setMessages(res.data))
+            .catch(() => { /* intentionally empty */ })
+        }
+        listConversations()
+          .then((res) => setConversations(res.data))
+          .catch(() => { /* intentionally empty */ })
+      } catch { /* intentionally empty */ }
+    }
+    subscribe('new-message', handleNewMessage)
+    return () => unsubscribe('new-message', handleNewMessage)
+  }, [subscribe, unsubscribe])
 
   function loadConversations() {
     setLoading(true)

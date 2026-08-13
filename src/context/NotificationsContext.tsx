@@ -8,6 +8,7 @@ import type { Notification } from '../types/notification'
 declare global {
   interface EventSourceEventMap {
     notification: MessageEvent
+    'new-message': MessageEvent
   }
 }
 
