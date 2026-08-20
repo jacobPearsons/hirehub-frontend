@@ -1,0 +1,482 @@
+{
+  "source": "Aggregated from We Work Remotely, ZipRecruiter, Robert Half, FlexJobs, and company career pages - August 2026",
+  "total_entries": 25,
+  "date_generated": "2026-08-04",
+  "jobs": [
+    {
+      "id": 1,
+      "title": "AI Prompt Engineering & Evaluation - Will Train",
+      "company": "DataAnnotation.tech",
+      "industry": "Technology / AI",
+      "location": "Remote (US)",
+      "salary_range": "$20 - $35/hr",
+      "employment_type": "Contract",
+      "description": "Train and evaluate AI prompts for large language models. No prior experience required - training provided. Work from anywhere in the US.",
+      "requirements": [
+        "Strong writing skills",
+        "Attention to detail",
+        "US-based",
+        "No prior AI experience needed"
+      ],
+      "source": "weworkremotely.com - Top Trending",
+      "posted_date": "2026-08-01",
+      "trending": true
+    },
+    {
+      "id": 2,
+      "title": "Full Stack AI Engineer",
+      "company": "Reveleer",
+      "industry": "Healthcare Technology / AI",
+      "location": "Remote (US)",
+      "salary_range": "$100,000+",
+      "employment_type": "Full-time",
+      "description": "Build AI-powered healthcare analytics solutions. Featured on We Work Remotely trending jobs.",
+      "requirements": [
+        "Full-stack development",
+        "Python",
+        "AI/ML frameworks",
+        "Healthcare data experience"
+      ],
+      "source": "weworkremotely.com - Top Trending",
+      "posted_date": "2026-08-01",
+      "trending": true
+    },
+    {
+      "id": 3,
+      "title": "Senior Software Engineer, Web",
+      "company": "Speechify Inc",
+      "industry": "Technology / AI",
+      "location": "Remote (US)",
+      "salary_range": "$100,000+",
+      "employment_type": "Contract",
+      "description": "Develop web applications for AI-powered text-to-speech platform. High-growth AI startup with remote-first culture.",
+      "requirements": [
+        "Web development",
+        "JavaScript/TypeScript",
+        "React",
+        "AI integration experience"
+      ],
+      "source": "weworkremotely.com - Top Trending",
+      "posted_date": "2026-07-27",
+      "trending": true
+    },
+    {
+      "id": 4,
+      "title": "AI Research Engineer",
+      "company": "Tether",
+      "industry": "Technology / Blockchain / AI",
+      "location": "Remote (US)",
+      "salary_range": "$120,000 - $200,000",
+      "employment_type": "Full-time",
+      "description": "Research and develop cutting-edge AI solutions for blockchain and financial technology applications.",
+      "requirements": [
+        "AI/ML research",
+        "Python/C++",
+        "Deep learning",
+        "Blockchain knowledge preferred"
+      ],
+      "source": "weworkremotely.com - Top Trending",
+      "posted_date": "2026-07-06",
+      "trending": true
+    },
+    {
+      "id": 5,
+      "title": "AI-Native Software Developer",
+      "company": "OnTheGoSystems",
+      "industry": "Technology / SaaS",
+      "location": "Remote (US)",
+      "salary_range": "$90,000 - $140,000",
+      "employment_type": "Full-time",
+      "description": "Build AI-native software solutions. Boosted featured listing on We Work Remotely.",
+      "requirements": [
+        "Software development",
+        "AI integration",
+        "Full-stack experience",
+        "SaaS background"
+      ],
+      "source": "weworkremotely.com - Top Trending",
+      "posted_date": "2026-08-01",
+      "trending": true
+    },
+    {
+      "id": 6,
+      "title": "Staff UI/UX Product Designer (USA/EMEA - Remote)",
+      "company": "Hospitable",
+      "industry": "Technology / Hospitality SaaS",
+      "location": "Remote (US)",
+      "salary_range": "$100,000+",
+      "employment_type": "Full-time",
+      "description": "Lead UI/UX design for hospitality management platform. Design intuitive interfaces for property management software.",
+      "requirements": [
+        "UI/UX design",
+        "Figma",
+        "Product design experience",
+        "SaaS design background"
+      ],
+      "source": "weworkremotely.com - Top Trending",
+      "posted_date": "2026-07-21",
+      "trending": true
+    },
+    {
+      "id": 7,
+      "title": "Front-End WordPress Developer",
+      "company": "Yoko Co",
+      "industry": "Technology / Web Development",
+      "location": "Remote (US)",
+      "salary_range": "$75,000 - $110,000",
+      "employment_type": "Full-time",
+      "description": "Develop custom WordPress themes and plugins. Boosted featured Top 100 listing on We Work Remotely.",
+      "requirements": [
+        "WordPress development",
+        "PHP",
+        "JavaScript",
+        "Front-end frameworks"
+      ],
+      "source": "weworkremotely.com - Top Trending",
+      "posted_date": "2026-07-29",
+      "trending": true
+    },
+    {
+      "id": 8,
+      "title": "Senior Frontend Developer (React.js / Next.js)",
+      "company": "Proxify AB",
+      "industry": "Technology / Staffing",
+      "location": "Remote (US)",
+      "salary_range": "$100,000 - $150,000",
+      "employment_type": "Full-time",
+      "description": "Develop frontend applications using React.js and Next.js. Boosted featured Top 100 listing on We Work Remotely.",
+      "requirements": [
+        "React.js",
+        "Next.js",
+        "TypeScript",
+        "Frontend architecture"
+      ],
+      "source": "weworkremotely.com - Top Trending",
+      "posted_date": "2026-07-18",
+      "trending": true
+    },
+    {
+      "id": 9,
+      "title": "Senior Fullstack Developer (React.js / Node.js)",
+      "company": "Proxify AB",
+      "industry": "Technology / Staffing",
+      "location": "Remote (US)",
+      "salary_range": "$110,000 - $160,000",
+      "employment_type": "Full-time",
+      "description": "Full-stack development with React.js and Node.js. Boosted featured Top 100 listing on We Work Remotely.",
+      "requirements": [
+        "React.js",
+        "Node.js",
+        "Full-stack development",
+        "Database design"
+      ],
+      "source": "weworkremotely.com - Top Trending",
+      "posted_date": "2026-07-18",
+      "trending": true
+    },
+    {
+      "id": 10,
+      "title": "Senior Fullstack Developer (Python)",
+      "company": "Proxify AB",
+      "industry": "Technology / Staffing",
+      "location": "Remote (US)",
+      "salary_range": "$110,000 - $160,000",
+      "employment_type": "Full-time",
+      "description": "Full-stack development with Python backend. Boosted featured Top 100 listing on We Work Remotely.",
+      "requirements": [
+        "Python",
+        "Django/Flask",
+        "React/Vue",
+        "Full-stack experience"
+      ],
+      "source": "weworkremotely.com - Top Trending",
+      "posted_date": "2026-07-19",
+      "trending": true
+    },
+    {
+      "id": 11,
+      "title": "Senior Java Backend Developer",
+      "company": "Proxify AB",
+      "industry": "Technology / Staffing",
+      "location": "Remote (US)",
+      "salary_range": "$110,000 - $160,000",
+      "employment_type": "Full-time",
+      "description": "Backend development with Java. Boosted Top 100 listing on We Work Remotely.",
+      "requirements": [
+        "Java",
+        "Spring Boot",
+        "Microservices",
+        "Database design"
+      ],
+      "source": "weworkremotely.com - Top Trending",
+      "posted_date": "2026-07-18",
+      "trending": true
+    },
+    {
+      "id": 12,
+      "title": "Senior QA Engineer",
+      "company": "Cortes 23",
+      "industry": "Technology / SaaS",
+      "location": "Remote (US)",
+      "salary_range": "$90,000 - $130,000",
+      "employment_type": "Full-time",
+      "description": "Lead quality assurance efforts for SaaS platform. Featured on We Work Remotely.",
+      "requirements": [
+        "QA automation",
+        "Selenium/Cypress",
+        "CI/CD",
+        "Test strategy"
+      ],
+      "source": "weworkremotely.com - Top Trending",
+      "posted_date": "2026-07-16",
+      "trending": true
+    },
+    {
+      "id": 13,
+      "title": "Mac MSP Help Desk Guru (Work From Home)",
+      "company": "Ignition, Inc.",
+      "industry": "Technology / IT Support",
+      "location": "Remote (US)",
+      "salary_range": "$50,000 - $74,999",
+      "employment_type": "Full-time",
+      "description": "Provide remote IT support for Mac environments. Managed Service Provider help desk role.",
+      "requirements": [
+        "Mac OS expertise",
+        "MSP experience",
+        "Remote support",
+        "Customer service"
+      ],
+      "source": "weworkremotely.com - Top Trending",
+      "posted_date": "2026-08-01",
+      "trending": true
+    },
+    {
+      "id": 14,
+      "title": "Technical Customer Support Specialist",
+      "company": "Qase",
+      "industry": "Technology / SaaS",
+      "location": "Remote (US)",
+      "salary_range": "$10,000 - $25,000 USD",
+      "employment_type": "Full-time",
+      "description": "Provide technical support for test management platform. US-based remote role.",
+      "requirements": [
+        "Technical support",
+        "SaaS experience",
+        "QA/testing knowledge",
+        "Communication skills"
+      ],
+      "source": "weworkremotely.com - Top Trending",
+      "posted_date": "2026-07-15",
+      "trending": true
+    },
+    {
+      "id": 15,
+      "title": "Campaign Manager - SEO & AI Content",
+      "company": "Clover Labs AI",
+      "industry": "Technology / AI Marketing",
+      "location": "Remote (US)",
+      "salary_range": "$10,000 - $25,000 USD",
+      "employment_type": "Full-time",
+      "description": "Manage SEO and AI-powered content campaigns. Boosted listing on We Work Remotely.",
+      "requirements": [
+        "SEO expertise",
+        "AI content tools",
+        "Campaign management",
+        "Content strategy"
+      ],
+      "source": "weworkremotely.com - Top Trending",
+      "posted_date": "2026-07-21",
+      "trending": true
+    },
+    {
+      "id": 16,
+      "title": "Content Marketing Coordinator",
+      "company": "DesignFiles",
+      "industry": "Technology / Design SaaS",
+      "location": "Remote (US)",
+      "salary_range": "$45,000 - $65,000",
+      "employment_type": "Contract",
+      "description": "Coordinate content marketing efforts for design platform. Featured listing on We Work Remotely.",
+      "requirements": [
+        "Content marketing",
+        "Social media",
+        "Copywriting",
+        "Design industry knowledge"
+      ],
+      "source": "weworkremotely.com - Top Trending",
+      "posted_date": "2026-08-01",
+      "trending": true
+    },
+    {
+      "id": 17,
+      "title": "Affiliate Marketing Manager",
+      "company": "Hello There Collective",
+      "industry": "Marketing / Digital",
+      "location": "Remote (US)",
+      "salary_range": "$60,000 - $90,000",
+      "employment_type": "Full-time",
+      "description": "Manage affiliate marketing programs and partnerships. Los Angeles-based company with remote US positions.",
+      "requirements": [
+        "Affiliate marketing",
+        "Partnership management",
+        "Analytics",
+        "Digital marketing"
+      ],
+      "source": "weworkremotely.com - Top Trending",
+      "posted_date": "2026-07-21",
+      "trending": true
+    },
+    {
+      "id": 18,
+      "title": "Marketing Quality Lead",
+      "company": "Forward Push Law Firm Marketing",
+      "industry": "Marketing / Legal",
+      "location": "Remote (US)",
+      "salary_range": "$70,000 - $100,000",
+      "employment_type": "Full-time",
+      "description": "Lead marketing quality assurance for law firm marketing campaigns. Boosted listing on We Work Remotely.",
+      "requirements": [
+        "Marketing QA",
+        "Legal industry knowledge",
+        "Content review",
+        "Project management"
+      ],
+      "source": "weworkremotely.com - Top Trending",
+      "posted_date": "2026-07-14",
+      "trending": true
+    },
+    {
+      "id": 19,
+      "title": "Client Success Advisor",
+      "company": "SiteCare",
+      "industry": "Technology / Web Services",
+      "location": "Remote (US)",
+      "salary_range": "$75,000 - $99,999",
+      "employment_type": "Full-time",
+      "description": "Guide customers through technical integrations and ensure successful platform adoption. Remote-first company.",
+      "requirements": [
+        "Customer success",
+        "Technical aptitude",
+        "WordPress knowledge",
+        "Communication skills"
+      ],
+      "source": "weworkremotely.com - Top Trending",
+      "posted_date": "2026-07-19",
+      "trending": true
+    },
+    {
+      "id": 20,
+      "title": "Sales Development Representative (SDR)",
+      "company": "Castr",
+      "industry": "Technology / Streaming",
+      "location": "Remote (US)",
+      "salary_range": "$50,000 - $75,000 + Commission",
+      "employment_type": "Full-time",
+      "description": "Generate leads and qualify prospects for streaming technology platform. Boosted featured listing on We Work Remotely.",
+      "requirements": [
+        "Sales experience",
+        "Cold calling",
+        "CRM tools",
+        "Tech industry knowledge"
+      ],
+      "source": "weworkremotely.com - Top Trending",
+      "posted_date": "2026-07-21",
+      "trending": true
+    },
+    {
+      "id": 21,
+      "title": "Sales Development Rep (Base + Uncapped Commission)",
+      "company": "Jobtable",
+      "industry": "Technology / HR Tech",
+      "location": "Remote (US)",
+      "salary_range": "$50,000 - $80,000 + Commission",
+      "employment_type": "Full-time",
+      "description": "Drive sales development for HR technology platform. Boosted featured listing on We Work Remotely.",
+      "requirements": [
+        "SDR experience",
+        "B2B sales",
+        "CRM proficiency",
+        "Self-motivated"
+      ],
+      "source": "weworkremotely.com - Top Trending",
+      "posted_date": "2026-07-28",
+      "trending": true
+    },
+    {
+      "id": 22,
+      "title": "Inside Sales - Account Executive",
+      "company": "Credit Wellness LLC",
+      "industry": "Finance / Credit Services",
+      "location": "Remote (US)",
+      "salary_range": "$75,000 - $99,999",
+      "employment_type": "Contract",
+      "description": "Close deals and manage client accounts for credit wellness services. Featured on We Work Remotely.",
+      "requirements": [
+        "Sales closing",
+        "Account management",
+        "Finance knowledge",
+        "Remote sales experience"
+      ],
+      "source": "weworkremotely.com - Top Trending",
+      "posted_date": "2026-07-17",
+      "trending": true
+    },
+    {
+      "id": 23,
+      "title": "Remote Customer Service Representative",
+      "company": "Power Finance Texas",
+      "industry": "Finance / Energy",
+      "location": "Remote (US - New Jersey Preferred)",
+      "salary_range": "$35,000 - $45,000",
+      "employment_type": "Full-time",
+      "description": "Provide customer support for energy finance company. Remote position with New Jersey residents preferred.",
+      "requirements": [
+        "Customer service",
+        "Communication skills",
+        "Finance basics",
+        "Remote work setup"
+      ],
+      "source": "ziprecruiter.com",
+      "posted_date": "2026-08-01",
+      "trending": true
+    },
+    {
+      "id": 24,
+      "title": "Remote Travel Customer Representative",
+      "company": "VIPdesk Connect",
+      "industry": "Travel / Customer Service",
+      "location": "Remote (US)",
+      "salary_range": "$18/hr",
+      "employment_type": "Full-time",
+      "description": "Support travelers before, during, and after trips. 100% work-from-home role with travel industry perks.",
+      "requirements": [
+        "Customer service",
+        "Travel industry knowledge",
+        "Communication skills",
+        "Flexible schedule"
+      ],
+      "source": "ziprecruiter.com",
+      "posted_date": "2026-08-01",
+      "trending": true
+    },
+    {
+      "id": 25,
+      "title": "Remote Medical Support Assistant (MSA)",
+      "company": "Ansible Government Solutions",
+      "industry": "Healthcare / Government",
+      "location": "Remote (US - Alaska, Idaho, Washington, Oregon)",
+      "salary_range": "$40,000 - $55,000",
+      "employment_type": "Full-time",
+      "description": "Support VA Medical Center facilities with remote medical administrative assistance. Government contractor role.",
+      "requirements": [
+        "Medical administrative experience",
+        "VA systems knowledge",
+        "Government clearance preferred",
+        "Remote work capability"
+      ],
+      "source": "ziprecruiter.com",
+      "posted_date": "2026-08-01",
+      "trending": true
+    }
+  ]
+}

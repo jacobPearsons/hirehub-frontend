@@ -1,5 +1,6 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { X, LogOut } from 'lucide-react'
+import { AnimatePresence, motion } from 'framer-motion'
 import { useApp } from '../../context/AppContext'
 import { Avatar } from '../ui/Avatar'
 import { logout } from '../../api/auth'
@@ -122,11 +123,24 @@ function SidebarContent({ onNavClick, collapsed }: { onNavClick?: () => void; co
 export function Sidebar({ mobile, isOpen, onClose, collapsed }: SidebarProps) {
   if (mobile) {
     return (
-      <>
+      <AnimatePresence>
         {isOpen && (
           <div className="fixed inset-0 z-50 md:hidden">
-            <div className="fixed inset-0 bg-black/40" onClick={onClose} />
-            <div className="fixed left-0 top-0 bottom-0 w-[280px] max-w-[85vw] bg-canvas border-r border-hairline shadow-2xl flex flex-col">
+            <motion.div
+              className="fixed inset-0 bg-black/40"
+              onClick={onClose}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+            />
+            <motion.div
+              className="fixed left-0 top-0 bottom-0 w-[280px] max-w-[85vw] bg-canvas border-r border-hairline shadow-2xl flex flex-col"
+              initial={{ x: '-100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: '-100%' }}
+              transition={{ duration: 0.25, ease: 'easeOut' }}
+            >
               <div className="flex items-center justify-between px-4 h-14 border-b border-hairline shrink-0">
                 <span className="font-medium text-ink text-sm">Menu</span>
             <button
@@ -141,10 +155,10 @@ export function Sidebar({ mobile, isOpen, onClose, collapsed }: SidebarProps) {
               <div className="flex-1 overflow-y-auto">
                 <SidebarContent onNavClick={onClose} />
               </div>
-            </div>
+            </motion.div>
           </div>
         )}
-      </>
+      </AnimatePresence>
     )
   }
 

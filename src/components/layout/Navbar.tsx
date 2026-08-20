@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link, NavLink, useNavigate } from 'react-router-dom'
 import { Menu, X, LogOut } from 'lucide-react'
 import * as Dialog from '@radix-ui/react-dialog'
+import { AnimatePresence, motion } from 'framer-motion'
 import { Button } from '../ui/Button'
 import { Container } from '../ui/Container'
 import { useApp } from '../../context/AppContext'
@@ -112,74 +113,109 @@ export function Navbar() {
                   <Menu size={24} />
                 </button>
               </Dialog.Trigger>
-            <Dialog.Portal>
-              <Dialog.Overlay className="fixed inset-0 z-40 bg-black/40 md:hidden" />
-              <Dialog.Content
-                aria-label="Navigation menu"
-                className="fixed inset-0 z-50 bg-canvas flex flex-col items-center justify-center gap-6 md:hidden"
-              >
-                <Dialog.Close asChild>
-                  <button className="absolute top-4 right-4 text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/40 rounded-md" aria-label="Close menu">
-                    <X size={24} />
-                  </button>
-                </Dialog.Close>
+              <AnimatePresence>
+                {mobileOpen && (
+                  <Dialog.Portal forceMount>
+                    <Dialog.Overlay asChild>
+                      <motion.div
+                        className="fixed inset-0 z-40 bg-black/40 md:hidden"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 0.2 }}
+                      />
+                    </Dialog.Overlay>
+                    <Dialog.Content asChild aria-label="Navigation menu">
+                      <motion.div
+                        className="fixed inset-0 z-50 bg-canvas flex flex-col items-center justify-center gap-6 md:hidden"
+                        initial={{ opacity: 0, y: -8 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -8 }}
+                        transition={{ duration: 0.25, ease: 'easeOut' }}
+                      >
+                        <Dialog.Close asChild>
+                          <button className="absolute top-4 right-4 text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/40 rounded-md" aria-label="Close menu">
+                            <X size={24} />
+                          </button>
+                        </Dialog.Close>
 
-                {navLinks.map((link) => (
-                  <NavLink key={link.to} to={link.to} onClick={() => setMobileOpen(false)}
-                    className={({ isActive }) =>
-                      `text-lg font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/40 rounded ${isActive ? 'text-accent' : 'text-ink-muted hover:text-accent'}`
-                    }
-                  >
-                    {link.label}
-                  </NavLink>
-                ))}
-                <hr className="w-16 border-hairline" />
+                        <motion.div
+                          className="flex flex-col items-center gap-6"
+                          initial="hidden"
+                          animate="show"
+                          variants={{
+                            hidden: {},
+                            show: { transition: { staggerChildren: 0.06 } },
+                          }}
+                        >
+                          {navLinks.map((link) => (
+                            <motion.div
+                              key={link.to}
+                              variants={{
+                                hidden: { opacity: 0, y: 8 },
+                                show: { opacity: 1, y: 0, transition: { duration: 0.25 } },
+                              }}
+                            >
+                              <NavLink to={link.to} onClick={() => setMobileOpen(false)}
+                                className={({ isActive }) =>
+                                  `text-lg font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/40 rounded ${isActive ? 'text-accent' : 'text-ink-muted hover:text-accent'}`
+                                }
+                              >
+                                {link.label}
+                              </NavLink>
+                            </motion.div>
+                          ))}
+                        </motion.div>
+                        <hr className="w-16 border-hairline" />
 
-                {user ? (
-                  <>
-                    <NotificationBell />
-                    {user.role === 'seeker' && (
-                      <NavLink to="/dashboard" onClick={() => setMobileOpen(false)}
-                        className={({ isActive }) =>
-                          `text-lg font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/40 rounded ${isActive ? 'text-accent' : 'text-ink-muted hover:text-accent'}`
+                        {user ? (
+                          <>
+                            <NotificationBell />
+                            {user.role === 'seeker' && (
+                              <NavLink to="/dashboard" onClick={() => setMobileOpen(false)}
+                                className={({ isActive }) =>
+                                  `text-lg font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/40 rounded ${isActive ? 'text-accent' : 'text-ink-muted hover:text-accent'}`
+                                }
+                              >
+                                Dashboard
+                              </NavLink>
+                            )}
+                            {user.role === 'employer' && (
+                              <NavLink to="/employer/dashboard" onClick={() => setMobileOpen(false)}
+                                className={({ isActive }) =>
+                                  `text-lg font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/40 rounded ${isActive ? 'text-accent' : 'text-ink-muted hover:text-accent'}`
+                                }
+                              >
+                                Employer Dashboard
+                              </NavLink>
+                            )}
+                            {user.role === 'admin' && (
+                              <NavLink to="/admin" onClick={() => setMobileOpen(false)}
+                                className={({ isActive }) =>
+                                  `text-lg font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/40 rounded ${isActive ? 'text-accent' : 'text-ink-muted hover:text-accent'}`
+                                }
+                              >
+                                Admin
+                              </NavLink>
+                            )}
+                            <button onClick={() => { handleLogout(); setMobileOpen(false) }}
+                              className="text-lg font-medium text-ink-muted hover:text-accent transition-colors"
+                            >
+                              Sign Out
+                            </button>
+                          </>
+                        ) : (
+                          <div className="flex flex-col items-center gap-3 mt-4">
+                              <Link to="/login"><Button variant="ghost" size="sm">Sign In</Button></Link>
+                              <Link to="/post-job"><Button variant="primary" size="sm">Post a Job</Button></Link>
+                            </div>
+                          )
                         }
-                      >
-                        Dashboard
-                      </NavLink>
-                    )}
-                    {user.role === 'employer' && (
-                      <NavLink to="/employer/dashboard" onClick={() => setMobileOpen(false)}
-                        className={({ isActive }) =>
-                          `text-lg font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/40 rounded ${isActive ? 'text-accent' : 'text-ink-muted hover:text-accent'}`
-                        }
-                      >
-                        Employer Dashboard
-                      </NavLink>
-                    )}
-                    {user.role === 'admin' && (
-                      <NavLink to="/admin" onClick={() => setMobileOpen(false)}
-                        className={({ isActive }) =>
-                          `text-lg font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/40 rounded ${isActive ? 'text-accent' : 'text-ink-muted hover:text-accent'}`
-                        }
-                      >
-                        Admin
-                      </NavLink>
-                    )}
-                    <button onClick={() => { handleLogout(); setMobileOpen(false) }}
-                      className="text-lg font-medium text-ink-muted hover:text-accent transition-colors"
-                    >
-                      Sign Out
-                    </button>
-                  </>
-                ) : (
-                  <div className="flex flex-col items-center gap-3 mt-4">
-                      <Link to="/login"><Button variant="ghost" size="sm">Sign In</Button></Link>
-                      <Link to="/post-job"><Button variant="primary" size="sm">Post a Job</Button></Link>
-                    </div>
-                  )
-                }
-              </Dialog.Content>
-            </Dialog.Portal>
+                      </motion.div>
+                    </Dialog.Content>
+                  </Dialog.Portal>
+                )}
+              </AnimatePresence>
             </Dialog.Root>
           </div>
         </div>

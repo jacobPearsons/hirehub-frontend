@@ -45,7 +45,14 @@ function App() {
     <Layout>
       <Suspense fallback={
         <main className="min-h-screen flex items-center justify-center bg-canvas">
-          <div className="text-center text-ink-muted">Loading...</div>
+          <div className="flex items-center gap-3 text-ink-muted" role="status" aria-label="Loading">
+            <motion.span
+              className="w-2.5 h-2.5 rounded-full bg-accent"
+              animate={reducedMotion ? undefined : { scale: [1, 1.4, 1], opacity: [0.6, 1, 0.6] }}
+              transition={{ duration: 1, repeat: Infinity, ease: 'easeInOut' }}
+            />
+            <span>Loading...</span>
+          </div>
         </main>
       }>
         <AnimatePresence mode="wait">

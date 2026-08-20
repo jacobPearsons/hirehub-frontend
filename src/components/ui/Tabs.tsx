@@ -1,4 +1,5 @@
 import { createContext, useCallback, useContext, useId, useMemo, useState, type ReactNode } from 'react'
+import { AnimatePresence, motion, useReducedMotionConfig } from 'framer-motion'
 
 interface TabsContextValue {
   activeTab: string
@@ -130,17 +131,25 @@ interface ContentProps {
 
 export function TabsContent({ value, children }: ContentProps) {
   const { activeTab } = useTabsContext()
-
-  if (activeTab !== value) return null
+  const reducedMotion = useReducedMotionConfig()
 
   return (
-    <div
-      role="tabpanel"
-      id={`panel-${value}`}
-      aria-labelledby={`tab-${value}`}
-      tabIndex={0}
-    >
-      {children}
-    </div>
+    <AnimatePresence mode="wait" initial={false}>
+      {activeTab === value && (
+        <motion.div
+          key={value}
+          role="tabpanel"
+          id={`panel-${value}`}
+          aria-labelledby={`tab-${value}`}
+          tabIndex={0}
+          initial={reducedMotion ? { opacity: 1, y: 0 } : { opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={reducedMotion ? { opacity: 1, y: 0 } : { opacity: 0, y: -8 }}
+          transition={{ duration: reducedMotion ? 0 : 0.2, ease: 'easeOut' }}
+        >
+          {children}
+        </motion.div>
+      )}
+    </AnimatePresence>
   )
 }

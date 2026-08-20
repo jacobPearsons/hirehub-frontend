@@ -1,5 +1,6 @@
 import { FileText, Bookmark, Calendar, MapPin, ArrowRight, Pencil } from 'lucide-react'
 import { Link } from 'react-router-dom'
+import { motion, useReducedMotionConfig } from 'framer-motion'
 import { useApplications } from '../../context/ApplicationsContext'
 import { useApp } from '../../context/AppContext'
 import { useTheme } from '../../context/ThemeContext'
@@ -38,6 +39,7 @@ export function OverviewTab() {
   const { applications } = useApplications()
   const { user, savedJobIds } = useApp()
   const { dark } = useTheme()
+  const reducedMotion = useReducedMotionConfig()
 
   const applicationsList = Array.isArray(applications) ? applications : []
 
@@ -121,7 +123,7 @@ export function OverviewTab() {
         </Card>
       )}
 
-      <div className="relative overflow-hidden rounded-xl">
+        <div className="relative overflow-hidden rounded-xl">
         <img
           src="/overview-grid-bg.svg"
           alt=""
@@ -129,40 +131,57 @@ export function OverviewTab() {
           loading="lazy"
           className="absolute inset-0 w-full h-full object-cover pointer-events-none text-ink"
         />
-        <div className="relative grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <motion.div
+          className="relative grid grid-cols-1 sm:grid-cols-3 gap-4"
+          initial={reducedMotion ? 'show' : 'hidden'}
+          whileInView="show"
+          viewport={{ once: true, margin: '-60px' }}
+          variants={{
+            hidden: {},
+            show: { transition: { staggerChildren: 0.08 } },
+          }}
+        >
         {statCards.map((card, i) => {
           const Icon = card.icon
           const count = counts[i]
           return (
-            <Link
+            <motion.div
               key={card.label}
-              to={card.to}
-              className="group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/40 rounded-xl"
+              variants={{
+                hidden: { opacity: 0, y: 16 },
+                show: { opacity: 1, y: 0, transition: { duration: 0.4, ease: 'easeOut' } },
+              }}
+              className="h-full"
             >
-              <Card variant="feature" className="p-5 h-full transition-transform duration-200 group-hover:-translate-y-1">
-                <div className="flex items-center justify-between gap-3">
-                  <div className="flex items-center gap-4">
-                    <div className={`flex items-center justify-center w-12 h-12 rounded-full ${card.bgClass}`}>
-                      <Icon className="w-5 h-5" />
+              <Link
+                to={card.to}
+                className="group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/40 rounded-xl h-full block"
+              >
+                <Card variant="feature" className="p-5 h-full transition-transform duration-200 group-hover:-translate-y-1">
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="flex items-center gap-4">
+                      <div className={`flex items-center justify-center w-12 h-12 rounded-full ${card.bgClass}`}>
+                        <Icon className="w-5 h-5" />
+                      </div>
+                      <div>
+                        <p className="text-sm text-ink-muted">{card.label}</p>
+                        <p className="text-2xl font-semibold text-ink">{count}</p>
+                        <p className="text-xs text-ink-muted">
+                          {count === 1 ? card.description.replace(/s$/, '') : card.description}
+                        </p>
+                      </div>
                     </div>
-                    <div>
-                      <p className="text-sm text-ink-muted">{card.label}</p>
-                      <p className="text-2xl font-semibold text-ink">{count}</p>
-                      <p className="text-xs text-ink-muted">
-                        {count === 1 ? card.description.replace(/s$/, '') : card.description}
-                      </p>
-                    </div>
+                    <ArrowRight
+                      className="w-4 h-4 text-ink-muted opacity-0 group-hover:opacity-100 transition-opacity"
+                      aria-hidden="true"
+                    />
                   </div>
-                  <ArrowRight
-                    className="w-4 h-4 text-ink-muted opacity-0 group-hover:opacity-100 transition-opacity"
-                    aria-hidden="true"
-                  />
-                </div>
-              </Card>
-            </Link>
+                </Card>
+              </Link>
+            </motion.div>
           )
         })}
-        </div>
+        </motion.div>
       </div>
     </div>
   )

@@ -60,6 +60,8 @@ export default function OnboardingWizard() {
           src={isLast ? '/onboarding-complete-bg.png' : '/onboarding-bg.png'}
           alt=""
           className="w-full h-full object-cover"
+          width="1672"
+          height="941"
           loading="eager"
         />
         <div className="absolute inset-0 bg-gradient-to-b from-canvas/60 via-canvas/20 to-canvas/80" />

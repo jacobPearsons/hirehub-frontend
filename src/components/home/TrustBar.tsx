@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Section } from '../ui/Section'
 import { Container } from '../ui/Container'
+import { Marquee } from '../ui/Marquee'
 
 const companies = [
   { name: 'Stripe', logo: '/logos/stripe.com.png' },
@@ -11,6 +12,14 @@ const companies = [
   { name: 'Coinbase', logo: '/logos/coinbase.com.png' },
   { name: "Lowe's", logo: '/logos/lowes.com.png' },
   { name: 'SonarSource', logo: '/logos/sonarsource.com.png' },
+  { name: 'GitHub', logo: '/logos/github.com.avif' },
+  { name: 'Atlassian', logo: '/logos/atlassian.com.avif' },
+  { name: 'Canva', logo: '/logos/canva.com.avif' },
+  { name: 'Amazon', logo: '/logos/amazon.com.avif' },
+  { name: 'Anthropic', logo: '/logos/anthropic.com.avif' },
+  { name: 'DigitalOcean', logo: '/logos/digitalocean.com.avif' },
+  { name: 'Salesforce', logo: '/logos/salesforce.com.avif' },
+  { name: 'Greenhouse', logo: '/logos/greenhouse.io.avif' },
 ]
 
 function LogoImg({ name, logo }: { name: string; logo: string }) {
@@ -36,13 +45,9 @@ export function TrustBar() {
     <Section className="py-16">
       <Container>
         <p className="text-sm font-medium text-ink-subtle text-center mb-8">
-          Trusted by teams at
+          Powered by
         </p>
-        <div className="flex flex-wrap items-center justify-center gap-8 md:gap-12">
-          {companies.map((c) => (
-            <LogoImg key={c.name} name={c.name} logo={c.logo} />
-          ))}
-        </div>
+        <Marquee items={companies.map((c) => <LogoImg key={c.name} name={c.name} logo={c.logo} />)} />
       </Container>
     </Section>
   )

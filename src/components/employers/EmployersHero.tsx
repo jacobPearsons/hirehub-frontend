@@ -11,6 +11,8 @@ export function EmployersHero() {
           src="/employers-hero.png"
           alt=""
           className="w-full h-full object-cover"
+          width="1672"
+          height="941"
           loading="eager"
         />
         <div className="absolute inset-0 bg-gradient-to-r from-canvas/80 via-canvas/40 to-transparent" />

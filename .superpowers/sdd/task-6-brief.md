@@ -1,105 +1,37 @@
-### Task 6: JobBoardPage Responsive Update
+### Task 6.1 — editor UI
 
-**Files:**
-- Modify: `src/components/jobs/JobBoardPage.tsx`
-- Modify: `src/components/jobs/FilterSidebar.tsx` (extract shared FilterOption)
+- Local draft type: `{ id: string; prompt: string; expectedKeywords: string; maxScore: number }`.
+- Section (collapsed by default, visible under the description/requirements fields): heading "Screening questions (optional)", an "Add question" button, and one row per draft: prompt input, expected-keywords input (comma-separated, placeholder "e.g. python, fastapi"), maxScore number input (default 5, min 1, max 100), remove button.
+- On submit, if drafts exist, append `screeningQuestions` to the payload: `drafts.map((d, i) => ({ prompt: d.prompt, expectedKeywords: d.expectedKeywords.split(',').map((s) => s.trim()).filter(Boolean), maxScore: Number(d.maxScore) || 5, order: i + 1 }))`.
+- Keep all existing fields/validation/tests intact.
 
-**Interfaces:**
-- Consumes: `FilterDrawer`, `ActiveFilterChips` from Task 5; existing `FilterSidebar`
-- Produces: Responsive JobBoardPage with conditional filter rendering
+### Task 6.2 — tests `src/components/post-job/__tests__/PostJobFormScreening.test.tsx`
 
-- [ ] **Step 1: Extract FilterOption from FilterSidebar into shared helper**
-
-Move the `FilterOption` sub-component to a shared location or keep it in FilterSidebar but export it for reuse by FilterDrawer. Since FilterDrawer uses a different layout (pill buttons instead of list items), keep them separate — no extraction needed.
-
-- [ ] **Step 2: Update JobBoardPage with responsive filter rendering**
+Adapt to the actual props (read the existing test file first):
 
 ```tsx
-// Key changes in JobBoardPage.tsx:
-// 1. Add state for filter drawer open/close
-// 2. Conditionally render FilterSidebar (lg+) vs FilterDrawer trigger (<lg)
-// 3. Add ActiveFilterChips below search bar on mobile
+it('adds a screening question row and submits it in the payload', async () => {
+  const onSubmit = vi.fn()
+  render(<PostJobForm onSubmit={onSubmit} />)
+  await userEvent.click(screen.getByRole('button', { name: /add screening question/i }))
+  await userEvent.type(screen.getByLabelText(/question prompt/i), 'Years of Python?')
+  await userEvent.type(screen.getByLabelText(/expected keywords/i), 'python, fastapi')
+  await userEvent.click(screen.getByRole('button', { name: /submit job listing/i }))
+  expect(onSubmit).toHaveBeenCalledWith(expect.objectContaining({
+    screeningQuestions: [expect.objectContaining({ prompt: 'Years of Python?', expectedKeywords: ['python', 'fastapi'], maxScore: 5 })],
+  }))
+})
 
-const [filterDrawerOpen, setFilterDrawerOpen] = useState(false)
-
-const activeFilterCount = [filters.category, filters.seniority, filters.remote].filter(Boolean).length
-
-// In the JSX, replace the grid section:
-<>
-  {/* Mobile: search + filter trigger */}
-  <div className="lg:hidden flex gap-3 mb-4">
-    <div className="flex-1">
-      <SearchBar value={search} onChange={handleSearchChange} />
-    </div>
-    <Button
-      variant="secondary"
-      size="md"
-      onClick={() => setFilterDrawerOpen(true)}
-      className="shrink-0"
-    >
-      Filters{activeFilterCount > 0 ? ` (${activeFilterCount})` : ''}
-    </Button>
-  </div>
-
-  {/* Desktop: search bar */}
-  <Reveal className="hidden lg:block max-w-xl mb-8">
-    <SearchBar value={search} onChange={handleSearchChange} />
-  </Reveal>
-
-  {/* Mobile: active filter chips */}
-  <div className="lg:hidden">
-    <ActiveFilterChips filters={filters} onFilterChange={handleFilterChange} />
-  </div>
-
-  {/* Filter drawer for mobile */}
-  <FilterDrawer
-    open={filterDrawerOpen}
-    onOpenChange={setFilterDrawerOpen}
-    filters={filters}
-    onFilterChange={handleFilterChange}
-    activeCount={activeFilterCount}
-  />
-
-  {/* Desktop: sidebar layout */}
-  <div className="hidden lg:grid grid-cols-[280px_1fr] gap-8">
-    <Reveal delay={0.05}><FilterSidebar filters={filters} onFilterChange={handleFilterChange} /></Reveal>
-    <Reveal delay={0.1}>
-      <JobCardGrid jobs={filteredJobs} />
-      {hasMore && (
-        <div className="mt-8 text-center">
-          <Button variant="ghost" size="md" onClick={() => loadJobs(false)} disabled={loadingMore}>
-            {loadingMore ? 'Loading more...' : `Load more (${filteredJobs.length} of ${total})`}
-          </Button>
-        </div>
-      )}
-    </Reveal>
-  </div>
-
-  {/* Mobile: jobs grid without sidebar */}
-  <div className="lg:hidden">
-    <JobCardGrid jobs={filteredJobs} />
-    {hasMore && (
-      <div className="mt-8 text-center">
-        <Button variant="ghost" size="md" onClick={() => loadJobs(false)} disabled={loadingMore}>
-          {loadingMore ? 'Loading more...' : `Load more (${filteredJobs.length} of ${total})`}
-        </Button>
-      </div>
-    )}
-  </div>
-</>
+it('removes a screening question row before submitting', async () => {
+  // add two rows, remove one, submit, expect one question in the payload
+})
 ```
 
-- [ ] **Step 3: Run build to verify**
-
-Run: `npx tsc --noEmit`
-Expected: No errors
-
-- [ ] **Step 4: Commit**
-
-```bash
-git add src/components/jobs/JobBoardPage.tsx
-git commit -m "feat: responsive job board with mobile filter drawer and active filter chips"
-```
+Run frontend gates → green. Commit: `feat: screening question editor in job posting form`.
 
 ---
+
+## M7 — ApplyJobForm dynamic screening answers
+
+**File:** `src/components/apply/ApplyJobForm.tsx` (+ existing tests). Read it first to learn how the job is provided (`job` prop with `screeningQuestions`? or fetched).
 

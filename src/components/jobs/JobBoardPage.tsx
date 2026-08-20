@@ -122,7 +122,7 @@ export default function JobBoardPage() {
       {meta}
       <Section className="relative overflow-hidden">
         <div className="absolute inset-0 opacity-[0.05]">
-          <img src="/featured-jobs.png" alt="" className="w-full h-full object-cover" loading="lazy" />
+          <img src="/featured-jobs.png" alt="" className="w-full h-full object-cover" width="1672" height="941" loading="lazy" />
         </div>
         <Container className="relative">
           <HeroContent variant="card" className="mb-8">

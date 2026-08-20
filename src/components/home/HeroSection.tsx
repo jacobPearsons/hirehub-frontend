@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import { Container } from '../ui/Container'
 import { HeroContent } from '../ui/HeroContent'
+import { Typewriter } from '../ui/Typewriter'
 
 export function HeroSection() {
   return (
@@ -10,7 +11,10 @@ export function HeroSection() {
           src="/hero-homepage.png"
           alt=""
           className="w-full h-full object-cover"
+          width="1672"
+          height="941"
           loading="eager"
+          fetchPriority="high"
         />
         <div className="absolute inset-0 bg-gradient-to-b from-canvas/20 via-canvas/40 to-canvas" />
       </div>
@@ -22,9 +26,7 @@ export function HeroSection() {
         </span>
 
              <h1 className="text-white font-semibold text-5xl md:text-7xl lg:text-8xl leading-[0.95] tracking-[-0.05em]">
-            Find your next role at
-            <br />
-            companies that build
+            <Typewriter text="Find your next role at companies that build" />
         </h1>
            <p className="mt-8 max-w-2xl text-lg md:text-xl text-white/80">
             Explore thousands of curated job listings from the world's best companies.

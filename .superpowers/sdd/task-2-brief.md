@@ -1,72 +1,175 @@
-## Task 2 — Fix remaining 10 pre-existing test failures
+### Task 2: Legal pages and routes
 
-Post-polyfill reality: **12 failed / 59 passed** in 5 files. All 10 remaining
-failures are real test bugs (missing providers/mocks, outdated expectations,
-responsive double-render) — NOT framework gaps. Component behavior is
-intentional; tests are corrected to match it.
+**Files:**
+- Create: `src/components/legal/PrivacyPolicyPage.tsx`
+- Create: `src/components/legal/TermsPage.tsx`
+- Create: `src/components/legal/CookiePolicyPage.tsx`
+- Create: `src/components/legal/index.ts`
+- Modify: `src/App.tsx` (lazy imports + 3 routes)
+- Test: `src/components/legal/__tests__/LegalPages.test.tsx`
 
-TDD: run each file, fix its tests, re-run until green. Exact fixes:
+**Interfaces:**
+- Consumes: `getLegalDocument`, `LegalLayout`, `LegalDocument` from Task 1; `usePageMeta` from `../../utils/usePageMeta`.
+- Produces: default-exported `PrivacyPolicyPage`, `TermsPage`, `CookiePolicyPage` (each renders `{meta}` + `<LegalLayout doc={...} />`); routes `/privacy`, `/terms`, `/cookies` in `App.tsx`; `src/components/legal/index.ts` barrel.
 
-### 2a. `src/components/jobs/__tests__/JobBoardPage.test.tsx` (4 failures)
+- [ ] **Step 1: Write the failing test**
 
-`JobCard` calls `useQueryClient` → wrap the render helper in
-`QueryClientProvider`:
+Create `src/components/legal/__tests__/LegalPages.test.tsx`:
 
-```ts
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+```tsx
+import { render, screen } from '@testing-library/react'
+import PrivacyPolicyPage from '../PrivacyPolicyPage'
+import TermsPage from '../TermsPage'
+import CookiePolicyPage from '../CookiePolicyPage'
 
-function renderJobBoardPage() {
-  const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } })
-  render(
-    <QueryClientProvider client={queryClient}>
-      <MemoryRouter>{/* ...existing wrapper... */}</MemoryRouter>
-    </QueryClientProvider>
+vi.mock('../../../utils/usePageMeta', () => ({
+  usePageMeta: () => null,
+}))
+
+describe('LegalPages', () => {
+  it('renders the privacy policy', () => {
+    render(<PrivacyPolicyPage />)
+    expect(screen.getByRole('heading', { level: 1, name: /privacy policy/i })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { level: 2, name: /information we collect/i })).toBeInTheDocument()
+  })
+
+  it('renders the terms of service', () => {
+    render(<TermsPage />)
+    expect(screen.getByRole('heading', { level: 1, name: /terms of service/i })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { level: 2, name: /acceptance of terms/i })).toBeInTheDocument()
+  })
+
+  it('renders the cookie policy', () => {
+    render(<CookiePolicyPage />)
+    expect(screen.getByRole('heading', { level: 1, name: /cookie policy/i })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { level: 2, name: /what are cookies/i })).toBeInTheDocument()
+  })
+})
+```
+
+- [ ] **Step 2: Run the test to verify it fails**
+
+Run: `npx vitest run src/components/legal/__tests__/LegalPages.test.tsx`
+Expected: FAIL — the three page modules cannot be resolved.
+
+- [ ] **Step 3: Create the three page components**
+
+`src/components/legal/PrivacyPolicyPage.tsx`:
+
+```tsx
+import { usePageMeta } from '../../utils/usePageMeta'
+import { getLegalDocument } from './legalData'
+import { LegalLayout } from './LegalLayout'
+
+export default function PrivacyPolicyPage() {
+  const meta = usePageMeta({
+    title: 'Privacy Policy',
+    description: 'How HireHub Community collects, uses, and protects your information.',
+    url: '/privacy',
+  })
+  return (
+    <>
+      {meta}
+      <LegalLayout doc={getLegalDocument('privacy')} />
+    </>
   )
 }
 ```
 
-`JobBoardPage` renders both a mobile and a desktop layout in one DOM tree
-(intentional responsive markup), so every one-off text/placeholder query
-matches twice. Fix each assertion:
+`src/components/legal/TermsPage.tsx`:
 
-- "renders a search bar": `getByPlaceholderText('Search jobs...')` →
-  `getAllByPlaceholderText('Search jobs...')`, expect `.length` to be ≥ 1.
-- "renders filter options ...": the grid is only rendered after `loading`
-  clears, so the synchronous `getByText('Category')` races the promise →
-  use `await screen.findByText('Category')` (also `findByText` for
-  'Seniority' and 'Location').
-- "renders empty state when no jobs are returned":
-  `await screen.findAllByText(/no jobs match/i)`, expect `.length` ≥ 1.
-- "renders job cards when jobs are returned":
-  `await screen.findAllByText('Frontend Engineer')`, expect `.length` ≥ 1
-  (unblocks once `QueryClientProvider` is present).
+```tsx
+import { usePageMeta } from '../../utils/usePageMeta'
+import { getLegalDocument } from './legalData'
+import { LegalLayout } from './LegalLayout'
 
-### 2b. `src/components/dashboard/__tests__/DashboardPage.test.tsx` (3 failures)
+export default function TermsPage() {
+  const meta = usePageMeta({
+    title: 'Terms of Service',
+    description: 'The rules that govern your use of HireHub Community.',
+    url: '/terms',
+  })
+  return (
+    <>
+      {meta}
+      <LegalLayout doc={getLegalDocument('terms')} />
+    </>
+  )
+}
+```
 
-`DashboardPage` renders `OverviewTab` by default, which calls `useApplications()`
-(needs `ApplicationsProvider`) and destructures `savedJobIds` from `useApp`
-(the mock only returns `user`/`setUser` → `savedJobIds.length` throws). Fix:
+`src/components/legal/CookiePolicyPage.tsx`:
 
-- Wrap the render helper in `<ApplicationsProvider>` (safe in tests: no access
-  token → it never calls the API) alongside the existing `MemoryRouter` +
-  `ToastProvider`.
-- Extend the `useApp` mock to return `{ user: null, setUser: vi.fn(), savedJobIds: [] }`.
-- "defaults to Saved Jobs tab" is WRONG — the component defaults to `overview`
-  (`DashboardPage.tsx:20` `useSearchParams().get('tab') ?? 'overview'`). Rename
-  to "defaults to Overview tab" and assert the Overview tab has
-  `aria-selected="true"`.
+```tsx
+import { usePageMeta } from '../../utils/usePageMeta'
+import { getLegalDocument } from './legalData'
+import { LegalLayout } from './LegalLayout'
 
-### 2c. `src/components/employer-dashboard/__tests__/EmployerDashboardPage.test.tsx` (3 failures)
+export default function CookiePolicyPage() {
+  const meta = usePageMeta({
+    title: 'Cookie Policy',
+    description: 'How HireHub Community uses cookies and similar technologies.',
+    url: '/cookies',
+  })
+  return (
+    <>
+      {meta}
+      <LegalLayout doc={getLegalDocument('cookies')} />
+    </>
+  )
+}
+```
 
-The page's `JobListingsTab` (rendered by default) calls `listEmployerJobs()`
-from `api/jobs`, but the test mock only exports `listJobs`. Fix:
+`src/components/legal/index.ts`:
 
-- Add `listEmployerJobs: vi.fn().mockResolvedValue({ data: [] })` to the
-  `vi.mock('../../../api/jobs')` factory (JobListingsTab reads `res.data`).
-- "defaults to Job Listings tab" is correct (default is `listings`,
-  `EmployerDashboardPage.tsx:14`) — it passes once the mock exists.
+```ts
+export { LegalLayout } from './LegalLayout'
+export {
+  getLegalDocument,
+  legalDocuments,
+  type LegalDocument,
+  type LegalParagraph,
+  type LegalSection,
+} from './legalData'
+export { default as PrivacyPolicyPage } from './PrivacyPolicyPage'
+export { default as TermsPage } from './TermsPage'
+export { default as CookiePolicyPage } from './CookiePolicyPage'
+```
 
-Verify: `npm run test:run` → **71 passed / 0 failed**. Also `npm run build`.
+- [ ] **Step 4: Wire the routes in `src/App.tsx`**
 
-Commit: `fix(test): repair JobBoard/Dashboard/EmployerDashboard suites`.
+Add the lazy imports after line 26 (`const FAQPage = lazy(...)`):
+
+```tsx
+const PrivacyPolicyPage = lazy(() => import('./components/legal/PrivacyPolicyPage'))
+const TermsPage = lazy(() => import('./components/legal/TermsPage'))
+const CookiePolicyPage = lazy(() => import('./components/legal/CookiePolicyPage'))
+```
+
+Add the routes after the `/faq` route (line 66):
+
+```tsx
+<Route path="/privacy" element={<ErrorBoundary><PrivacyPolicyPage /></ErrorBoundary>} />
+<Route path="/terms" element={<ErrorBoundary><TermsPage /></ErrorBoundary>} />
+<Route path="/cookies" element={<ErrorBoundary><CookiePolicyPage /></ErrorBoundary>} />
+```
+
+- [ ] **Step 5: Run the tests to verify they pass**
+
+Run: `npx vitest run src/components/legal`
+Expected: PASS (legalData, LegalLayout, and LegalPages suites all green).
+
+- [ ] **Step 6: Typecheck, lint, and full suite**
+
+Run: `npx tsc --noEmit && npx eslint . && npx vitest run`
+Expected: tsc clean, eslint clean, 237 baseline tests + new legal tests all pass (no regressions — proves the `App.tsx` route additions compile and lazy imports resolve).
+
+- [ ] **Step 7: Commit**
+
+```bash
+git add src/components/legal/PrivacyPolicyPage.tsx src/components/legal/TermsPage.tsx src/components/legal/CookiePolicyPage.tsx src/components/legal/index.ts src/components/legal/__tests__/LegalPages.test.tsx src/App.tsx
+git commit -m "feat(legal): add privacy, terms, and cookie policy pages with routes"
+```
+
+---
 

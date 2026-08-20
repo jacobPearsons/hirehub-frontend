@@ -1,170 +1,93 @@
-### Task 5: FilterDrawer + ActiveFilterChips
+### Task 5.1 — `src/types/application.ts` (red: compile against new tests)
 
-**Files:**
-- Create: `src/components/jobs/FilterDrawer.tsx`
-- Create: `src/components/jobs/ActiveFilterChips.tsx`
+```ts
+export type ApplicationStatus =
+  | 'applied' | 'screening' | 'shortlist' | 'interviewing'
+  | 'offer' | 'hired' | 'rejected' | 'withdrawn'
 
-**Interfaces:**
-- Consumes: Same filter state as FilterSidebar (`filters`, `onFilterChange`); Radix Dialog; Framer Motion
-- Produces: `FilterDrawer` (mobile bottom sheet), `ActiveFilterChips` (chip row)
-
-- [ ] **Step 1: Create FilterDrawer component**
-
-A bottom sheet using Radix Dialog with slide-up animation. Contains the same filter groups as FilterSidebar.
-
-```tsx
-// src/components/jobs/FilterDrawer.tsx
-import * as Dialog from '@radix-ui/react-dialog'
-import { motion, AnimatePresence } from 'framer-motion'
-import { X } from 'lucide-react'
-import { Button } from '../ui/Button'
-
-interface FilterDrawerProps {
-  open: boolean
-  onOpenChange: (open: boolean) => void
-  filters: { category: string; seniority: string; remote: string }
-  onFilterChange: (key: string, value: string) => void
-  activeCount: number
+export interface ScreeningAnswer {
+  questionId: string
+  answerText: string
+  score?: number
+  matchedKeywords?: string[]
+  question?: { prompt: string; expectedKeywords: string[]; maxScore: number }
 }
 
-const categories = ['All', 'Engineering', 'Design', 'Marketing', 'Sales', 'Operations']
-const seniorities = ['All', 'Junior', 'Mid', 'Senior', 'Lead', 'Executive']
-const locations = ['All', 'Remote', 'On-site', 'Hybrid']
+export interface ScreeningResult { score: number; maxPossible: number }
 
-function FilterGroup({ label, options, value, onChange }: {
-  label: string
-  options: string[]
-  value: string
-  onChange: (val: string) => void
-}) {
-  return (
-    <fieldset className="border-0 p-0 m-0">
-      <legend className="text-sm font-medium mb-3 text-ink">{label}</legend>
-      <div className="flex flex-wrap gap-2">
-        {options.map((opt) => {
-          const optValue = opt === 'All' ? '' : (label === 'Seniority' ? opt.toLowerCase() : opt)
-          const isSelected = value === optValue
-          return (
-            <button
-              key={opt}
-              type="button"
-              onClick={() => onChange(optValue)}
-              className={`px-3 py-1.5 rounded-pill text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/30 ${
-                isSelected
-                  ? 'bg-accent text-white'
-                  : 'bg-surface-2 text-ink-muted hover:text-ink'
-              }`}
-            >
-              {opt}
-            </button>
-          )
-        })}
-      </div>
-    </fieldset>
-  )
-}
-
-export function FilterDrawer({ open, onOpenChange, filters, onFilterChange, activeCount }: FilterDrawerProps) {
-  const handleClear = () => {
-    onFilterChange('category', '')
-    onFilterChange('seniority', '')
-    onFilterChange('remote', '')
-  }
-
-  return (
-    <Dialog.Root open={open} onOpenChange={onOpenChange}>
-      <Dialog.Portal>
-        <Dialog.Overlay className="fixed inset-0 z-50 bg-black/40 md:hidden" />
-        <Dialog.Content
-          className="fixed inset-x-0 bottom-0 z-50 bg-canvas rounded-t-xl border-t border-hairline max-h-[80vh] overflow-y-auto md:hidden"
-          aria-label="Filter jobs"
-        >
-          <div className="sticky top-0 bg-canvas border-b border-hairline px-4 py-3 flex items-center justify-between">
-            <Dialog.Title className="text-base font-medium text-ink">
-              Filters {activeCount > 0 && <span className="text-ink-muted">({activeCount})</span>}
-            </Dialog.Title>
-            <Dialog.Close asChild>
-              <button
-                className="p-1 text-ink-muted hover:text-ink rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/30"
-                aria-label="Close filters"
-              >
-                <X size={20} />
-              </button>
-            </Dialog.Close>
-          </div>
-
-          <div className="p-4 space-y-6">
-            <FilterGroup label="Category" options={categories} value={filters.category} onChange={(v) => onFilterChange('category', v)} />
-            <FilterGroup label="Seniority" options={seniorities} value={filters.seniority} onChange={(v) => onFilterChange('seniority', v)} />
-            <FilterGroup label="Location" options={locations} value={filters.remote} onChange={(v) => onFilterChange('remote', v)} />
-          </div>
-
-          <div className="sticky bottom-0 bg-canvas border-t border-hairline px-4 py-3 flex gap-3">
-            <Button variant="ghost" size="md" className="flex-1" onClick={handleClear}>Clear all</Button>
-            <Dialog.Close asChild>
-              <Button variant="primary" size="md" className="flex-1">Show results</Button>
-            </Dialog.Close>
-          </div>
-        </Dialog.Content>
-      </Dialog.Portal>
-    </Dialog.Root>
-  )
+export interface TimelineEntry {
+  id: string
+  fromStatus: ApplicationStatus | null
+  toStatus: ApplicationStatus
+  actorRole: string
+  createdAt: string
 }
 ```
 
-- [ ] **Step 2: Create ActiveFilterChips component**
+Extend the existing `Application` interface with `screeningResult?: ScreeningResult`, `screeningAnswers?: ScreeningAnswer[]`, `timeline?: TimelineEntry[]` (read the file first; do not remove existing fields).
 
-```tsx
-// src/components/jobs/ActiveFilterChips.tsx
-import { X } from 'lucide-react'
+### Task 5.2 — `src/api/applications.ts`
 
-interface ActiveFilterChipsProps {
-  filters: { category: string; seniority: string; remote: string }
-  onFilterChange: (key: string, value: string) => void
+- `STATUS_TO_UPPER`: remove `reviewing`, add `screening: 'SCREENING'`, `shortlist: 'SHORTLIST'`, `hired: 'HIRED'`, `withdrawn: 'WITHDRAWN'`.
+- `normalizeApplication`: map `screeningResult`, `screeningAnswers`, `timeline` (dates → strings as the rest of the object does).
+- New functions (read the file and mirror existing signatures/error handling):
+  - `getApplication(id: string): Promise<Application>`
+  - `withdrawApplication(id: string): Promise<Application>`
+  - extend the apply call to accept `screeningAnswers: { questionId: string; answerText: string }[]`.
+
+### Task 5.3 — new `src/utils/status.ts`
+
+Centralize the duplicated `statusConfig` records:
+
+```ts
+import type { ApplicationStatus } from '../types/application'
+
+export const STATUS_CONFIG: Record<ApplicationStatus, { label: string; color: string }> = {
+  applied: { label: 'Applied', color: 'bg-ink-muted/10 text-ink-muted' },
+  screening: { label: 'Screening', color: 'bg-amber-500/10 text-amber-600' },
+  shortlist: { label: 'Shortlist', color: 'bg-sky-500/10 text-sky-600' },
+  interviewing: { label: 'Interviewing', color: 'bg-violet-500/10 text-violet-600' },
+  offer: { label: 'Offer', color: 'bg-emerald-500/10 text-emerald-600' },
+  hired: { label: 'Hired', color: 'bg-green-600/10 text-green-700' },
+  rejected: { label: 'Rejected', color: 'bg-error/10 text-error' },
+  withdrawn: { label: 'Withdrawn', color: 'bg-ink-muted/10 text-ink-muted' },
 }
 
-export function ActiveFilterChips({ filters, onFilterChange }: ActiveFilterChipsProps) {
-  const chips: { key: string; label: string }[] = []
+export const ALLOWED_TRANSITIONS: Record<ApplicationStatus, ApplicationStatus[]> = {
+  applied: ['screening', 'shortlist', 'rejected', 'withdrawn'],
+  screening: ['shortlist', 'interviewing', 'rejected', 'withdrawn', 'applied'],
+  shortlist: ['interviewing', 'offer', 'rejected', 'withdrawn'],
+  interviewing: ['offer', 'rejected', 'withdrawn'],
+  offer: ['hired', 'rejected', 'withdrawn'],
+  hired: [],
+  rejected: [],
+  withdrawn: [],
+}
 
-  if (filters.category) chips.push({ key: 'category', label: filters.category })
-  if (filters.seniority) chips.push({ key: 'seniority', label: filters.seniority })
-  if (filters.remote) chips.push({ key: 'remote', label: filters.remote })
-
-  if (chips.length === 0) return null
-
-  return (
-    <div className="flex flex-wrap gap-2 mb-4">
-      {chips.map((chip) => (
-        <span
-          key={chip.key}
-          className="inline-flex items-center gap-1 px-2.5 py-1 rounded-pill bg-surface-2 text-sm text-ink-muted"
-        >
-          {chip.label}
-          <button
-            onClick={() => onFilterChange(chip.key, '')}
-            className="text-ink-tertiary hover:text-ink transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/30 rounded"
-            aria-label={`Remove ${chip.label} filter`}
-          >
-            <X size={14} />
-          </button>
-        </span>
-      ))}
-    </div>
-  )
+export function canTransition(from: ApplicationStatus, to: ApplicationStatus): boolean {
+  return ALLOWED_TRANSITIONS[from]?.includes(to) ?? false
 }
 ```
 
-- [ ] **Step 3: Run build to verify**
+Update the four components to import `STATUS_CONFIG` instead of their local records (delete the locals). Specific line-level changes:
+- `ApplicantsTab.tsx`: `statusConfig` → `STATUS_CONFIG`; replace `app.status !== 'reviewing'` with `app.status !== 'screening'` and `handleStatusChange(app.id, 'reviewing')` → `'screening'`.
+- `CandidateDetailDrawer.tsx` (~lines 224/228): same `reviewing` → `screening` replacement.
+- `ApplicationCard.tsx`: local record → import.
+- `AdminPage.tsx`: local record → import.
+- `HiringFlowModal.tsx`: `STAGES` — replace `{ key: 'reviewing', ... }` with `{ key: 'screening', label: 'Screening', description: 'Your application is being screened against the job requirements.' }`; add `{ key: 'hired', label: 'Hired', ... }`; extend `STATUS_ORDER`: `screening: 1`, `shortlist: 2`, `interviewing: 3`, `offer: 4`, `hired: 5`, `rejected: 3`, `withdrawn: 0`.
 
-Run: `npx tsc --noEmit`
-Expected: No errors
+### Task 5.4 — `(sweep)` tests (red → green)
 
-- [ ] **Step 4: Commit**
+- `src/api/__tests__/applications.test.ts`: `'REVIEWING'` → `'SCREENING'` and `status: 'reviewing'` → `'screening'`.
+- `src/components/dashboard/__tests__/ApplicationCard.test.tsx`: `status: 'reviewing'` → `'screening'`.
+- `src/components/dashboard/__tests__/HiringFlowModal.test.tsx`: `status: 'reviewing'` → `'screening'`; assert the modal renders a "Screening" stage.
+- New `src/utils/__tests__/status.test.ts`: `canTransition('screening', 'interviewing') === true`, `canTransition('applied', 'offer') === false`, `STATUS_CONFIG` has all 8 keys.
 
-```bash
-git add src/components/jobs/FilterDrawer.tsx src/components/jobs/ActiveFilterChips.tsx
-git commit -m "feat: add FilterDrawer bottom sheet and ActiveFilterChips for mobile"
-```
+Run `npm run test:run`, `npm run lint`, `npm run build` → green. Commit: `feat(frontend): expand application status types and centralize status config`.
 
 ---
+
+## M6 — PostJobForm screening question editor
+
+**File:** `src/components/post-job/PostJobForm.tsx` (+ existing `__tests__/PostJobForm.test.tsx` must stay green). Read the form first to learn its state shape and submit path (props vs internal API call).
 

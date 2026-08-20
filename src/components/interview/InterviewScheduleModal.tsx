@@ -98,7 +98,7 @@ export function InterviewScheduleModal({
         await updateApplicationStatus(application.id, 'interviewing')
 
         const { data: conversationRes } = await openInterviewConversation(application.id)
-        const base = user?.role === 'employer' ? '/employer/dashboard' : '/dashboard'
+        const base = user?.role === 'admin' ? '/admin' : user?.role === 'employer' ? '/employer/dashboard' : '/dashboard'
         navigate(`${base}?tab=messages&conv=${conversationRes.conversation.id}`)
         return
       }
@@ -133,8 +133,11 @@ export function InterviewScheduleModal({
       showToast('success', `Interview scheduled for ${application.applicantName}`)
       handleClose()
       onSuccess()
-    } catch {
-      showToast('error', 'Failed to schedule interview. Please try again.')
+    } catch (err) {
+      const message = err instanceof Error && err.message
+        ? err.message
+        : 'Failed to schedule interview. Please try again.'
+      showToast('error', message)
     } finally {
       setSubmitting(false)
     }

@@ -1,110 +1,63 @@
-# Task 7 Report — Seeker onboarding steps + wizard shell
+# Task M7 — collect screening answers on the application form
 
-## Status: DONE
+Commit: `3ae132d` `feat: collect screening answers on application form`
 
-## What was implemented
+## Task 7.2 — tests (written first, ran red)
 
-TDD seeker path for the onboarding wizard on the `feat/onboarding-wizard`
-branch. Four step components + complete step + wizard shell.
+New file `src/components/apply/__tests__/ApplyJobFormScreening.test.tsx`.
 
-### `src/components/onboarding/OnboardingWizard.tsx` (new)
-- Default-exported wizard. Renders `OnboardingProgress` header, step title
-  block, current step, and a sticky bottom bar with Back / Skip (optional
-  steps only) / Continue + "Saved" indicator.
-- Continue submits via `form="onboarding-step"`; `handleSaved` advances the
-  step (`setStepIndex(i+1)`), flashes the Saved check, and clears the saving
-  state.
-- The final step (SeekerCompleteStep) is rendered outside the form footer.
-- **Plan deviation (bug fix):** the plan's verbatim `handleSaved` never
-  advanced the step index, so no step could move forward — contradicting the
-  plan's own spec ("entering a headline and continuing calls updateProfile and
-  advances to Step 2 of 5"). Added `setStepIndex((i) => Math.min(i + 1, steps.length - 1))`
-  inside `handleSaved`.
-- The seeker-only branch destructures no `user` yet (role routing is Task 8);
-  the `useApp`/`useNavigate` imports are intentionally absent until then to
-  keep `tsc -b` clean.
+Adapted the brief's test to the real submit path. The brief's snippet assumed `onSubmit`/`onClose` props and expected the submit handler to receive the payload; the real `ApplyJobForm` props are `job`/`onSuccess`/`resumeFile`/`resumeFileName`/`onResumeChange`, and submission goes through a dynamic import of `createApplication` (internal API call) then `onSuccess(resumeFileName?)`. Adaptations:
 
-### `SeekerBasicsStep.tsx` (new)
-- RHF + zod schema (`name` 1–100, `headline` max 120, `location` max 100),
-  prefilled from `user`. Submit → `updateProfile` → `setUser` → `onSaved()`.
-  API failure → inline `role="alert"` error, no advance.
+- Mock `createApplication` from `../../../api/applications` and assert it was called with `expect.objectContaining({ screeningAnswers: [{ questionId: 'q1', answerText: 'Five years' }] })` (keeps the exact core assertion of the brief).
+- Mock `useApp` from `AppContext` with a resume-on-file seeker (cover-letter-only mode), so name/email/resume fields are hidden and the form stays focused on cover letter + screening answers.
+- `onSuccess` is asserted to have been called (fires after the API resolves).
+- Filled the cover letter (≥50 chars per `applicationSchema`) since RHF validation otherwise blocks submit.
+- `job` built as `{ ...jobs[0], screeningQuestions: [...] }`.
 
-### `SeekerResumeStep.tsx` (new)
-- Hidden PDF-only file input (≤10 MB) with a dashed "Choose a resume" picker.
-- No file → `onSaved()` (skip path). With file → `apiUpload('/upload/resume',
-  formData)` → `updateProfile({ resumePath, resumeFileName })` → `setUser` →
-  `onSaved()`. Matches verified backend contract (`POST /api/upload/resume`,
-  requireRole('SEEKER'), returns `{ resumePath, resumeFileName }`).
+Ran it red before implementation (missing label `Years of Python?`). Passed green after implementation.
 
-### `SeekerSkillsStep.tsx` (new)
-- Uses `SkillInput`. <3 skills → "Add at least 3 skills"; >15 → "Add at most 15
-  skills"; then `updateProfile({ skills })` → `setUser` → `onSaved()`.
-- Removed `error` pass-through to `SkillInput` — the step-level alert and
-  SkillInput's own error text rendered the same string twice (duplicate
-  `role="alert"`, a11y regression); the step keeps the single alert.
+## Task 7.1 — implementation
 
-### `SeekerPreferencesStep.tsx` (new)
-- RHF + zod: `remoteOnly` checkbox, `salaryMin`/`salaryMax` (optional, ≥0 via
-  `z.preprocess` empty→undefined), `currency` (USD/EUR/GBP), `employmentType`
-  (Full-time/Part-time/Contract/Internship). Only set fields are sent.
-- **Typing fix:** `z.preprocess` makes `z.input` yield `unknown`, so the RHF
-  `Resolver` generic disagreed with `z.infer` (numbers). Switched to
-  `type PreferencesFormData = z.input<typeof preferencesSchema>` and narrowed
-  with `typeof data.salaryMin === 'number'` before writing the payload.
+`src/components/apply/ApplyJobForm.tsx`:
 
-### `SeekerCompleteStep.tsx` (new)
-- Summary card of entered profile (headline / location / skills / remote-only)
-  + primary "Go to job board" → `updateProfile({ onboardingCompleted: true })`
-  → `setUser` → `navigate('/jobs')`. Rendered outside the form footer.
+- `const screeningQuestions = job.screeningQuestions ?? []`.
+- State `answers: Record<string, string>` + `answerErrors: Record<string, string>` (validation errors per question).
+- If `screeningQuestions.length > 0`, renders one `Textarea` per question under the cover letter: `label` = question prompt, `id="screening-<id>"`, `rows={4}`, `required`, shows per-question `error` when unanswered; typing clears that question's error.
+- `onSubmit` validates each answered (trim) before proceeding; on failure sets `answerErrors` and returns.
+- `createApplication` payload includes `screeningAnswers: screeningQuestions.map((q) => ({ questionId: q.id, answerText: answers[q.id] ?? '' }))` only when questions exist (spread conditionally).
 
-### `__tests__/OnboardingWizard.test.tsx` (new, RED→GREEN)
-- 4 seeker tests per plan spec: renders Step 1 of 5; headline → updateProfile
-  called + advances; Skills <3 → inline error, no advance; final CTA →
-  updateProfile with `{ onboardingCompleted: true }`.
-- AppContext mocked via `vi.mock('../../../context/AppContext')` overriding
-  `useApp` only (existing repo pattern).
+`src/data/jobs.ts`:
 
-## TDD evidence
+- `Job` interface gained optional `screeningQuestions?: { id; prompt; expectedKeywords: string[]; maxScore: number; order: number }[]`, matching the brief's shape. `api/types.ts` re-exports this `Job`, so the single source of truth type-checks for both data and API layers (no closed-union conflict to reconcile with 5.1).
 
-- RED: wizard test failed resolving `../OnboardingWizard` (component absent).
-- GREEN after writing components: onboarding suite 11/11
-  (`npx vitest run src/components/onboarding/`).
-- Full suite: `npm run test:run` → 82 passed / 0 failed.
-- Build: `npm run build` (`tsc -b && vite build`) → passes (no unused imports,
-  no unused destructures).
+`src/api/applications.ts` already accepted `screeningAnswers?: { questionId; answerText }[]` on `createApplication` — no change needed there.
 
-## Test fixes made during GREEN
+## Gates
 
-1. Plan's `handleSaved` bug (see above) — wizard could not advance.
-2. `/continue/i` query matched the Resume picker's copy
-   ("Optional — continue without one to skip.") → tightened test to exact
-   `{ name: 'Continue' }`; the wizard and copy are correct.
-3. Duplicate "Add at least 3 skills" (step alert + SkillInput error) → removed
-   `error` prop pass-through to SkillInput.
-4. Build-time unused `FormEvent` imports / unused `user`; z.input typing for
-   preprocess fields.
+| Gate | Result |
+|------|--------|
+| `npm run test:run` | ✅ 70 files / 284 tests passed |
+| `npm run lint` | ✅ clean |
+| `npm run build` | ✅ `tsc -b && vite build` succeeded |
 
 ## Files changed
 
-- `src/components/onboarding/OnboardingWizard.tsx` (new)
-- `src/components/onboarding/SeekerBasicsStep.tsx` (new)
-- `src/components/onboarding/SeekerResumeStep.tsx` (new)
-- `src/components/onboarding/SeekerSkillsStep.tsx` (new)
-- `src/components/onboarding/SeekerPreferencesStep.tsx` (new)
-- `src/components/onboarding/SeekerCompleteStep.tsx` (new)
-- `src/components/onboarding/__tests__/OnboardingWizard.test.tsx` (new)
+- `src/components/apply/ApplyJobForm.tsx` (modified)
+- `src/components/apply/__tests__/ApplyJobFormScreening.test.tsx` (new)
+- `src/data/jobs.ts` (modified)
 
-## Commit
+Verified via `git status`: only these three files staged; nothing under `.superpowers/` staged or committed.
 
-- `51127fa feat(onboarding): seeker wizard steps`
+## Self-review findings
 
-## Self-review
+- Existing `ApplyJobForm.test.tsx` still green (2 files, 5 tests).
+- Payload mapping exact per brief (`questionId`/`answerText`, one entry per question).
+- Validation blocks submit with unanswered questions; native `required` also present for a11y/UX.
+- Lint/build/test all green before commit.
+- Single commit `3ae132d` with the exact required message.
 
-- All steps follow the contract: `<form id="onboarding-step">`, own saving
-  state, `onSaved()` on success, inline `role="alert"` error on API failure,
-  no advance on failure.
-- Full suite green (82), build green, output pristine.
+## Concerns / adaptations vs the brief
 
-## Concerns
-
-- None. Task 8 (employer steps + employer wizard branch) is next.
+1. The brief's test assumed `onSubmit`/`onClose` props and `onSubmit` receiving the apply payload; real component uses internal API call + `onSuccess`. Test was adapted to assert on the mocked `createApplication` payload instead (core `screeningAnswers` assertion preserved verbatim).
+2. Cover letter must be filled in the test because the real schema requires ≥50 chars.
+3. `screeningAnswers` is included in the payload only when the job has screening questions (per brief's `if length > 0` gating); jobs without questions send an unchanged payload.

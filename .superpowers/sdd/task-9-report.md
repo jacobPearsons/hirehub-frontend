@@ -1,80 +1,48 @@
-# Task 9 Report — Routing + gating wiring
+# Task M9 Report — screening scores + status timeline in candidate drawer
 
-## Status: DONE
+**Status:** DONE
+**Commit:** `d85177f` — `feat: show screening scores and status timeline in candidate drawer`
 
-## What was implemented
+## Per-task summary
 
-TDD wiring of the `/onboarding` route and the onboarding-completion gate on
-the `feat/onboarding-wizard` branch.
+### 9.2 (tests — written first, red)
+Created `src/components/candidate/__tests__/CandidateDetailDrawerScreening.test.tsx`. Renders the drawer with an application carrying:
+- `screeningResult { score: 8, maxPossible: 10 }`
+- one `screeningAnswer` with `question.prompt`, `answerText`, `score: 8`
+- 2 timeline entries (null→applied/SEEKER and applied→screening/EMPLOYER)
 
-### `src/components/auth/ProtectedRoute.tsx`
-Added `useLocation()` and, after the role check:
-```tsx
-if (user && !user.onboardingCompleted && location.pathname !== '/onboarding') {
-  return <Navigate to="/onboarding" replace />
-}
-```
-- The `location.pathname !== '/onboarding'` guard prevents a redirect loop
-  when the user is already viewing the wizard (per plan).
-- Ordering note: the role check runs before the onboarding gate, so an
-  employer with `allowedRoles={['employer']}` still hits the role redirect
-  first — matches plan intent.
+Asserts: section titles "Screening" and "Timeline", overall score "8 / 10", per-answer prompt, answer text and "8 pts", both timeline step labels ("Submitted → Applied", "Applied → Screening"), both actors ("Seeker", "Employer"), and both dates ("Jul 1, 2026", "Jul 2, 2026").
+Ran red first (failed on missing "Screening" text) → green after implementation.
 
-### `src/App.tsx`
-Added lazy import `const OnboardingWizard = lazy(() => import('./components/onboarding/OnboardingWizard'))`
-and route:
-```tsx
-<Route path="/onboarding" element={
-  <ProtectedRoute><ErrorBoundary><OnboardingWizard /></ErrorBoundary></ProtectedRoute>
-} />
-```
+### 9.1 (implementation)
+`src/components/candidate/CandidateDetailDrawer.tsx`:
+- **Screening section** rendered when `screeningResult` exists: header row `score / maxPossible` plus a progress bar (`h-1.5 rounded-full bg-surface-2` / `bg-accent`, mirroring `OnboardingProgress.tsx`), followed by one card per `screeningAnswer` with prompt (falls back to `questionId`), answer text, and per-answer `{score} pts`.
+- **Timeline section** rendered when `timeline?.length > 0`: entries sorted chronologically ascending by `createdAt`, each showing `{fromLabel} → {toLabel}` using `STATUS_CONFIG` labels (null `fromStatus` → "Submitted"), prettified `actorRole` ("Seeker"/"Employer"), and date via the repo-standard `formatDate` util (`src/utils/date.ts`).
+- **Status buttons**: now gated by `canTransition(application.status, target)` (screening/interviewing/offer/rejected) instead of `status !== X`, and the two direct status-change buttons use `STATUS_CONFIG` labels ("Move to Screening", "Move to Rejected"). "Schedule Interview"/"Make offer" keep their existing labels but are hidden when the transition isn't allowed.
 
-### `src/components/auth/SignupPage.tsx`
-- `setUser` now includes `onboardingCompleted: res.data.user.onboardingCompleted`.
-- Final navigation changed to `navigate('/onboarding')` for both roles (was
-  role-based dashboard redirect). Existing `SignupPage.test.tsx` does not
-  assert navigation, so it stays green.
-
-### `__tests__/ProtectedRoute.test.tsx` (new, RED→GREEN)
-5 tests per plan spec: loading spinner (`Loader2`), no user → `/login`,
-`onboardingCompleted: false` on `/dashboard` → `/onboarding`, completed →
-renders children, disallowed role → `/`. Mocked `useApp` via
-`vi.mock('../../../context/AppContext')`, wrapped in `MemoryRouter` + `Routes`.
-
-## TDD evidence
-
-- RED: 1 failed / 5 (onboarding-gate test only — gate absent).
-- GREEN: 5/5 after implementation.
-- Full suite: `npm run test:run` → 91 passed / 0 failed.
-- Build: `npm run build` (`tsc -b && vite build`) → passes.
-- Lint: `npm run lint` → 0 errors. Fixed 2 errors I had introduced (unused
-  `_props` params in `SeekerCompleteStep`/`EmployerCompleteStep` — removed the
-  parameter and the now-unused prop interfaces). Remaining 3 warnings are
-  pre-existing RHF `watch` "incompatible library" notes in
-  ApplyJobForm.tsx / InterviewScheduleModal.tsx / ProfilePage.tsx — untouched.
+## Gates
+- `npm run test:run` → 73 files, 301 tests passed (incl. 2 drawer suites, 4 tests)
+- `npm run lint` → clean (no output, exit 0)
+- `npm run build` → tsc + vite build succeeded
 
 ## Files changed
+- `src/components/candidate/CandidateDetailDrawer.tsx` (+85 / −8)
+- `src/components/candidate/__tests__/CandidateDetailDrawerScreening.test.tsx` (new)
 
-- `src/components/auth/ProtectedRoute.tsx`
-- `src/components/auth/SignupPage.tsx`
-- `src/App.tsx`
-- `src/components/auth/__tests__/ProtectedRoute.test.tsx` (new)
-- `src/components/onboarding/SeekerCompleteStep.tsx` (lint fix)
-- `src/components/onboarding/EmployerCompleteStep.tsx` (lint fix)
-
-## Commit
-
-- `b28fbe5 feat(auth): gate incomplete users to onboarding`
+Only these two files staged and committed; `.superpowers/` and all pre-existing dirty files (JobBoardPage.tsx, useJobs.ts, api/types.ts, PricingSection.tsx, HeroSection.tsx, JobBoardPageSearch.test.tsx, etc.) left untouched.
 
 ## Self-review
+- Both sub-tasks complete; single commit with exact message.
+- Existing `CandidateDetailDrawer.test.tsx` (3 tests) still green.
+- No `.superpowers/` or WIP files staged (verified `git status` before commit; commit stat shows only the 2 files).
+- Timeline sorted chronologically (oldest first) via explicit `[...timeline].sort(...)`.
+- Score bar clamps 0–100% and guards `maxPossible === 0`.
 
-- Incomplete users are redirected from every protected route to `/onboarding`
-  (including `/dashboard/profile` and `/post-job`); the wizard's own landing
-  and the completion redirects (`/jobs`, `/post-job`) are unaffected because
-  `onboardingCompleted` is set before navigating.
-- Both roles land on `/onboarding` after signup.
-- Lint/build/tests all green.
+## Concerns / adaptations vs brief
+- **Date timezone flake**: the brief's illustrative timeline dates at `00:00:00Z` shift a day in EDT (this machine is America/New_York), so `formatDate` produced e.g. "Jun 30, 2026". The test uses `T12:00:00Z` midday timestamps to be timezone-stable; dates near midnight in real data will display local time (consistent with `formatDate` used across the app).
+- **`candidateStatus` in the brief** interpreted as the target status for each action button (`canTransition(application.status, 'screening')` etc.).
+- **null `fromStatus`** (application-created entry, per API mapping in `applications.test.ts`) renders as "Submitted".
+- Drawer has no pre-existing progress-bar or date formatting of its own, so the score bar reuses the `OnboardingProgress` styling pattern and dates use the shared `formatDate` util (the closest repo-standard date formatter).
+- Changing the "Mark reviewing" label to "Move to Screening" and gating on `canTransition` is a behavior change: from `applied`, "Schedule Interview"/"Make offer" are now hidden (previously always shown when status differed). This matches the allowed-transition flow and the brief's explicit instruction; no existing test asserted their presence.
 
-## Concerns
-
-- None. Task 10 (final whole-branch gate) is next.
+Report path: `.superpowers/sdd/task-9-report.md`

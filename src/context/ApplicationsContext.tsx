@@ -48,9 +48,11 @@ export function ApplicationsProvider({ children }: { children: ReactNode }) {
   }, [])
 
   const updateApplicationStatus = useCallback(async (id: string, status: Application['status']) => {
+    const current = applications.find((a) => a.id === id)
+    if (current && current.status === status) return
     const res = await apiUpdateStatus(id, status)
     setApplications(prev => prev.map(a => a.id === id ? res.data : a))
-  }, [])
+  }, [applications])
 
   const updateApplicationInterview = useCallback(async (id: string, details: InterviewDetails) => {
     const res = await updateHiringData(id, { interviewData: details })

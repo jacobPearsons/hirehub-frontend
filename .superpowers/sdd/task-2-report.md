@@ -1,63 +1,69 @@
-# Task 2 Report — Fix remaining 10 pre-existing test failures
+# Task 2 Report: Legal pages and routes
 
-## Status: DONE
+## What I implemented
 
-## What was implemented
+Followed the brief verbatim:
 
-Corrected the three test suites that were failing after the Task 1
-IntersectionObserver polyfill (12 failed / 59 passed → 2 failed / 69 passed;
-the 2 remaining are ForgotPasswordPage and ContactInfo = Tasks 3 & 4).
+- `src/components/legal/PrivacyPolicyPage.tsx` — default export `PrivacyPolicyPage` calling `usePageMeta({ title, description, url: '/privacy' })` and rendering `<LegalLayout doc={getLegalDocument('privacy')} />`.
+- `src/components/legal/TermsPage.tsx` — same shape, `getLegalDocument('terms')`, `url: '/terms'`.
+- `src/components/legal/CookiePolicyPage.tsx` — same shape, `getLegalDocument('cookies')`, `url: '/cookies'`.
+- `src/components/legal/index.ts` — barrel re-exporting `LegalLayout`, `legalData` exports/types, and the three pages as default exports.
+- `src/App.tsx` — three lazy imports after line 26 (`const FAQPage = lazy(...)`) and three routes after the `/faq` route (line 66), each wrapped in `ErrorBoundary`.
+- `src/components/legal/__tests__/LegalPages.test.tsx` — the test given in the brief, verbatim. Uses `vi.mock` (globals enabled; no `vi` import, as expected).
 
-### 2a. `src/components/jobs/__tests__/JobBoardPage.test.tsx`
-- Added `vi.mock('../../../context/AppContext', ...)` overriding `useApp` to
-  return `{ isSaved: vi.fn(() => false), toggleSaveJob: vi.fn() }` — the
-  `SaveButton` inside `JobCard` calls `useApp()` → `useAuth()`, which requires
-  an `AuthProvider`; mocking `useApp` follows the established pattern in the
-  DashboardPage/EmployerDashboardPage suites and avoids the provider stack.
-- Already in place (from the cancelled implementer run, verified): the
-  `QueryClientProvider` wrapper, `getAllByPlaceholderText` for the duplicate
-  search bar, `findByText` for the filter legends (async — grid renders after
-  loading clears), `findAllByText` for the duplicate empty state and duplicate
-  job cards.
+## TDD Evidence
 
-### 2b. `src/components/dashboard/__tests__/DashboardPage.test.tsx`
-- Already in place (verified): wrapped in `ApplicationsProvider`, extended the
-  `useApp` mock with `savedJobIds: []`, and renamed "defaults to Saved Jobs
-  tab" → "defaults to Overview tab" (component defaults to `overview`,
-  DashboardPage.tsx:20).
+### RED
 
-### 2c. `src/components/employer-dashboard/__tests__/EmployerDashboardPage.test.tsx`
-- Already in place (verified): added `listEmployerJobs: vi.fn().mockResolvedValue({ data: [] })`
-  to the `api/jobs` mock (JobListingsTab reads `res.data`).
+Command: `npx vitest run src/components/legal/__tests__/LegalPages.test.tsx`
 
-## TDD evidence
+Result: FAIL — suite failed with:
+```
+Error: Failed to resolve import "../PrivacyPolicyPage" from "src/components/legal/__tests__/LegalPages.test.tsx". Does the file exist?
+```
+Why expected: the three page modules did not exist yet, so vitest could not resolve them at import analysis time (0 tests ran, 1 failed suite).
 
-- RED: `npx vitest run <three files>` → 11 failed / 12 total (JobBoard 4,
-  Dashboard 3, Employer 3, plus an unhandled "useAuth must be used within
-  AuthProvider" error thrown from `SaveButton` while rendering job cards).
-- GREEN: same command → 12 passed (0 failed, 0 unhandled errors).
-- Full suite: `npm run test:run` → 69 passed / 2 failed (remaining =
-  ForgotPasswordPage, ContactInfo — separate tasks).
-- Build: `npm run build` (`tsc -b && vite build`) → passes.
+### GREEN
+
+Command: `npx vitest run src/components/legal`
+
+Result: PASS —
+```
+Test Files  3 passed (3)
+      Tests  11 passed (11)
+```
+(legalData 4 + LegalLayout 4 + LegalPages 3 = 11.)
+
+## Verification (Step 6)
+
+Command: `npx tsc --noEmit && npx eslint . && npx vitest run`
+
+Result: tsc clean (no output/errors), eslint clean, full suite green:
+```
+Test Files  62 passed (62)
+      Tests  248 passed (248)
+```
+248 = 237 baseline + 11 legal tests. No regressions; the `App.tsx` route additions and lazy imports compile and resolve.
 
 ## Files changed
 
-- `src/components/jobs/__tests__/JobBoardPage.test.tsx`
-- `src/components/dashboard/__tests__/DashboardPage.test.tsx`
-- `src/components/employer-dashboard/__tests__/EmployerDashboardPage.test.tsx`
+Committed (exactly the six task files, 6 files changed, 96 insertions):
+- `src/components/legal/PrivacyPolicyPage.tsx` (new)
+- `src/components/legal/TermsPage.tsx` (new)
+- `src/components/legal/CookiePolicyPage.tsx` (new)
+- `src/components/legal/index.ts` (new)
+- `src/components/legal/__tests__/LegalPages.test.tsx` (new)
+- `src/App.tsx` (modified: +3 lazy imports, +3 routes)
 
-## Commit
+## Self-review findings
 
-- `aa913e9 fix(test): repair JobBoard/Dashboard/EmployerDashboard suites`
+- All six files from the brief implemented, transcribed exactly (no comments added).
+- Anchors verified before editing: `const FAQPage = lazy(...)` at line 26; `/faq` route at line 66. No shifts.
+- Legal suites all pass: legalData 4 + LegalLayout 4 + LegalPages 3 = 11.
+- Full suite green (248), tsc clean, eslint clean.
+- Staged ONLY the six task files via explicit `git add` of each path (no `git add -A`/`git add .`). Unrelated uncommitted files (`.superpowers/sdd/*`, `public/logos/*`, `PricingSection.tsx`, `HeroSection.tsx`, plan docs, etc.) left untouched and unstaged.
+- Committed on `main` (no branch creation/switching/stashing, no worktrees) with the exact message: `feat(legal): add privacy, terms, and cookie policy pages with routes`. No new dependencies.
 
-## Self-review
+## Issues or concerns
 
-- Component behavior unchanged; all changes are test-side corrections that
-  match intentional component behavior (responsive double-render, overview
-  default tab, JobListingsTab calling listEmployerJobs).
-- Output pristine — no unhandled errors, no stray warnings.
-
-## Concerns
-
-- None. The two remaining failures are owned by Tasks 3 (ForgotPasswordPage)
-  and 4 (ContactInfo).
+None.

@@ -1,142 +1,93 @@
-### Task 4: DashboardShell Layout
+### Task 4: Footer links
 
 **Files:**
-- Create: `src/components/layout/DashboardShell.tsx`
-- Modify: `src/components/dashboard/DashboardPage.tsx`
-- Modify: `src/components/employer-dashboard/EmployerDashboardPage.tsx`
-- Modify: `src/App.tsx`
+- Modify: `src/components/layout/Footer.tsx:16,24` (broken `#` links) and `src/components/layout/Footer.tsx:19-25` (add Terms + Cookie links)
+- Test: `src/components/layout/__tests__/Footer.test.tsx`
 
 **Interfaces:**
-- Consumes: `Sidebar`, `Infobar` from this task batch; `useState` from React
-- Produces: `DashboardShell` component wrapping children with sidebar + infobar layout
+- Consumes: existing `footerLinks` object shape `{ label: string; to: string }[]` rendered via react-router `Link`.
+- Produces: `Help Center` → `/help`, `Privacy Policy` → `/privacy`, plus new `Terms of Service` → `/terms` and `Cookie Policy` → `/cookies` in the Company column. No `to: '#'` remaining in the four columns.
 
-- [ ] **Step 1: Create DashboardShell component**
+- [ ] **Step 1: Write the failing test**
+
+Create `src/components/layout/__tests__/Footer.test.tsx`:
 
 ```tsx
-// src/components/layout/DashboardShell.tsx
-import { useState } from 'react'
-import { Sidebar } from './Sidebar'
-import { Infobar } from './Infobar'
-import type { ReactNode } from 'react'
+import { render, screen } from '@testing-library/react'
+import { MemoryRouter } from 'react-router-dom'
+import { Footer } from '../Footer'
 
-interface DashboardShellProps {
-  children: ReactNode
-}
-
-export function DashboardShell({ children }: DashboardShellProps) {
-  const [sidebarOpen, setSidebarOpen] = useState(false)
-
-  return (
-    <div className="flex h-screen overflow-hidden bg-canvas">
-      <Sidebar mobile isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
-      <Sidebar />
-      <div className="flex-1 flex flex-col min-w-0">
-        <Infobar onMenuToggle={() => setSidebarOpen(true)} />
-        <main className="flex-1 overflow-y-auto">
-          <div className="p-4 md:p-6 lg:p-8">
-            {children}
-          </div>
-        </main>
-      </div>
-    </div>
+function renderFooter() {
+  return render(
+    <MemoryRouter>
+      <Footer />
+    </MemoryRouter>,
   )
 }
+
+describe('Footer', () => {
+  it('links the Help Center and legal pages to real routes', () => {
+    renderFooter()
+    expect(screen.getByRole('link', { name: 'Help Center' })).toHaveAttribute('href', '/help')
+    expect(screen.getByRole('link', { name: 'Privacy Policy' })).toHaveAttribute('href', '/privacy')
+    expect(screen.getByRole('link', { name: 'Terms of Service' })).toHaveAttribute('href', '/terms')
+    expect(screen.getByRole('link', { name: 'Cookie Policy' })).toHaveAttribute('href', '/cookies')
+  })
+
+  it('has no links pointing at "#" in the content columns', () => {
+    renderFooter()
+    const links = screen.getAllByRole('link')
+    const hashLinks = links.filter((link) => link.getAttribute('href') === '#')
+    expect(hashLinks).toHaveLength(3)
+  })
+})
 ```
 
-- [ ] **Step 2: Update DashboardPage to work inside DashboardShell**
+Note: the second test expects exactly 3 `#` links — those are the three social links (`Globe`, `MessageCircle`, `ExternalLink`), which are intentionally placeholder `href="#"` anchors and are NOT part of the four content columns. Do not change the social links.
 
-Remove the outer `Section`/`Container` wrapper and the header's "Browse jobs" link (now accessible via sidebar). Simplify the header:
+- [ ] **Step 2: Run the test to verify it fails**
+
+Run: `npx vitest run src/components/layout/__tests__/Footer.test.tsx`
+Expected: FAIL — `Help Center` has `href="#"` and `Terms of Service`/`Cookie Policy` links do not exist.
+
+- [ ] **Step 3: Update `footerLinks` in `src/components/layout/Footer.tsx`**
+
+Replace the `resources` entry (line 16) and the `company` array (lines 19-25):
 
 ```tsx
-// src/components/dashboard/DashboardPage.tsx
-import { useState } from 'react'
-import { HeroContent } from '../ui/HeroContent'
-import { usePageMeta } from '../../utils/usePageMeta'
-import { SavedJobsTab } from './SavedJobsTab'
-import { ApplicationsTab } from './ApplicationsTab'
-
-const tabs = [
-  { id: 'saved', label: 'Saved Jobs' },
-  { id: 'applications', label: 'My Applications' },
-] as const
-
-export default function DashboardPage() {
-  const [activeTab, setActiveTab] = useState<'saved' | 'applications'>('saved')
-  const meta = usePageMeta({ title: 'Dashboard | HireHub Community', description: 'Manage your saved jobs and applications' })
-
-  return (
-    <>
-      {meta}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-        <HeroContent variant="accent">
-          <div>
-            <h1 className="text-3xl md:text-[40px] leading-[1.15] tracking-[-0.8px] font-medium">Dashboard</h1>
-            <p className="text-ink-muted mt-1">Manage your saved jobs and applications</p>
-          </div>
-        </HeroContent>
-      </div>
-
-      <div role="tablist" aria-label="Dashboard tabs" className="flex overflow-x-auto gap-1 border-b border-hairline mb-6">
-        {tabs.map((tab) => (
-          <button
-            key={tab.id}
-            role="tab"
-            aria-selected={activeTab === tab.id}
-            onClick={() => setActiveTab(tab.id)}
-            className={`px-4 py-2.5 text-sm font-medium transition-colors border-b-2 -mb-px whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/30 rounded-t ${
-              activeTab === tab.id
-                ? 'border-ink text-ink'
-                : 'border-transparent text-ink-muted hover:text-ink hover:border-ink/30'
-            }`}
-          >
-            {tab.label}
-          </button>
-        ))}
-      </div>
-
-      {activeTab === 'saved' && <SavedJobsTab />}
-      {activeTab === 'applications' && <ApplicationsTab />}
-    </>
-  )
-}
+  resources: [
+    { label: 'Blog', to: '/blog' },
+    { label: 'Career Advice', to: '/blog' },
+    { label: 'Salary Guide', to: '/blog' },
+    { label: 'Help Center', to: '/help' },
+    { label: 'FAQ', to: '/faq' },
+  ],
+  company: [
+    { label: 'About Us', to: '/about' },
+    { label: 'For Employers', to: '/employers' },
+    { label: 'Contact', to: '/contact' },
+    { label: 'Post a Job', to: '/post-job' },
+    { label: 'Privacy Policy', to: '/privacy' },
+    { label: 'Terms of Service', to: '/terms' },
+    { label: 'Cookie Policy', to: '/cookies' },
+  ],
 ```
 
-- [ ] **Step 3: Update EmployerDashboardPage similarly**
+- [ ] **Step 4: Run the test to verify it passes**
 
-Same pattern — remove `Section`/`Container`, simplify header, add `overflow-x-auto` to tabs, responsive heading.
+Run: `npx vitest run src/components/layout/__tests__/Footer.test.tsx`
+Expected: PASS (2 tests).
 
-- [ ] **Step 4: Update App.tsx routes to wrap dashboards in DashboardShell**
+- [ ] **Step 5: Typecheck and full suite**
 
-```tsx
-import { DashboardShell } from './components/layout/DashboardShell'
-
-// In Routes:
-<Route path="/dashboard" element={
-  <ProtectedRoute allowedRoles={['seeker']}>
-    <DashboardShell>
-      <ErrorBoundary><DashboardPage /></ErrorBoundary>
-    </DashboardShell>
-  </ProtectedRoute>
-} />
-<Route path="/employer/dashboard" element={
-  <ProtectedRoute allowedRoles={['employer']}>
-    <DashboardShell>
-      <ErrorBoundary><EmployerDashboardPage /></ErrorBoundary>
-    </DashboardShell>
-  </ProtectedRoute>
-} />
-```
-
-- [ ] **Step 5: Run build to verify**
-
-Run: `npx tsc --noEmit`
-Expected: No errors
+Run: `npx tsc --noEmit && npx eslint src/components/layout && npx vitest run`
+Expected: tsc clean, eslint clean, all tests pass.
 
 - [ ] **Step 6: Commit**
 
 ```bash
-git add src/components/layout/DashboardShell.tsx src/components/dashboard/DashboardPage.tsx src/components/employer-dashboard/EmployerDashboardPage.tsx src/App.tsx
-git commit -m "feat: add DashboardShell layout with sidebar and infobar"
+git add src/components/layout/Footer.tsx src/components/layout/__tests__/Footer.test.tsx
+git commit -m "fix(footer): point help and legal links at real routes"
 ```
 
 ---

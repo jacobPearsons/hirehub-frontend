@@ -1,95 +1,16 @@
-# Task 9: Final Wiring and Build Verification
+### Task 9.1 — screening + timeline sections
 
-## Task Description
+- If `application.screeningResult`: render a "Screening" section — score bar `score / maxPossible`, and each `screeningAnswers` row with question prompt, answer text, per-answer score.
+- If `application.timeline?.length`: render a "Timeline" section — chronological steps `fromStatus → toStatus` with actor + relative/absolute date (reuse existing date formatting used in the drawer).
+- Update the status buttons to use `STATUS_CONFIG` labels and to hide buttons when `canTransition(application.status, candidate)` is false.
 
-Verify that all hiring pipeline components are properly wired together and the build passes. This is the final quality gate.
+### Task 9.2 — tests `src/components/candidate/__tests__/CandidateDetailDrawerScreening.test.tsx`
 
-## Verification Checklist
+Render the drawer with an application that has `screeningResult`, one `screeningAnswer`, and 2 timeline entries; assert the prompt, answer text, score text, and both timeline labels appear. Run frontend gates → green. Commit: `feat: show screening scores and status timeline in candidate drawer`.
 
-### 1. TypeScript Compilation
-Run: `npx tsc --noEmit`
-Expected: Zero errors
+---
 
-### 2. Build
-Run: `npm run build`
-Expected: Clean build with no warnings
+## M10 — Realtime pipeline stream
 
-### 3. Lint
-Run: `npm run lint`
-Expected: No errors (warnings are acceptable)
+**Files:** `src/context/NotificationsContext.tsx` (read first — it already owns the `EventSource` for `/notifications/stream` and forwards `notification` and `new-message` events), `src/hooks/usePipelineStream.ts` (new), `src/components/employer-dashboard/PipelineTab.tsx` (wire).
 
-### 4. Component Integration Check
-
-Verify all components are properly exported and importable:
-
-**`src/components/interview/index.ts`** should export:
-- `InterviewScheduleModal`
-- `InterviewDetails`
-
-**`src/components/offer/index.ts`** should export:
-- `OfferLetterModal`
-- `OfferLetterView`
-
-**`src/components/preboarding/index.ts`** should export:
-- `PreBoardingChecklist`
-
-**`src/components/orientation/index.ts`** should export:
-- `OrientationCard`
-
-### 5. Dashboard Wiring Check
-
-**`src/components/employer-dashboard/ApplicantsTab.tsx`** should:
-- Import and render `InterviewScheduleModal`
-- Import and render `OfferLetterModal`
-- Have "Schedule Interview" and "Make Offer" buttons wired to open modals
-- Have "Send Pre-Boarding" and "Send Orientation" buttons
-
-**`src/components/dashboard/ApplicationCard.tsx`** should:
-- Show `InterviewDetails` when status is `interviewing`
-- Show `OfferLetterView` when status is `offer`
-- Show `PreBoardingChecklist` when offer is accepted
-- Show `OrientationCard` when orientation details exist
-
-### 6. Email Integration Check
-
-**`src/api/emails.ts`** should export:
-- `sendInterviewInvitation`
-- `sendInterviewFollowUp`
-- `sendOfferLetter`
-- `sendPreBoardingChecklist`
-- `sendOrientation`
-
-### 7. Type Check
-
-**`src/types/hiring-flow.ts`** should have:
-- `InterviewDetails` interface
-- `OfferDetails` interface
-- `OnboardingChecklistItem` interface
-- `OrientationDetails` interface
-
-**`src/types/application.ts`** should have optional fields:
-- `interviewDetails?: InterviewDetails`
-- `offerDetails?: OfferDetails`
-- `preBoardingChecklist?: OnboardingChecklistItem[]`
-- `orientationDetails?: OrientationDetails`
-
-## If Issues Found
-
-- Fix any TypeScript errors
-- Fix any build errors
-- Fix any import issues
-- Commit fixes
-
-## Report
-
-Write your report to `/home/jacobp/Desktop/Projecs/hirehub-frontend/.superpowers/sdd/task-9-report.md`:
-- Test results for each check
-- Any issues found and fixed
-- Final status
-
-Then report back with ONLY:
-- **Status:** DONE | DONE_WITH_CONCERNS | BLOCKED | NEEDS_CONTEXT
-- Commits created (short SHA + subject)
-- One-line test summary
-- Your concerns, if any
-- The report file path

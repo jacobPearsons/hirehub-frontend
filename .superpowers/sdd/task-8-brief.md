@@ -1,74 +1,66 @@
-# Task 8 Brief — Employer steps + wizard employer branch
+### Task 8.1 — pure `src/utils/kanban.ts` (red first)
 
-## Objective
-Complete the employer side of the onboarding wizard: four employer step
-components + employer branch in the wizard shell, TDD against the existing
-`OnboardingWizard.test.tsx` (new employer `describe`).
+```ts
+export const PIPELINE_COLUMNS = [
+  { key: 'applied', label: 'Applied', color: 'bg-ink-muted/10 text-ink-muted' },
+  { key: 'screening', label: 'Screening', color: 'bg-amber-500/10 text-amber-600' },
+  { key: 'shortlist', label: 'Shortlist', color: 'bg-sky-500/10 text-sky-600' },
+  { key: 'interviewing', label: 'Interviewing', color: 'bg-violet-500/10 text-violet-600' },
+  { key: 'offer', label: 'Offer', color: 'bg-emerald-500/10 text-emerald-600' },
+  { key: 'hired', label: 'Hired', color: 'bg-green-600/10 text-green-700' },
+] as const
 
-## Context
-- Branch `feat/onboarding-wizard`, commit `51127fa` (Task 7 seeker path done).
-- Plan Task 8 at docs/superpowers/plans/2026-07-31-onboarding-wizard-frontend.md:524.
-- Company API (already committed in `2fd36f3`, `src/api/company.ts`):
-  - `upsertCompany(input: CompanyInput)` → `{ data: Company }`
-  - `uploadCompanyLogo(file)` → `{ data: { logoUrl } }`
-  - `inviteTeam(emails: string[])` → `{ data: { invites } }`
-  - `CompanyInput = { name, website?, industry?, size?, description?, location? }`
-- `AppUser` has `role: 'seeker' | 'employer'` (mock `useApp` returns employer
-  user in the employer describe).
-- Wizard shell currently has no `useApp`/`useNavigate` (removed for tsc).
-  Task 8 re-adds `useApp` for the role branch. `handleSaved` already advances
-  the step (Task 7 fix) — employer steps call `onSaved()` the same way.
+export const TERMINAL_STATUSES = ['rejected', 'withdrawn'] as const
 
-## Steps (each `<form id="onboarding-step">`, own saving state, inline
-`role="alert"` on API failure, `onSaved()` on success)
+export function groupByStatus(apps: Application[]): Record<string, Application[]> { /* group, active columns only */ }
+export function moveCard(columns: Record<string, Application[]>, fromKey: string, toKey: string, appId: string): { columns: Record<string, Application[]>; app: Application | null; allowed: boolean }
+```
 
-### `EmployerCompanyStep.tsx` — MANDATORY (no Skip)
-RHF + zod. Fields: `name` (min 1, max 200, prefill `user.companyName`),
-`website` (optional, URL-validated), `industry`, `size`. Submit →
-`upsertCompany({ name, website, industry, size })` → `setUser({ ...user,
-companyName: name })` → `onSaved()`.
+`moveCard` uses `canTransition` (from `utils/status.ts`); if the move is illegal it returns `{ columns, app: null, allowed: false }` — the UI never calls the API for illegal moves.
 
-### `EmployerProfileStep.tsx` — OPTIONAL
-Logo file input (jpeg/png/webp, ≤2 MB, client-side validated) + `description`
-(max 500) + `location`. Submit: logo selected →
-`uploadCompanyLogo(file)` → `upsertCompany({ description, location, ...(logoUrl ? { logo: logoUrl } : {}) })`
-→ `onSaved()`. Skip available.
+Tests `src/utils/__tests__/kanban.test.ts`: grouping puts apps in the right column, terminal apps excluded from columns; `moveCard` moves a card between legal columns and returns `allowed: false` for illegal (e.g. `applied → offer`).
 
-### `EmployerInviteStep.tsx` — OPTIONAL
-Textarea for comma/newline-separated emails; parse + trim; validate each with
-`z.string().email()`; invalid → error "Not a valid email: X"; max 20; chips of
-parsed emails with remove buttons. Submit → `inviteTeam(emails)` → `onSaved()`.
+### Task 8.2 — PipelineTab UI
 
-### `EmployerCompleteStep.tsx`
-Summary + Button "Post your first job": `updateProfile({ onboardingCompleted:
-true })` → `setUser` → `navigate('/post-job')`. Rendered outside form footer.
+- Props: `{ applications: Application[] }`. Uses `updateApplicationStatus` from `ApplicationsContext`.
+- State: `columns = groupByStatus(applications)` (recomputed via effect when the prop changes).
+- `DndContext onDragEnd`: `if (!event.over) return; const from = String(event.active.id).split(':')[0]; const to = String(event.over.id).split(':')[0]; const appId = String(event.active.id).split(':')[1];` → `moveCard(...)`; if `allowed`, optimistic set + `updateApplicationStatus(appId, to.toUpperCase() as any)`; on API failure, refetch and toast.
+- Card id convention: `col-${status}:${appId}` (draggable ids) and `col-${status}` (droppable ids).
+- Reuse `ApplicationCard` inside each draggable card (pass its existing props; read `ApplicationCard.tsx`).
+- Bottom "Closed" section: grid of `rejected` + `withdrawn` cards, non-draggable.
+- Toolbar: status counts per column; an "Add new" hint is out of scope.
 
-### `OnboardingWizard.tsx`
-Add `EMPLOYER_STEPS` (Company/Profile/Team/Done, same `StepDef` shape), pick
-`const steps = user?.role === 'employer' ? EMPLOYER_STEPS : SEEKER_STEPS`,
-re-add `useApp`, import the four employer step components.
+### Task 8.3 — tests `src/components/employer-dashboard/__tests__/PipelineTab.test.tsx`
 
-## Tests (RED first)
-Extend `src/components/onboarding/__tests__/OnboardingWizard.test.tsx` with an
-employer `describe`. The existing `useApp` mock is a fixed object — refactor to
-`useApp: vi.fn()` and set the return value per describe's `beforeEach`
-(seeker user / employer user). Mock `vi.mock('../../../api/company')` with
-`upsertCompany`, `uploadCompanyLogo`, `inviteTeam` as `vi.fn()`. Add
-`vi.mock('../../../api/auth')` updateProfile (already present).
-Tests:
-- renders "Step 1 of 4" (Company) for an employer user.
-- Company step: entering name + Continue calls `upsertCompany` and advances.
-- Invite step: invalid email shows "Not a valid email: <x>"; valid submit calls
-  `inviteTeam` with the parsed emails.
-- completing the flow: final CTA calls `updateProfile({ onboardingCompleted: true })`.
+Mock `@dnd-kit/core` so jsdom can drive it deterministically:
 
-## Gates
-- `npx vitest run src/components/onboarding/` → GREEN (all seeker + employer).
-- `npm run test:run` → 0 failed.
-- `npm run build` (`tsc -b && vite build`) → passes (no unused imports).
-- Commit: `feat(onboarding): employer wizard steps`.
+```ts
+vi.mock('@dnd-kit/core', () => ({
+  DndContext: ({ children, onDragEnd }: any) => {
+    ;(DndContext as any).__dragEnd = onDragEnd
+    return children
+  },
+  useDraggable: () => ({ attributes: {}, listeners: {}, setNodeRef: () => {}, transform: null, isDragging: false }),
+  useDroppable: () => ({ setNodeRef: () => {}, isOver: false }),
+  DragOverlay: ({ children }: any) => children ?? null,
+}))
 
-## Notes
-- Reuse the Input/Textarea/Button primitives; no new UI components.
-- Employer user mock shape: `{ id, name, email, role: 'employer', companyName? }`.
-- Keep seeker tests untouched except the mock refactor.
+function drag(appId: string, from: string, to: string) {
+  ;(DndContext as any).__dragEnd({ active: { id: `col-${from}:${appId}` }, over: { id: `col-${to}` } })
+}
+```
+
+Assert:
+- renders 6 column headers and places a card in its column.
+- `drag(app.id, 'applied', 'screening')` calls `updateApplicationStatus` with `'SCREENING'`.
+- `drag(app.id, 'applied', 'offer')` does NOT call `updateApplicationStatus` (matrix gate).
+- rejected/withdrawn cards appear in the Closed section, not in columns.
+
+Wire into `EmployerDashboardPage.tsx` as a `PipelineTab` beside `ApplicantsTab` (read the tab rendering first; keep the existing tabs' tests green). Run frontend gates → green. Commit: `feat: employer kanban pipeline tab`.
+
+---
+
+## M9 — CandidateDetailDrawer enrichment
+
+**File:** `src/components/candidate/CandidateDetailDrawer.tsx`. Read it first; it already renders application details and status buttons.
+
