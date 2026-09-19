@@ -79,7 +79,7 @@ export default function ProfilePage() {
         ...res.data,
         role: user!.role,
       })
-      showToast('success', 'Profile updated successfully')
+      showToast('success', 'Your changes has been saved!')
     } catch (err) {
       showToast('error', err instanceof Error ? err.message : 'Failed to update profile')
     }

@@ -39,7 +39,7 @@ export function JobCard({ job }: JobCardProps) {
           <img
             src={job.companyLogo}
             alt={job.company}
-            className="w-10 h-10 rounded-md bg-surface-2 object-contain flex-shrink-0"
+            className="w-10 h-10 rounded-md bg-surface-2 object-cover flex-shrink-0"
             onError={() => setLogoError(true)}
           />
         )}

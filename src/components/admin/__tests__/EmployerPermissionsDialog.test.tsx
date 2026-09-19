@@ -39,8 +39,14 @@ const roleEmployer: Role = {
   capabilities: ['job:create', 'application:read', 'application:update', 'legacy:cap'],
 }
 const roleSeeker: Role = { id: 'seeker', name: 'Job Seeker', description: 'Seeker', capabilities: [] }
+const roleJobPoster: Role = {
+  id: 'job-poster',
+  name: 'Job Poster',
+  description: 'Can create new job listings',
+  capabilities: ['job:create'],
+}
 
-const roles: Role[] = [roleAdmin, roleEmployer, roleSeeker]
+const roles: Role[] = [roleAdmin, roleEmployer, roleJobPoster, roleSeeker]
 
 const bindingEmployer: RoleBinding = {
   id: 'binding-1',
@@ -99,6 +105,7 @@ describe('EmployerPermissionsDialog', () => {
     const options = within(select).getAllByRole('option').map((o) => o.textContent)
     expect(options).toContain('Employer')
     expect(options).toContain('Job Seeker')
+    expect(options).toContain('Job Poster')
     expect(options).not.toContain('Administrator')
 
     expect(screen.getAllByRole('button', { name: 'Remove' })).toHaveLength(1)
@@ -113,12 +120,13 @@ describe('EmployerPermissionsDialog', () => {
     const select = await screen.findByLabelText('Role to grant')
     const options = within(select).getAllByRole('option').map((o) => o.textContent)
     expect(options).not.toContain('Administrator')
-    expect(options).toEqual(['Select a role…', 'Employer', 'Job Seeker'])
+    expect(options).toEqual(['Select a role…', 'Employer', 'Job Poster', 'Job Seeker'])
 
     const capabilityCheckboxes = screen.getAllByRole('checkbox')
     expect(capabilityCheckboxes.length).toBeGreaterThan(0)
     expect(screen.getByRole('checkbox', { name: 'job:create' })).toBeInTheDocument()
     expect(screen.getByRole('checkbox', { name: 'application:update' })).toBeInTheDocument()
+    expect(screen.getByText(/locked from posting jobs/i)).toBeInTheDocument()
   })
 
   it('grants a role by calling createRoleBinding with (roleId, employer.id)', async () => {
@@ -158,8 +166,8 @@ describe('EmployerPermissionsDialog', () => {
 
     await waitFor(() => {
       expect(mockUpdateRoleCapabilities).toHaveBeenCalledWith(roleEmployer.id, [
-        'job:create',
         'application:read',
+        'job:create',
         'legacy:cap',
       ])
     })

@@ -65,7 +65,7 @@ export async function apiFetch<T>(
     credentials: 'include',
   })
 
-  if (res.status === 401 && accessToken) {
+  if ((res.status === 401 || res.status === 403) && accessToken) {
     const refreshed = await attemptRefresh()
     if (refreshed) {
       headers['Authorization'] = `Bearer ${accessToken}`

@@ -51,15 +51,23 @@ export function Typewriter({
   const showCaret = !reducedMotion && !holding
 
   return (
-    <span aria-label={text} className={className}>
-      <span aria-hidden="true">{visible}</span>
-      {!reducedMotion && (
-        <span
-          aria-hidden="true"
-          className={`inline-block w-[1ch] ${showCaret ? 'animate-pulse' : 'opacity-0'}`}
-        >
-          |
-        </span>
+    <span aria-label={text} className={`relative inline-block ${className ?? ''}`}>
+      {reducedMotion ? (
+        <span aria-hidden="true">{text}</span>
+      ) : (
+        <>
+          <span aria-hidden="true" className="invisible">
+            {text}
+          </span>
+          <span aria-hidden="true" className="absolute inset-0">
+            {visible}
+            <span
+              className={`inline-block w-[1ch] ${showCaret ? 'animate-pulse' : 'opacity-0'}`}
+            >
+              |
+            </span>
+          </span>
+        </>
       )}
     </span>
   )

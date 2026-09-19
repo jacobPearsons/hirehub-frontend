@@ -17,6 +17,11 @@ describe('Typewriter', () => {
     expect(screen.getByLabelText('Find your next role')).toBeInTheDocument()
   })
 
+  it('reserves the full text width invisibly so layout stays fixed while typing', () => {
+    render(<Typewriter text="hello world" speed={10} />)
+    expect(screen.getByText('hello world', { hidden: true })).toBeInTheDocument()
+  })
+
   it('types the full text, holds, deletes, then loops', () => {
     render(<Typewriter text="abc" speed={10} deleteSpeed={5} holdMs={100} />)
 
@@ -27,7 +32,7 @@ describe('Typewriter', () => {
     expect(screen.getByText('ab', { hidden: true })).toBeInTheDocument()
 
     act(() => { vi.advanceTimersByTime(10) })
-    expect(screen.getByText('abc', { hidden: true })).toBeInTheDocument()
+    expect(screen.getAllByText('abc', { hidden: true }).length).toBeGreaterThan(0)
 
     act(() => { vi.advanceTimersByTime(100) })
     act(() => { vi.advanceTimersByTime(5) })

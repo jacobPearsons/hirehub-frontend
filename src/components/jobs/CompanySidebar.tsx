@@ -3,6 +3,7 @@ import { Building2, Users, Clock, MapPin } from 'lucide-react'
 import { Card, Button } from '../ui'
 import { ApplyJobModal } from '../apply/ApplyJobModal'
 import { getCompanyBrief } from '../../data/companyBriefs'
+import { getCompanySummary } from './JobBody'
 import type { Job } from '../../data/jobs'
 
 interface CompanySidebarProps {
@@ -14,6 +15,10 @@ export function CompanySidebar({ job }: CompanySidebarProps) {
   const [logoError, setLogoError] = useState(false)
   const [now] = useState(() => Date.now())
   const brief = getCompanyBrief(job.company)
+  const companySummary =
+    getCompanySummary(job.company, job.description) ??
+    brief?.description ??
+    'A leading company building innovative solutions.'
   const expired = job.expiresAt ? new Date(job.expiresAt).getTime() < now : false
 
   return (
@@ -36,15 +41,9 @@ export function CompanySidebar({ job }: CompanySidebarProps) {
         </div>
 
         <h2 className="text-lg font-medium mb-2">About the company</h2>
-        {brief ? (
-          <p className="text-sm text-ink-muted mb-6">
-            {brief.description}
-          </p>
-        ) : (
-          <p className="text-sm text-ink-muted mb-6">
-            A leading company building innovative solutions.
-          </p>
-        )}
+        <p className="text-sm text-ink-muted mb-6">
+          {companySummary}
+        </p>
 
         <div className="space-y-3 mb-6">
           {brief?.industry && (

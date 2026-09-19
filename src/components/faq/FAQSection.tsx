@@ -1,9 +1,16 @@
+import { useState } from 'react'
 import { HelpCircle, Plus } from 'lucide-react'
 import { Section } from '../ui/Section'
 import { Container } from '../ui/Container'
 import { faqItems } from './faqData'
 
 export function FAQSection() {
+  const [openIndex, setOpenIndex] = useState<number | null>(null)
+
+  function handleToggle(index: number) {
+    setOpenIndex((current) => (current === index ? null : index))
+  }
+
   return (
     <Section id="faq" className="relative overflow-hidden">
       <div className="absolute inset-0 opacity-[0.05]" aria-hidden="true">
@@ -20,9 +27,20 @@ export function FAQSection() {
           Everything you need to know about registering, hiring, and interviews.
         </p>
         <div className="space-y-3">
-          {faqItems.map((item) => (
-            <details key={item.question} className="group border border-hairline rounded-lg bg-surface-1">
-              <summary className="flex items-center justify-between gap-3 px-4 py-3.5 cursor-pointer list-none rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/30">
+          {faqItems.map((item, index) => (
+            <details
+              key={item.question}
+              open={openIndex === index}
+              className="group border border-hairline rounded-lg bg-surface-1"
+            >
+              <summary
+                onClick={(e) => {
+                  e.preventDefault()
+                  handleToggle(index)
+                }}
+                aria-expanded={openIndex === index}
+                className="flex items-center justify-between gap-3 px-4 py-3.5 cursor-pointer list-none rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink/30"
+              >
                 <span className="text-sm font-medium text-ink">{item.question}</span>
                 <span className="text-ink-muted transition-transform group-open:rotate-45" aria-hidden="true">
                   <Plus className="w-4 h-4" />

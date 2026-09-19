@@ -1,6 +1,7 @@
 import type { Job } from '../../data/jobs'
 
 const DEFINITIONAL_CUES = ['is a', 'is the', 'is building', 'is revolutionizing', 'creates', 'powers', "world's", 'in the world', 'is one of']
+const PRESENCE_CUES = ['is featured on', 'is listed on', 'is posted on', 'appears on', 'is advertised on', 'can be found on']
 const RECRUITMENT_CUES = ['looking for', 'seeking', 'to join', "we're", 'we are']
 const ROLE_FLUFF_CUES = ['this role', 'this is an', 'this is a', 'opportunity', 'ideal for']
 
@@ -12,6 +13,9 @@ function scoreCompanyParagraph(paragraph: string, company: string): number {
     score += 2
   }
   if (DEFINITIONAL_CUES.some((cue) => lower.includes(cue))) {
+    score += 1
+  }
+  if (PRESENCE_CUES.some((cue) => lower.includes(cue))) {
     score += 1
   }
   if (RECRUITMENT_CUES.some((cue) => lower.includes(cue))) {

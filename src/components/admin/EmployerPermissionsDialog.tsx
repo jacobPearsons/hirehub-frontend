@@ -16,7 +16,7 @@ import {
 } from '../../api/admin'
 
 const EMPLOYER_CAPABILITIES = [
-  'job:create', 'job:read', 'job:update', 'job:delete', 'job:list',
+  'job:read', 'job:update', 'job:delete', 'job:list',
   'application:create', 'application:read', 'application:update', 'application:delete', 'application:list',
   'user:read',
 ]
@@ -251,6 +251,9 @@ export function EmployerPermissionsDialog({ employer, open, onOpenChange }: Empl
                         <h3 className="text-xs font-semibold uppercase tracking-wide text-ink-tertiary mb-2">
                           Grant Role
                         </h3>
+                        <p className="text-xs text-ink-muted mb-2">
+                          New employers are locked from posting jobs until granted the <code>Job Poster</code> role.
+                        </p>
                         <div className="flex items-center gap-2">
                           <select
                             value={selectedRoleId}
